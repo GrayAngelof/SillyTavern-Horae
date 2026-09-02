@@ -17,6 +17,7 @@ const _promptFileMap = Object.freeze({
     customAutoSummaryPrompt: 'customAutoSummaryPrompt.txt',
     customAutoResummaryPrompt: 'customAutoResummaryPrompt.txt',
     customTablesPrompt: 'customTablesPrompt.txt',
+	customItemsPrompt: 'customItemsPrompt.txt',
     customLocationPrompt: 'customLocationPrompt.txt',
     customRelationshipPrompt: 'customRelationshipPrompt.txt',
     customMoodPrompt: 'customMoodPrompt.txt',

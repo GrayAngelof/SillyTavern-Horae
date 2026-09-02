@@ -1,0 +1,1 @@
+Это customItemsPrompt по умолчанию

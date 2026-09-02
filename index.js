@@ -137,6 +137,7 @@ const DEFAULT_SETTINGS = {
     sendCharacterAffection: true,        // 单独控制好感度注入
     sendMainCharacterPersonality: true,  // 关闭后主要角色（卡片本体 + 置顶 NPC）的性格简述不再注入
     sendItems: true,       // 发送物品栏
+	customItemsPrompt: '',
     panelLayoutStyle: 'classic',         // 'classic' = 默认 / 'glass' = 半透明玻璃 / 'obsidian' = 曜石简约 / 'cyber' = 赛博
     customTables: [],      // 自定义表格 [{id, name, rows, cols, data, prompt}]
     customSystemPrompt: '',      // 自定义系统注入提示词（空=使用默认）
@@ -274,6 +275,7 @@ const PROMPT_SETTING_KEYS = [
     'customRelationshipPrompt',
     'customMoodPrompt',
     'customRpgPrompt',
+	'customItemsPrompt',
     'vectorQueryRewriteSystemPrompt',
 ];
 
@@ -14020,12 +14022,15 @@ function initSettingsEvents() {
         updateTokenCounter();
     });
 
-    $('#horae-setting-send-items').on('change', function () {
-        settings.sendItems = this.checked;
-        saveSettings();
-        horaeManager.init(getContext(), settings);
-        updateTokenCounter();
-    });
+	$('#horae-setting-send-items').on('change', function () {
+		settings.sendItems = this.checked;
+		saveSettings();
+		$('#horae-items-prompt-group').toggle(this.checked);
+		$('.horae-tab[data-tab="items"]').toggle(this.checked);
+		horaeManager.init(getContext(), settings);
+		_refreshSystemPromptDisplay();
+		updateTokenCounter();
+	});
 
     $('#horae-setting-send-location-memory').on('change', function () {
         settings.sendLocationMemory = this.checked;
@@ -14508,6 +14513,28 @@ function initSettingsEvents() {
         showToast(t('toast.promptsRestored'), 'success');
     });
 
+	// Промпт инвентаря
+	$('#horae-custom-items-prompt').on('input', function () {
+		const val = this.value;
+		settings.customItemsPrompt = (val.trim() === horaeManager.getDefaultItemsPrompt().trim()) ? '' : val;
+		$('#horae-items-prompt-count').text(val.length);
+		saveSettings();
+		horaeManager.init(getContext(), settings);
+		updateTokenCounter();
+	});
+
+	$('#horae-btn-reset-items-prompt').on('click', () => {
+		if (!confirm(t('confirm.restoreRpgPrompts'))) return;
+		settings.customItemsPrompt = '';
+		saveSettings();
+		const def = horaeManager.getDefaultItemsPrompt();
+		$('#horae-custom-items-prompt').val(def);
+		$('#horae-items-prompt-count').text(def.length);
+		horaeManager.init(getContext(), settings);
+		updateTokenCounter();
+		showToast(t('toast.promptsRestored'), 'success');
+	});
+
     // 场景记忆提示词
     $('#horae-custom-location-prompt').on('input', function () {
         const val = this.value;
@@ -14517,7 +14544,7 @@ function initSettingsEvents() {
         horaeManager.init(getContext(), settings);
         updateTokenCounter();
     });
-
+	
     $('#horae-btn-reset-location-prompt').on('click', () => {
         if (!confirm(t('confirm.restoreRpgPrompts'))) return;
         settings.customLocationPrompt = '';
@@ -15823,10 +15850,14 @@ function syncSettingsToUI() {
     $('#horae-setting-send-characters').prop('checked', settings.sendCharacters);
     $('#horae-setting-send-character-affection').prop('checked', settings.sendCharacterAffection !== false);
     $('#horae-setting-send-main-character-personality').prop('checked', settings.sendMainCharacterPersonality !== false);
-    $('#horae-setting-send-items').prop('checked', settings.sendItems);
 
     applyTopIconVisibility();
 
+	//Инвентарь
+	$('#horae-setting-send-items').prop('checked', settings.sendItems);
+	$('#horae-items-prompt-group').toggle(!!settings.sendItems);
+	$('.horae-tab[data-tab="items"]').toggle(!!settings.sendItems);
+	
     // 场景记忆
     $('#horae-setting-send-location-memory').prop('checked', !!settings.sendLocationMemory);
     $('#horae-location-prompt-group').toggle(!!settings.sendLocationMemory);
@@ -15924,10 +15955,12 @@ function syncSettingsToUI() {
     const autoSumPromptVal = settings.customAutoSummaryPrompt || getDefaultAutoSummaryPrompt();
     const autoResumPromptVal = settings.customAutoResummaryPrompt || getDefaultAutoResummaryPrompt();
     const tablesPromptVal = settings.customTablesPrompt || horaeManager.getDefaultTablesPrompt();
+	const itemsPromptVal = settings.customItemsPrompt || horaeManager.getDefaultItemsPrompt();
     const locationPromptVal = settings.customLocationPrompt || horaeManager.getDefaultLocationPrompt();
     const relPromptVal = settings.customRelationshipPrompt || horaeManager.getDefaultRelationshipPrompt();
     const moodPromptVal = settings.customMoodPrompt || horaeManager.getDefaultMoodPrompt();
     const rpgPromptVal = settings.customRpgPrompt || horaeManager.getDefaultRpgPromptResolved();
+
     $('#horae-custom-system-prompt').val(sysPrompt);
     $('#horae-custom-batch-prompt').val(batchPromptVal);
     $('#horae-custom-analysis-prompt').val(analysisPromptVal);
@@ -15935,6 +15968,7 @@ function syncSettingsToUI() {
     $('#horae-custom-auto-summary-prompt').val(autoSumPromptVal);
     $('#horae-custom-auto-resummary-prompt').val(autoResumPromptVal);
     $('#horae-custom-tables-prompt').val(tablesPromptVal);
+	$('#horae-custom-items-prompt').val(itemsPromptVal);
     $('#horae-custom-location-prompt').val(locationPromptVal);
     $('#horae-custom-relationship-prompt').val(relPromptVal);
     $('#horae-custom-mood-prompt').val(moodPromptVal);
@@ -15946,6 +15980,7 @@ function syncSettingsToUI() {
     $('#horae-auto-summary-prompt-count').text(autoSumPromptVal.length);
     $('#horae-auto-resummary-prompt-count').text(autoResumPromptVal.length);
     $('#horae-tables-prompt-count').text(tablesPromptVal.length);
+	$('#horae-items-prompt-count').text(itemsPromptVal.length);
     $('#horae-location-prompt-count').text(locationPromptVal.length);
     $('#horae-relationship-prompt-count').text(relPromptVal.length);
     $('#horae-mood-prompt-count').text(moodPromptVal.length);

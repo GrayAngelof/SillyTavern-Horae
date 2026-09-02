@@ -3472,10 +3472,10 @@ class HoraeManager {
 
     generateSystemPromptAddition() {
         const [userName, charName] = this._getDefaultNames();
-        const subs = this.generateLocationMemoryPrompt() + this.generateCustomTablesPrompt() +
-                     this.generateRelationshipPrompt() + this.generateMoodPrompt() +
-                     this.generateRpgPrompt() + this._generateAntiParaphrasePrompt() +
-                     this._generateCustomCalendarPrompt();
+        const subs = this.generateItemsMemoryPrompt() + this.generateLocationMemoryPrompt() + 
+					 this.generateCustomTablesPrompt() + this.generateRelationshipPrompt() + 
+					 this.generateMoodPrompt() + this.generateRpgPrompt() + 
+					 this._generateAntiParaphrasePrompt() + this._generateCustomCalendarPrompt();
         const fieldLines = this.getPromptFieldLines();
 
         if (this.settings?.customSystemPrompt) {
@@ -3548,7 +3548,22 @@ class HoraeManager {
         return this._getPromptDefaultFromResource('customTablesPrompt');
     }
 
-    getDefaultLocationPrompt() {
+	getDefaultItemsPrompt() {
+		return this._getPromptDefaultFromResource('customItemsPrompt');
+	}
+	
+	generateItemsMemoryPrompt() {
+		if (!this.settings?.sendItems) return '';
+		const custom = this.settings?.customItemsPrompt;
+		if (custom) {
+			const userName = this.context?.name1 || '主角';
+			const charName = this.context?.name2 || '角色';
+			return '\n' + custom.replace(/\{\{user\}\}/gi, userName).replace(/\{\{char\}\}/gi, charName);
+		}
+		return '\n' + this.getDefaultItemsPrompt();
+	}
+    
+	getDefaultLocationPrompt() {
         return this._getPromptDefaultFromResource('customLocationPrompt');
     }
 
