@@ -14210,11 +14210,12 @@ function initSettingsEvents() {
     });
 
     // 自动摘要设置
-    $('#horae-setting-auto-summary').on('change', function () {
-        settings.autoSummaryEnabled = this.checked;
-        saveSettings();
-        $('#horae-auto-summary-options').toggle(this.checked);
-    });
+	$('#horae-setting-auto-summary').on('change', function () {
+		settings.autoSummaryEnabled = this.checked;
+		saveSettings();
+		$('#horae-auto-summary-options').toggle(this.checked);
+		$('#horae-auto-summary-prompt-group').toggle(this.checked);
+	});
     $('#horae-setting-auto-summary-keep').on('change', function () {
         settings.autoSummaryKeepRecent = Math.max(3, parseInt(this.value) || 10);
         this.value = settings.autoSummaryKeepRecent;
@@ -16041,6 +16042,7 @@ function syncSettingsToUI() {
     // 自动摘要
     $('#horae-setting-auto-summary').prop('checked', !!settings.autoSummaryEnabled);
     $('#horae-auto-summary-options').toggle(!!settings.autoSummaryEnabled);
+	$('#horae-auto-summary-prompt-group').toggle(!!settings.autoSummaryEnabled);
     $('#horae-setting-auto-summary-keep').val(settings.autoSummaryKeepRecent || 10);
     $('#horae-setting-auto-summary-mode').val(settings.autoSummaryBufferMode || 'messages');
     $('#horae-setting-auto-summary-source').val(_getAutoSummarySourceMode());
