@@ -14008,6 +14008,45 @@ function initSettingsEvents() {
         horaeManager.init(getContext(), settings);
         updateTokenCounter();
     });
+	
+	    $('#horae-setting-context-depth').on('change', function () {
+        const val = parseInt(this.value, 10);
+        settings.contextDepth = Number.isNaN(val) ? 15 : Math.max(0, val);
+        this.value = settings.contextDepth;
+        saveSettings();
+        horaeManager.init(getContext(), settings);
+        updateTokenCounter();
+    });
+
+    $('#horae-setting-show-system-prompt').on('change', function () {
+        settings.showSystemPrompt = this.checked;
+        $('#horae-system-prompt-group').toggle(this.checked);
+        saveSettings();
+    });
+	
+	$('#horae-setting-show-batch-prompt').on('change', function () {
+		settings.showBatchPrompt = this.checked;
+		$('#horae-batch-prompt-group').toggle(this.checked);
+		saveSettings();
+	});
+
+	$('#horae-setting-show-analysis-prompt').on('change', function () {
+		settings.showAnalysisPrompt = this.checked;
+		$('#horae-analysis-prompt-group').toggle(this.checked);
+		saveSettings();
+	});
+	
+	$('#horae-setting-show-compress-prompt').on('change', function () {
+    settings.showCompressPrompt = this.checked;
+    $('#horae-compress-prompt-group').toggle(this.checked);
+    saveSettings();
+	});
+	
+	$('#horae-setting-show-tables-prompt').on('change', function () {
+    settings.showTablesPrompt = this.checked;
+    $('#horae-tables-prompt-group').toggle(this.checked);
+    saveSettings();
+	});
 
     $('#horae-setting-custom-cal-enabled').on('change', _applyCustomCalendarFromUI);
     $('#horae-setting-custom-cal-apply').on('click', _applyCustomCalendarFromUI);
@@ -14209,12 +14248,13 @@ function initSettingsEvents() {
         icon.toggleClass('collapsed');
     });
 
-    // 自动摘要设置
+	// 自动摘要设置
 	$('#horae-setting-auto-summary').on('change', function () {
 		settings.autoSummaryEnabled = this.checked;
 		saveSettings();
 		$('#horae-auto-summary-options').toggle(this.checked);
 		$('#horae-auto-summary-prompt-group').toggle(this.checked);
+		$('#horae-auto-resummary-prompt-group').toggle(this.checked);
 	});
     $('#horae-setting-auto-summary-keep').on('change', function () {
         settings.autoSummaryKeepRecent = Math.max(3, parseInt(this.value) || 10);
@@ -15959,6 +15999,16 @@ function syncSettingsToUI() {
     $('#horae-setting-timeline-injection-mode').val(settings.timelineInjectionMode === 'separate' ? 'separate' : 'inline');
     $('#horae-setting-send-timeline').prop('checked', settings.sendTimeline);
     $('#horae-setting-context-depth').val(Number.isFinite(parseInt(settings.contextDepth, 10)) ? Math.max(0, parseInt(settings.contextDepth, 10)) : 15);
+	$('#horae-setting-show-system-prompt').prop('checked', settings.showSystemPrompt !== false);
+	$('#horae-system-prompt-group').toggle(settings.showSystemPrompt !== false);
+	$('#horae-setting-show-batch-prompt').prop('checked', settings.showBatchPrompt !== false);
+	$('#horae-batch-prompt-group').toggle(settings.showBatchPrompt !== false);
+	$('#horae-setting-show-analysis-prompt').prop('checked', settings.showAnalysisPrompt !== false);
+	$('#horae-analysis-prompt-group').toggle(settings.showAnalysisPrompt !== false);
+	$('#horae-setting-show-compress-prompt').prop('checked', settings.showCompressPrompt !== false);
+	$('#horae-compress-prompt-group').toggle(settings.showCompressPrompt !== false);
+	$('#horae-setting-show-tables-prompt').prop('checked', settings.showTablesPrompt !== false);
+	$('#horae-tables-prompt-group').toggle(settings.showTablesPrompt !== false);
     _syncCustomCalendarToUI();
 
     applyTopIconVisibility();
@@ -16043,6 +16093,7 @@ function syncSettingsToUI() {
     $('#horae-setting-auto-summary').prop('checked', !!settings.autoSummaryEnabled);
     $('#horae-auto-summary-options').toggle(!!settings.autoSummaryEnabled);
 	$('#horae-auto-summary-prompt-group').toggle(!!settings.autoSummaryEnabled);
+	$('#horae-auto-resummary-prompt-group').toggle(!!settings.autoSummaryEnabled);
     $('#horae-setting-auto-summary-keep').val(settings.autoSummaryKeepRecent || 10);
     $('#horae-setting-auto-summary-mode').val(settings.autoSummaryBufferMode || 'messages');
     $('#horae-setting-auto-summary-source').val(_getAutoSummarySourceMode());

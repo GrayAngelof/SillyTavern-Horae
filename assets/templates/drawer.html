@@ -748,68 +748,119 @@
                     </div>
                 </div>
                 
-                <div class="horae-settings-section">
-                    <div class="horae-section-header horae-collapse-header" id="horae-advanced-collapse-toggle" data-i18n="settings.advanced">
-                        <i class="fa-solid fa-sliders"></i>
-                        高级设置
-                        <i class="fa-solid fa-chevron-down horae-collapse-icon collapsed"></i>
-                    </div>
-                    <div id="horae-advanced-collapse-body" style="display: none;">
-                    <div class="horae-setting-item">
-                        <label data-i18n="settings.contextDepth">
-                            上下文深度
-                            <input type="number" id="horae-setting-context-depth" min="0" max="99999" value="15">
-                        </label>
-                        <span class="horae-setting-sub-hint" data-i18n="settings.contextDepthHint">
-                            控制发送给 AI 的一般级别剧情轨迹数量。0 = 不发送一般事件；重要/关键/摘要仍会发送。
-                        </span>
-                    </div>
+				<div class="horae-settings-section">
+					<div class="horae-section-header horae-collapse-header" id="horae-advanced-collapse-toggle" data-i18n="settings.advanced">
+						<i class="fa-solid fa-sliders"></i>
+						高级设置
+						<i class="fa-solid fa-chevron-down horae-collapse-icon collapsed"></i>
+					</div>
+					<div id="horae-advanced-collapse-body" style="display: none;">
+					<div class="horae-setting-item">
+						<label data-i18n="settings.contextDepth">
+							上下文深度
+							<input type="number" id="horae-setting-context-depth" min="0" max="99999" value="15">
+						</label>
+						<span class="horae-setting-sub-hint" data-i18n="settings.contextDepthHint">
+							控制发送给 AI 的一般级别剧情轨迹数量。0 = 不发送一般事件；重要/关键/摘要仍会发送。
+						</span>
+					</div>
 
-                    <div class="horae-setting-item">
-                        <label data-i18n="settings.injectionDepth">
-                            注入深度
-                        </label>
-                        <div class="horae-setting-inline-controls">
-                            <select id="horae-setting-injection-depth-source">
-                                <option value="system" data-i18n="settings.injectionDepthSystem">系统 @D</option>
-                                <option value="preset" data-i18n="settings.injectionDepthPreset">预设 @D</option>
-                            </select>
-                            <input type="number" id="horae-setting-injection-position" min="0" max="10" value="1">
-                        </div>
-                        <span class="horae-setting-hint" data-i18n="settings.injectionDepthHint">
-                            <i class="fa-solid fa-circle-info"></i>
-                            选择 @D 来源并设置注入深度数值。<br>
-                            系统 @D = 与世界书同理<br>
-                            预设 @D = 在整个预设中从末端开始定位，例如0是注入到预设最末尾，1就是注入到最后一条前
-                        </span>
-                    </div>
+					<div class="horae-setting-item">
+						<label data-i18n="settings.injectionDepth">
+							注入深度
+						</label>
+						<div class="horae-setting-inline-controls">
+							<select id="horae-setting-injection-depth-source">
+								<option value="system" data-i18n="settings.injectionDepthSystem">系统 @D</option>
+								<option value="preset" data-i18n="settings.injectionDepthPreset">预设 @D</option>
+							</select>
+							<input type="number" id="horae-setting-injection-position" min="0" max="10" value="1">
+						</div>
+						<span class="horae-setting-hint" data-i18n="settings.injectionDepthHint">
+							<i class="fa-solid fa-circle-info"></i>
+							选择 @D 来源并设置注入深度数值。<br>
+							系统 @D = 与世界书同理<br>
+							预设 @D = 在整个预设中从末端开始定位，例如0是注入到预设最末尾，1就是注入到最后一条前
+						</span>
+					</div>
 
-                    <div class="horae-setting-item">
-                        <label data-i18n="settings.timelineInjectionMode">
-                            剧情轨迹注入模式
-                        </label>
-                        <div class="horae-setting-inline-controls">
-                            <select id="horae-setting-timeline-injection-mode">
-                                <option value="inline" data-i18n="settings.timelineInjectionInline">原版合并注入</option>
-                                <option value="separate" data-i18n="settings.timelineInjectionSeparate">独立前置注入</option>
-                            </select>
-                        </div>
-                        <div class="horae-setting-hint horae-timeline-injection-hint">
-                            <i class="fa-solid fa-circle-info"></i>
-                            <div class="horae-timeline-injection-hint-body">
-                                <div class="horae-timeline-injection-hint-row">
-                                    <strong data-i18n="settings.timelineInjectionInline">原版合并注入</strong>
-                                    <span data-i18n="settings.timelineInjectionInlineHint">会把剧情轨迹和状态信息放在同一注入块。</span>
-                                </div>
-                                <div class="horae-timeline-injection-hint-row">
-                                    <strong data-i18n="settings.timelineInjectionSeparate">独立前置注入</strong>
-                                    <span data-i18n="settings.timelineInjectionSeparateHint">会把剧情轨迹单独放到聊天记录更靠前的位置。</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    </div>
-                </div>
+					<div class="horae-setting-item">
+						<label data-i18n="settings.timelineInjectionMode">
+							剧情轨迹注入模式
+						</label>
+						<div class="horae-setting-inline-controls">
+							<select id="horae-setting-timeline-injection-mode">
+								<option value="inline" data-i18n="settings.timelineInjectionInline">原版合并注入</option>
+								<option value="separate" data-i18n="settings.timelineInjectionSeparate">独立前置注入</option>
+							</select>
+						</div>
+						<div class="horae-setting-hint horae-timeline-injection-hint">
+							<i class="fa-solid fa-circle-info"></i>
+							<div class="horae-timeline-injection-hint-body">
+								<div class="horae-timeline-injection-hint-row">
+									<strong data-i18n="settings.timelineInjectionInline">原版合并注入</strong>
+									<span data-i18n="settings.timelineInjectionInlineHint">会把剧情轨迹和状态信息放在同一注入块。</span>
+								</div>
+								<div class="horae-timeline-injection-hint-row">
+									<strong data-i18n="settings.timelineInjectionSeparate">独立前置注入</strong>
+									<span data-i18n="settings.timelineInjectionSeparateHint">会把剧情轨迹单独放到聊天记录更靠前的位置。</span>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="horae-setting-item">
+						<label>
+							<input type="checkbox" id="horae-setting-show-system-prompt" checked>
+							Системный промпт инъекции
+						</label>
+						<span class="horae-setting-sub-hint">
+							Показывать редактор системного промпта, который используется для формирования инъекции Horae.
+						</span>
+					</div>
+
+					<div class="horae-setting-item">
+						<label>
+							<input type="checkbox" id="horae-setting-show-batch-prompt" checked>
+							Промпт ИИ-сводки
+						</label>
+						<span class="horae-setting-sub-hint">
+							Показывать редактор промпта ИИ-сводки.
+						</span>
+					</div>
+
+					<div class="horae-setting-item">
+						<label>
+							<input type="checkbox" id="horae-setting-show-analysis-prompt" checked>
+							Промпт ИИ-анализа
+						</label>
+						<span class="horae-setting-sub-hint">
+							Показывать редактор промпта ИИ-анализа для дополнительного извлечения информации из сюжета.
+						</span>
+					</div>
+
+					<div class="horae-setting-item">
+						<label>
+							<input type="checkbox" id="horae-setting-show-compress-prompt" checked>
+							Промпт сжатия сюжета
+						</label>
+						<span class="horae-setting-sub-hint">
+							Показывать редактор промпта ручного сжатия сюжета.
+						</span>
+					</div>
+
+					<div class="horae-setting-item">
+						<label>
+							<input type="checkbox" id="horae-setting-show-tables-prompt" checked>
+							Промпт правил заполнения таблиц
+						</label>
+						<span class="horae-setting-sub-hint">
+							Показывать редактор правил, используемых ИИ при заполнении таблиц.
+						</span>
+					</div>
+
+					</div>
+				</div>
                 
                 <div class="horae-settings-section">
                     <div class="horae-section-header horae-collapse-header" id="horae-custom-tables-collapse-toggle" data-i18n="settings.customTables">
@@ -1517,7 +1568,7 @@
                             <button id="horae-prompt-reset-all" class="horae-rpg-btn-sm" data-i18n="prompts.resetAll" data-i18n-title="tooltip.resetAllPrompts" title="" style="color:#ef4444;"><i class="fa-solid fa-rotate-left"></i> 全部重置</button>
                         </div>
                         
-                        <div class="horae-prompt-editor-group">
+                        <div id="horae-system-prompt-group"class="horae-prompt-editor-group">
                             <div class="horae-prompt-editor-header">
                                 <span data-i18n="prompts.systemPrompt">系统注入提示词</span>
                                 <button id="horae-btn-reset-system-prompt" class="horae-btn-reset-prompt" data-i18n="common.restoreDefault" data-i18n-title="tooltip.restoreDefault" title="">
@@ -1530,7 +1581,7 @@
                             </div>
                         </div>
                         
-                        <div class="horae-prompt-editor-group" style="margin-top: 12px;">
+                        <div id="horae-batch-prompt-group" class="horae-prompt-editor-group" style="margin-top: 12px;">
                             <div class="horae-prompt-editor-header">
                                 <span data-i18n="prompts.batchPrompt">AI 智能补全提示词</span>
                                 <button id="horae-btn-reset-batch-prompt" class="horae-btn-reset-prompt" data-i18n="common.restoreDefault" data-i18n-title="tooltip.restoreDefault" title="">
@@ -1543,7 +1594,7 @@
                             </div>
                         </div>
 
-                        <div class="horae-prompt-editor-group" style="margin-top: 12px;">
+                        <div id="horae-analysis-prompt-group" class="horae-prompt-editor-group" style="margin-top: 12px;">
                             <div class="horae-prompt-editor-header">
                                 <span data-i18n="prompts.analysisPrompt">AI 分析提示词</span>
                                 <button id="horae-btn-reset-analysis-prompt" class="horae-btn-reset-prompt" data-i18n="common.restoreDefault" data-i18n-title="tooltip.restoreDefault" title="">
@@ -1556,7 +1607,7 @@
                             </div>
                         </div>
 
-                        <div class="horae-prompt-editor-group" style="margin-top: 12px;">
+                        <div id="horae-compress-prompt-group" class="horae-prompt-editor-group" style="margin-top: 12px;">
                             <div class="horae-prompt-editor-header">
                                 <span data-i18n="prompts.compressPrompt">剧情压缩提示词（手动压缩）</span>
                                 <button id="horae-btn-reset-compress-prompt" class="horae-btn-reset-prompt" data-i18n="common.restoreDefault" data-i18n-title="tooltip.restoreDefault" title="">
@@ -1582,7 +1633,7 @@
                             </div>
                         </div>
 
-                        <div class="horae-prompt-editor-group" style="margin-top: 12px;">
+                        <div id="horae-auto-resummary-prompt-group" class="horae-prompt-editor-group" style="margin-top: 12px;">
                             <div class="horae-prompt-editor-header">
                                 <span data-i18n="prompts.autoResummaryPrompt">二次总结提示词（多级总结）</span>
                                 <button id="horae-btn-reset-auto-resummary-prompt" class="horae-btn-reset-prompt" data-i18n="common.restoreDefault" data-i18n-title="tooltip.restoreDefault" title="">
@@ -1595,7 +1646,7 @@
                             </div>
                         </div>
 
-                        <div class="horae-prompt-editor-group" style="margin-top: 12px;">
+                        <div id="horae-tables-prompt-group" class="horae-prompt-editor-group" style="margin-top: 12px;">
                             <div class="horae-prompt-editor-header">
                                 <span data-i18n="prompts.tablesPrompt">表格填写规则提示词</span>
                                 <button id="horae-btn-reset-tables-prompt" class="horae-btn-reset-prompt" data-i18n="common.restoreDefault" data-i18n-title="tooltip.restoreDefault" title="">
