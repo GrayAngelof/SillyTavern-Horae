@@ -137,7 +137,6 @@ const DEFAULT_SETTINGS = {
     sendCharacterAffection: true,        // 单独控制好感度注入
     sendMainCharacterPersonality: true,  // 关闭后主要角色（卡片本体 + 置顶 NPC）的性格简述不再注入
     sendItems: true,       // 发送物品栏
-	customItemsPrompt: '',
     panelLayoutStyle: 'classic',         // 'classic' = 默认 / 'glass' = 半透明玻璃 / 'obsidian' = 曜石简约 / 'cyber' = 赛博
     customTables: [],      // 自定义表格 [{id, name, rows, cols, data, prompt}]
     customSystemPrompt: '',      // 自定义系统注入提示词（空=使用默认）
@@ -158,6 +157,7 @@ const DEFAULT_SETTINGS = {
     globalTables: [],              // 全局表格（跨角色卡共享）
     showTopIcon: true,             // 显示顶部导航栏图标
     customTablesPrompt: '',        // 自定义表格填写规则提示词（空=使用默认）
+	customItemsPrompt: '',		   // // Отправка памяти Предметов (описание функции фиксированного местоположения)
     sendLocationMemory: false,     // 发送场景记忆（地点固定特征描述）
     customLocationPrompt: '',      // 自定义场景记忆提示词（空=使用默认）
     sendRelationships: false,      // 发送关系网络
@@ -271,11 +271,11 @@ const PROMPT_SETTING_KEYS = [
     'customAutoSummaryPrompt',
     'customAutoResummaryPrompt',
     'customTablesPrompt',
+	'customItemsPrompt',
     'customLocationPrompt',
     'customRelationshipPrompt',
     'customMoodPrompt',
     'customRpgPrompt',
-	'customItemsPrompt',
     'vectorQueryRewriteSystemPrompt',
 ];
 
@@ -13613,6 +13613,7 @@ function initSettingsEvents() {
             ['customAutoSummaryPrompt', 'horae-custom-auto-summary-prompt', 'horae-auto-summary-prompt-count', () => getDefaultAutoSummaryPrompt()],
             ['customAutoResummaryPrompt', 'horae-custom-auto-resummary-prompt', 'horae-auto-resummary-prompt-count', () => getDefaultAutoResummaryPrompt()],
             ['customTablesPrompt', 'horae-custom-tables-prompt', 'horae-tables-prompt-count', () => horaeManager.getDefaultTablesPrompt()],
+			['customItemsPrompt', 'horae-custom-items-prompt', 'horae-items-prompt-count', () => horaeManager.getDefaultItemsPrompt()],
             ['customLocationPrompt', 'horae-custom-location-prompt', 'horae-location-prompt-count', () => horaeManager.getDefaultLocationPrompt()],
             ['customRelationshipPrompt', 'horae-custom-relationship-prompt', 'horae-relationship-prompt-count', () => horaeManager.getDefaultRelationshipPrompt()],
             ['customMoodPrompt', 'horae-custom-mood-prompt', 'horae-mood-prompt-count', () => horaeManager.getDefaultMoodPrompt()],
@@ -13786,6 +13787,7 @@ function initSettingsEvents() {
             ['customAutoSummaryPrompt', 'horae-custom-auto-summary-prompt', 'horae-auto-summary-prompt-count', () => getDefaultAutoSummaryPrompt()],
             ['customAutoResummaryPrompt', 'horae-custom-auto-resummary-prompt', 'horae-auto-resummary-prompt-count', () => getDefaultAutoResummaryPrompt()],
             ['customTablesPrompt', 'horae-custom-tables-prompt', 'horae-tables-prompt-count', () => horaeManager.getDefaultTablesPrompt()],
+			['customItemsPrompt', 'horae-custom-items-prompt', 'horae-items-prompt-count', () => horaeManager.getDefaultItemsPrompt()],
             ['customLocationPrompt', 'horae-custom-location-prompt', 'horae-location-prompt-count', () => horaeManager.getDefaultLocationPrompt()],
             ['customRelationshipPrompt', 'horae-custom-relationship-prompt', 'horae-relationship-prompt-count', () => horaeManager.getDefaultRelationshipPrompt()],
             ['customMoodPrompt', 'horae-custom-mood-prompt', 'horae-mood-prompt-count', () => horaeManager.getDefaultMoodPrompt()],
@@ -15640,6 +15642,7 @@ function _refreshSystemPromptDisplay() {
         ['customAutoSummaryPrompt', 'horae-custom-auto-summary-prompt', 'horae-auto-summary-prompt-count', () => getDefaultAutoSummaryPrompt()],
         ['customAutoResummaryPrompt', 'horae-custom-auto-resummary-prompt', 'horae-auto-resummary-prompt-count', () => getDefaultAutoResummaryPrompt()],
         ['customTablesPrompt', 'horae-custom-tables-prompt', 'horae-tables-prompt-count', () => horaeManager.getDefaultTablesPrompt()],
+		['customItemsPrompt', 'horae-custom-items-prompt', 'horae-items-prompt-count', () => horaeManager.getDefaultItemsPrompt()],
         ['customLocationPrompt', 'horae-custom-location-prompt', 'horae-location-prompt-count', () => horaeManager.getDefaultLocationPrompt()],
         ['customRelationshipPrompt', 'horae-custom-relationship-prompt', 'horae-relationship-prompt-count', () => horaeManager.getDefaultRelationshipPrompt()],
         ['customMoodPrompt', 'horae-custom-mood-prompt', 'horae-mood-prompt-count', () => horaeManager.getDefaultMoodPrompt()],
