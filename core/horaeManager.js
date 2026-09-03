@@ -3472,10 +3472,15 @@ class HoraeManager {
 
     generateSystemPromptAddition() {
         const [userName, charName] = this._getDefaultNames();
-        const subs = this.generateItemsMemoryPrompt() + this.generateLocationMemoryPrompt() + 
-					 this.generateCustomTablesPrompt() + this.generateRelationshipPrompt() + 
-					 this.generateMoodPrompt() + this.generateRpgPrompt() + 
-					 this._generateAntiParaphrasePrompt() + this._generateCustomCalendarPrompt();
+        const subs = this.generateCharactersMemoryPrompt() +  
+					this.generateItemsMemoryPrompt() +
+					this.generateLocationMemoryPrompt() +
+					this.generateCustomTablesPrompt() +
+					this.generateRelationshipPrompt() +
+					this.generateMoodPrompt() +
+					this.generateRpgPrompt() +
+					this._generateAntiParaphrasePrompt() +
+					this._generateCustomCalendarPrompt();
         const fieldLines = this.getPromptFieldLines();
 
         if (this.settings?.customSystemPrompt) {
@@ -3544,9 +3549,53 @@ class HoraeManager {
         };
     }
 
-    getDefaultTablesPrompt() {
-        return this._getPromptDefaultFromResource('customTablesPrompt');
-    }
+	getDefaultTablesPrompt() {
+		return this._getPromptDefaultFromResource('customTablesPrompt');
+	}
+
+	getDefaultCharactersPrompt() {
+		return this._getPromptDefaultFromResource('customCharactersPrompt');
+	}
+
+	generateCharactersMemoryPrompt() {
+		if (!this.settings?.sendCharacters) return '';
+
+		const custom = this.settings?.customCharactersPrompt;
+		const userName = this.context?.name1 || '主角';
+		const charName = this.context?.name2 || '角色';
+
+		let prompt = custom
+			? custom.replace(/\{\{user\}\}/gi, userName).replace(/\{\{char\}\}/gi, charName)
+			: this.getDefaultCharactersPrompt();
+
+		if (this.settings?.sendCharacterAffection !== false) {
+			const affection = this.settings?.customCharacterAffectionPrompt;
+			prompt += '\n' + (
+				affection
+					? affection.replace(/\{\{user\}\}/gi, userName).replace(/\{\{char\}\}/gi, charName)
+					: this.getDefaultCharacterAffectionPrompt()
+			);
+		}
+
+		if (this.settings?.sendMainCharacterPersonality !== false) {
+			const personality = this.settings?.customCharacterPersonalityPrompt;
+			prompt += '\n' + (
+				personality
+					? personality.replace(/\{\{user\}\}/gi, userName).replace(/\{\{char\}\}/gi, charName)
+					: this.getDefaultCharacterPersonalityPrompt()
+			);
+		}
+
+		return '\n' + prompt;
+	}
+
+	getDefaultCharacterAffectionPrompt() {
+		return this._getPromptDefaultFromResource('customCharacterAffectionPrompt');
+	}
+
+	getDefaultCharacterPersonalityPrompt() {
+		return this._getPromptDefaultFromResource('customCharacterPersonalityPrompt');
+	}
 
 	getDefaultItemsPrompt() {
 		return this._getPromptDefaultFromResource('customItemsPrompt');

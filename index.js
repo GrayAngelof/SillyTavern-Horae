@@ -271,6 +271,9 @@ const PROMPT_SETTING_KEYS = [
     'customAutoSummaryPrompt',
     'customAutoResummaryPrompt',
     'customTablesPrompt',
+	'customCharactersPrompt',
+	'customCharacterAffectionPrompt',
+	'customCharacterPersonalityPrompt',
 	'customItemsPrompt',
     'customLocationPrompt',
     'customRelationshipPrompt',
@@ -13613,6 +13616,9 @@ function initSettingsEvents() {
             ['customAutoSummaryPrompt', 'horae-custom-auto-summary-prompt', 'horae-auto-summary-prompt-count', () => getDefaultAutoSummaryPrompt()],
             ['customAutoResummaryPrompt', 'horae-custom-auto-resummary-prompt', 'horae-auto-resummary-prompt-count', () => getDefaultAutoResummaryPrompt()],
             ['customTablesPrompt', 'horae-custom-tables-prompt', 'horae-tables-prompt-count', () => horaeManager.getDefaultTablesPrompt()],
+			['customCharactersPrompt', 'horae-custom-characters-prompt', 'horae-characters-prompt-count', () => horaeManager.getDefaultCharactersPrompt()],
+			['customCharacterAffectionPrompt', 'horae-custom-affection-prompt', 'horae-affection-prompt-count', () => horaeManager.getDefaultCharacterAffectionPrompt()],
+			['customCharacterPersonalityPrompt', 'horae-custom-personality-prompt', 'horae-personality-prompt-count', () => horaeManager.getDefaultCharacterPersonalityPrompt()],			
 			['customItemsPrompt', 'horae-custom-items-prompt', 'horae-items-prompt-count', () => horaeManager.getDefaultItemsPrompt()],
             ['customLocationPrompt', 'horae-custom-location-prompt', 'horae-location-prompt-count', () => horaeManager.getDefaultLocationPrompt()],
             ['customRelationshipPrompt', 'horae-custom-relationship-prompt', 'horae-relationship-prompt-count', () => horaeManager.getDefaultRelationshipPrompt()],
@@ -13787,6 +13793,9 @@ function initSettingsEvents() {
             ['customAutoSummaryPrompt', 'horae-custom-auto-summary-prompt', 'horae-auto-summary-prompt-count', () => getDefaultAutoSummaryPrompt()],
             ['customAutoResummaryPrompt', 'horae-custom-auto-resummary-prompt', 'horae-auto-resummary-prompt-count', () => getDefaultAutoResummaryPrompt()],
             ['customTablesPrompt', 'horae-custom-tables-prompt', 'horae-tables-prompt-count', () => horaeManager.getDefaultTablesPrompt()],
+			['customCharactersPrompt', 'horae-custom-characters-prompt', 'horae-characters-prompt-count', () => horaeManager.getDefaultCharactersPrompt()],
+			['customCharacterAffectionPrompt', 'horae-custom-affection-prompt', 'horae-affection-prompt-count', () => horaeManager.getDefaultCharacterAffectionPrompt()],
+			['customCharacterPersonalityPrompt', 'horae-custom-personality-prompt', 'horae-personality-prompt-count', () => horaeManager.getDefaultCharacterPersonalityPrompt()],			
 			['customItemsPrompt', 'horae-custom-items-prompt', 'horae-items-prompt-count', () => horaeManager.getDefaultItemsPrompt()],
             ['customLocationPrompt', 'horae-custom-location-prompt', 'horae-location-prompt-count', () => horaeManager.getDefaultLocationPrompt()],
             ['customRelationshipPrompt', 'horae-custom-relationship-prompt', 'horae-relationship-prompt-count', () => horaeManager.getDefaultRelationshipPrompt()],
@@ -14003,26 +14012,47 @@ function initSettingsEvents() {
     $('#horae-setting-custom-cal-enabled').on('change', _applyCustomCalendarFromUI);
     $('#horae-setting-custom-cal-apply').on('click', _applyCustomCalendarFromUI);
 
-    $('#horae-setting-send-characters').on('change', function () {
-        settings.sendCharacters = this.checked;
-        saveSettings();
-        horaeManager.init(getContext(), settings);
-        updateTokenCounter();
-    });
+	$('#horae-setting-send-characters').on('change', function () {
+		settings.sendCharacters = this.checked;
 
-    $('#horae-setting-send-character-affection').on('change', function () {
-        settings.sendCharacterAffection = this.checked;
-        saveSettings();
-        horaeManager.init(getContext(), settings);
-        updateTokenCounter();
-    });
+		$('#horae-setting-send-character-affection')
+			.closest('div')
+			.toggle(this.checked);
 
-    $('#horae-setting-send-main-character-personality').on('change', function () {
-        settings.sendMainCharacterPersonality = this.checked;
-        saveSettings();
-        horaeManager.init(getContext(), settings);
-        updateTokenCounter();
-    });
+		$('#horae-setting-send-main-character-personality')
+			.closest('div')
+			.toggle(this.checked);
+
+		$('#horae-characters-prompt-group').toggle(this.checked);
+		$('#horae-affection-prompt-group').toggle(this.checked && settings.sendCharacterAffection !== false);
+		$('#horae-personality-prompt-group').toggle(this.checked && settings.sendMainCharacterPersonality !== false);
+
+		$('.horae-tab[data-tab="characters"]').toggle(this.checked);
+
+		saveSettings();
+		horaeManager.init(getContext(), settings);
+		updateTokenCounter();
+	});
+
+	$('#horae-setting-send-character-affection').on('change', function () {
+		settings.sendCharacterAffection = this.checked;
+
+		$('#horae-affection-prompt-group').toggle(settings.sendCharacters && this.checked);
+
+		saveSettings();
+		horaeManager.init(getContext(), settings);
+		updateTokenCounter();
+	});
+
+	$('#horae-setting-send-main-character-personality').on('change', function () {
+		settings.sendMainCharacterPersonality = this.checked;
+
+		$('#horae-personality-prompt-group').toggle(settings.sendCharacters && this.checked);
+
+		saveSettings();
+		horaeManager.init(getContext(), settings);
+		updateTokenCounter();
+	});
 
 	$('#horae-setting-send-items').on('change', function () {
 		settings.sendItems = this.checked;
@@ -14515,7 +14545,83 @@ function initSettingsEvents() {
         showToast(t('toast.promptsRestored'), 'success');
     });
 
-	// Промпт инвентаря
+	// Промпт Персонажи
+	$('#horae-custom-characters-prompt').on('input', function () {
+		const val = this.value;
+		settings.customCharactersPrompt =
+			(val.trim() === horaeManager.getDefaultCharactersPrompt().trim()) ? '' : val;
+		$('#horae-characters-prompt-count').text(val.length);
+		saveSettings();
+		horaeManager.init(getContext(), settings);
+		updateTokenCounter();
+	});
+	
+	$('#horae-btn-reset-characters-prompt').on('click', () => {
+    if (!confirm(t('confirm.restoreRpgPrompts'))) return;
+
+    settings.customCharactersPrompt = '';
+    saveSettings();
+
+    const def = horaeManager.getDefaultCharactersPrompt();
+    $('#horae-custom-characters-prompt').val(def);
+    $('#horae-characters-prompt-count').text(def.length);
+
+    horaeManager.init(getContext(), settings);
+    updateTokenCounter();
+    showToast(t('toast.promptsRestored'), 'success');
+	});
+
+	$('#horae-custom-affection-prompt').on('input', function () {
+		const val = this.value;
+		settings.customCharacterAffectionPrompt =
+			(val.trim() === horaeManager.getDefaultCharacterAffectionPrompt().trim()) ? '' : val;
+		$('#horae-affection-prompt-count').text(val.length);
+		saveSettings();
+		horaeManager.init(getContext(), settings);
+		updateTokenCounter();
+	});
+	
+	$('#horae-btn-reset-affection-prompt').on('click', () => {
+    if (!confirm(t('confirm.restoreRpgPrompts'))) return;
+
+    settings.customCharacterAffectionPrompt = '';
+    saveSettings();
+
+    const def = horaeManager.getDefaultCharacterAffectionPrompt();
+    $('#horae-custom-affection-prompt').val(def);
+    $('#horae-affection-prompt-count').text(def.length);
+
+    horaeManager.init(getContext(), settings);
+    updateTokenCounter();
+    showToast(t('toast.promptsRestored'), 'success');
+	});
+
+	$('#horae-custom-personality-prompt').on('input', function () {
+		const val = this.value;
+		settings.customCharacterPersonalityPrompt =
+			(val.trim() === horaeManager.getDefaultCharacterPersonalityPrompt().trim()) ? '' : val;
+		$('#horae-personality-prompt-count').text(val.length);
+		saveSettings();
+		horaeManager.init(getContext(), settings);
+		updateTokenCounter();
+	});
+	
+	$('#horae-btn-reset-personality-prompt').on('click', () => {
+    if (!confirm(t('confirm.restoreRpgPrompts'))) return;
+
+    settings.customCharacterPersonalityPrompt = '';
+    saveSettings();
+
+    const def = horaeManager.getDefaultCharacterPersonalityPrompt();
+    $('#horae-custom-personality-prompt').val(def);
+    $('#horae-personality-prompt-count').text(def.length);
+
+    horaeManager.init(getContext(), settings);
+    updateTokenCounter();
+    showToast(t('toast.promptsRestored'), 'success');
+	});
+
+	// Промпт Предметы
 	$('#horae-custom-items-prompt').on('input', function () {
 		const val = this.value;
 		settings.customItemsPrompt = (val.trim() === horaeManager.getDefaultItemsPrompt().trim()) ? '' : val;
@@ -15642,6 +15748,9 @@ function _refreshSystemPromptDisplay() {
         ['customAutoSummaryPrompt', 'horae-custom-auto-summary-prompt', 'horae-auto-summary-prompt-count', () => getDefaultAutoSummaryPrompt()],
         ['customAutoResummaryPrompt', 'horae-custom-auto-resummary-prompt', 'horae-auto-resummary-prompt-count', () => getDefaultAutoResummaryPrompt()],
         ['customTablesPrompt', 'horae-custom-tables-prompt', 'horae-tables-prompt-count', () => horaeManager.getDefaultTablesPrompt()],
+		['customCharactersPrompt', 'horae-custom-characters-prompt', 'horae-characters-prompt-count', () => horaeManager.getDefaultCharactersPrompt()],
+		['customCharacterAffectionPrompt', 'horae-custom-affection-prompt', 'horae-affection-prompt-count', () => horaeManager.getDefaultCharacterAffectionPrompt()],
+		['customCharacterPersonalityPrompt', 'horae-custom-personality-prompt', 'horae-personality-prompt-count', () => horaeManager.getDefaultCharacterPersonalityPrompt()],
 		['customItemsPrompt', 'horae-custom-items-prompt', 'horae-items-prompt-count', () => horaeManager.getDefaultItemsPrompt()],
         ['customLocationPrompt', 'horae-custom-location-prompt', 'horae-location-prompt-count', () => horaeManager.getDefaultLocationPrompt()],
         ['customRelationshipPrompt', 'horae-custom-relationship-prompt', 'horae-relationship-prompt-count', () => horaeManager.getDefaultRelationshipPrompt()],
@@ -15850,13 +15959,31 @@ function syncSettingsToUI() {
     $('#horae-setting-send-timeline').prop('checked', settings.sendTimeline);
     $('#horae-setting-context-depth').val(Number.isFinite(parseInt(settings.contextDepth, 10)) ? Math.max(0, parseInt(settings.contextDepth, 10)) : 15);
     _syncCustomCalendarToUI();
-    $('#horae-setting-send-characters').prop('checked', settings.sendCharacters);
-    $('#horae-setting-send-character-affection').prop('checked', settings.sendCharacterAffection !== false);
-    $('#horae-setting-send-main-character-personality').prop('checked', settings.sendMainCharacterPersonality !== false);
 
     applyTopIconVisibility();
 
-	//Инвентарь
+	// Персонажи
+	const charactersEnabled = !!settings.sendCharacters;
+
+	$('#horae-setting-send-characters').prop('checked', charactersEnabled);
+
+	$('#horae-setting-send-character-affection')
+		.prop('checked', settings.sendCharacterAffection !== false)
+		.closest('div')
+		.toggle(charactersEnabled);
+
+	$('#horae-setting-send-main-character-personality')
+		.prop('checked', settings.sendMainCharacterPersonality !== false)
+		.closest('div')
+		.toggle(charactersEnabled);
+
+	$('#horae-characters-prompt-group').toggle(charactersEnabled);
+	$('#horae-affection-prompt-group').toggle(charactersEnabled && settings.sendCharacterAffection !== false);
+	$('#horae-personality-prompt-group').toggle(charactersEnabled && settings.sendMainCharacterPersonality !== false);
+
+	$('.horae-tab[data-tab="characters"]').toggle(charactersEnabled);
+
+	//Предметы
 	$('#horae-setting-send-items').prop('checked', settings.sendItems);
 	$('#horae-items-prompt-group').toggle(!!settings.sendItems);
 	$('.horae-tab[data-tab="items"]').toggle(!!settings.sendItems);
@@ -15958,6 +16085,9 @@ function syncSettingsToUI() {
     const autoSumPromptVal = settings.customAutoSummaryPrompt || getDefaultAutoSummaryPrompt();
     const autoResumPromptVal = settings.customAutoResummaryPrompt || getDefaultAutoResummaryPrompt();
     const tablesPromptVal = settings.customTablesPrompt || horaeManager.getDefaultTablesPrompt();
+	const charactersPromptVal = settings.customCharactersPrompt || horaeManager.getDefaultCharactersPrompt();
+	const characterAffectionPromptVal = settings.customCharacterAffectionPrompt || horaeManager.getDefaultCharacterAffectionPrompt();
+	const characterPersonalityPromptVal = settings.customCharacterPersonalityPrompt || horaeManager.getDefaultCharacterPersonalityPrompt();
 	const itemsPromptVal = settings.customItemsPrompt || horaeManager.getDefaultItemsPrompt();
     const locationPromptVal = settings.customLocationPrompt || horaeManager.getDefaultLocationPrompt();
     const relPromptVal = settings.customRelationshipPrompt || horaeManager.getDefaultRelationshipPrompt();
@@ -15971,6 +16101,12 @@ function syncSettingsToUI() {
     $('#horae-custom-auto-summary-prompt').val(autoSumPromptVal);
     $('#horae-custom-auto-resummary-prompt').val(autoResumPromptVal);
     $('#horae-custom-tables-prompt').val(tablesPromptVal);
+	$('#horae-custom-characters-prompt').val(charactersPromptVal);
+	$('#horae-characters-prompt-count').text(charactersPromptVal.length);
+	$('#horae-custom-affection-prompt').val(characterAffectionPromptVal);
+	$('#horae-affection-prompt-count').text(characterAffectionPromptVal.length);
+	$('#horae-custom-personality-prompt').val(characterPersonalityPromptVal);
+	$('#horae-personality-prompt-count').text(characterPersonalityPromptVal.length);	
 	$('#horae-custom-items-prompt').val(itemsPromptVal);
     $('#horae-custom-location-prompt').val(locationPromptVal);
     $('#horae-custom-relationship-prompt').val(relPromptVal);
