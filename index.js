@@ -273,7 +273,6 @@ const PROMPT_SETTING_KEYS = [
     'customTablesPrompt',
 	'customCharactersPrompt',
 	'customCharacterAffectionPrompt',
-	'customCharacterPersonalityPrompt',
 	'customItemsPrompt',
     'customLocationPrompt',
     'customRelationshipPrompt',
@@ -13617,8 +13616,7 @@ function initSettingsEvents() {
             ['customAutoResummaryPrompt', 'horae-custom-auto-resummary-prompt', 'horae-auto-resummary-prompt-count', () => getDefaultAutoResummaryPrompt()],
             ['customTablesPrompt', 'horae-custom-tables-prompt', 'horae-tables-prompt-count', () => horaeManager.getDefaultTablesPrompt()],
 			['customCharactersPrompt', 'horae-custom-characters-prompt', 'horae-characters-prompt-count', () => horaeManager.getDefaultCharactersPrompt()],
-			['customCharacterAffectionPrompt', 'horae-custom-affection-prompt', 'horae-affection-prompt-count', () => horaeManager.getDefaultCharacterAffectionPrompt()],
-			['customCharacterPersonalityPrompt', 'horae-custom-personality-prompt', 'horae-personality-prompt-count', () => horaeManager.getDefaultCharacterPersonalityPrompt()],			
+			['customCharacterAffectionPrompt', 'horae-custom-affection-prompt', 'horae-affection-prompt-count', () => horaeManager.getDefaultCharacterAffectionPrompt()],			
 			['customItemsPrompt', 'horae-custom-items-prompt', 'horae-items-prompt-count', () => horaeManager.getDefaultItemsPrompt()],
             ['customLocationPrompt', 'horae-custom-location-prompt', 'horae-location-prompt-count', () => horaeManager.getDefaultLocationPrompt()],
             ['customRelationshipPrompt', 'horae-custom-relationship-prompt', 'horae-relationship-prompt-count', () => horaeManager.getDefaultRelationshipPrompt()],
@@ -13794,8 +13792,7 @@ function initSettingsEvents() {
             ['customAutoResummaryPrompt', 'horae-custom-auto-resummary-prompt', 'horae-auto-resummary-prompt-count', () => getDefaultAutoResummaryPrompt()],
             ['customTablesPrompt', 'horae-custom-tables-prompt', 'horae-tables-prompt-count', () => horaeManager.getDefaultTablesPrompt()],
 			['customCharactersPrompt', 'horae-custom-characters-prompt', 'horae-characters-prompt-count', () => horaeManager.getDefaultCharactersPrompt()],
-			['customCharacterAffectionPrompt', 'horae-custom-affection-prompt', 'horae-affection-prompt-count', () => horaeManager.getDefaultCharacterAffectionPrompt()],
-			['customCharacterPersonalityPrompt', 'horae-custom-personality-prompt', 'horae-personality-prompt-count', () => horaeManager.getDefaultCharacterPersonalityPrompt()],			
+			['customCharacterAffectionPrompt', 'horae-custom-affection-prompt', 'horae-affection-prompt-count', () => horaeManager.getDefaultCharacterAffectionPrompt()],		
 			['customItemsPrompt', 'horae-custom-items-prompt', 'horae-items-prompt-count', () => horaeManager.getDefaultItemsPrompt()],
             ['customLocationPrompt', 'horae-custom-location-prompt', 'horae-location-prompt-count', () => horaeManager.getDefaultLocationPrompt()],
             ['customRelationshipPrompt', 'horae-custom-relationship-prompt', 'horae-relationship-prompt-count', () => horaeManager.getDefaultRelationshipPrompt()],
@@ -14064,7 +14061,7 @@ function initSettingsEvents() {
 
 		$('#horae-characters-prompt-group').toggle(this.checked);
 		$('#horae-affection-prompt-group').toggle(this.checked && settings.sendCharacterAffection !== false);
-		$('#horae-personality-prompt-group').toggle(this.checked && settings.sendMainCharacterPersonality !== false);
+
 
 		$('.horae-tab[data-tab="characters"]').toggle(this.checked);
 
@@ -14086,7 +14083,7 @@ function initSettingsEvents() {
 	$('#horae-setting-send-main-character-personality').on('change', function () {
 		settings.sendMainCharacterPersonality = this.checked;
 
-		$('#horae-personality-prompt-group').toggle(settings.sendCharacters && this.checked);
+
 
 		saveSettings();
 		horaeManager.init(getContext(), settings);
@@ -14611,7 +14608,7 @@ function initSettingsEvents() {
     updateTokenCounter();
     showToast(t('toast.promptsRestored'), 'success');
 	});
-
+	// Промпт Отношение
 	$('#horae-custom-affection-prompt').on('input', function () {
 		const val = this.value;
 		settings.customCharacterAffectionPrompt =
@@ -14631,31 +14628,6 @@ function initSettingsEvents() {
     const def = horaeManager.getDefaultCharacterAffectionPrompt();
     $('#horae-custom-affection-prompt').val(def);
     $('#horae-affection-prompt-count').text(def.length);
-
-    horaeManager.init(getContext(), settings);
-    updateTokenCounter();
-    showToast(t('toast.promptsRestored'), 'success');
-	});
-
-	$('#horae-custom-personality-prompt').on('input', function () {
-		const val = this.value;
-		settings.customCharacterPersonalityPrompt =
-			(val.trim() === horaeManager.getDefaultCharacterPersonalityPrompt().trim()) ? '' : val;
-		$('#horae-personality-prompt-count').text(val.length);
-		saveSettings();
-		horaeManager.init(getContext(), settings);
-		updateTokenCounter();
-	});
-	
-	$('#horae-btn-reset-personality-prompt').on('click', () => {
-    if (!confirm(t('confirm.restoreRpgPrompts'))) return;
-
-    settings.customCharacterPersonalityPrompt = '';
-    saveSettings();
-
-    const def = horaeManager.getDefaultCharacterPersonalityPrompt();
-    $('#horae-custom-personality-prompt').val(def);
-    $('#horae-personality-prompt-count').text(def.length);
 
     horaeManager.init(getContext(), settings);
     updateTokenCounter();
@@ -15791,7 +15763,6 @@ function _refreshSystemPromptDisplay() {
         ['customTablesPrompt', 'horae-custom-tables-prompt', 'horae-tables-prompt-count', () => horaeManager.getDefaultTablesPrompt()],
 		['customCharactersPrompt', 'horae-custom-characters-prompt', 'horae-characters-prompt-count', () => horaeManager.getDefaultCharactersPrompt()],
 		['customCharacterAffectionPrompt', 'horae-custom-affection-prompt', 'horae-affection-prompt-count', () => horaeManager.getDefaultCharacterAffectionPrompt()],
-		['customCharacterPersonalityPrompt', 'horae-custom-personality-prompt', 'horae-personality-prompt-count', () => horaeManager.getDefaultCharacterPersonalityPrompt()],
 		['customItemsPrompt', 'horae-custom-items-prompt', 'horae-items-prompt-count', () => horaeManager.getDefaultItemsPrompt()],
         ['customLocationPrompt', 'horae-custom-location-prompt', 'horae-location-prompt-count', () => horaeManager.getDefaultLocationPrompt()],
         ['customRelationshipPrompt', 'horae-custom-relationship-prompt', 'horae-relationship-prompt-count', () => horaeManager.getDefaultRelationshipPrompt()],
@@ -16030,7 +16001,7 @@ function syncSettingsToUI() {
 
 	$('#horae-characters-prompt-group').toggle(charactersEnabled);
 	$('#horae-affection-prompt-group').toggle(charactersEnabled && settings.sendCharacterAffection !== false);
-	$('#horae-personality-prompt-group').toggle(charactersEnabled && settings.sendMainCharacterPersonality !== false);
+
 
 	$('.horae-tab[data-tab="characters"]').toggle(charactersEnabled);
 
@@ -16140,7 +16111,6 @@ function syncSettingsToUI() {
     const tablesPromptVal = settings.customTablesPrompt || horaeManager.getDefaultTablesPrompt();
 	const charactersPromptVal = settings.customCharactersPrompt || horaeManager.getDefaultCharactersPrompt();
 	const characterAffectionPromptVal = settings.customCharacterAffectionPrompt || horaeManager.getDefaultCharacterAffectionPrompt();
-	const characterPersonalityPromptVal = settings.customCharacterPersonalityPrompt || horaeManager.getDefaultCharacterPersonalityPrompt();
 	const itemsPromptVal = settings.customItemsPrompt || horaeManager.getDefaultItemsPrompt();
     const locationPromptVal = settings.customLocationPrompt || horaeManager.getDefaultLocationPrompt();
     const relPromptVal = settings.customRelationshipPrompt || horaeManager.getDefaultRelationshipPrompt();
@@ -16157,9 +16127,7 @@ function syncSettingsToUI() {
 	$('#horae-custom-characters-prompt').val(charactersPromptVal);
 	$('#horae-characters-prompt-count').text(charactersPromptVal.length);
 	$('#horae-custom-affection-prompt').val(characterAffectionPromptVal);
-	$('#horae-affection-prompt-count').text(characterAffectionPromptVal.length);
-	$('#horae-custom-personality-prompt').val(characterPersonalityPromptVal);
-	$('#horae-personality-prompt-count').text(characterPersonalityPromptVal.length);	
+	$('#horae-affection-prompt-count').text(characterAffectionPromptVal.length);	
 	$('#horae-custom-items-prompt').val(itemsPromptVal);
     $('#horae-custom-location-prompt').val(locationPromptVal);
     $('#horae-custom-relationship-prompt').val(relPromptVal);

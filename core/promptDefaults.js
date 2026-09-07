@@ -19,7 +19,6 @@ const _promptFileMap = Object.freeze({
     customTablesPrompt: 'customTablesPrompt.txt',
 	customCharactersPrompt: 'customCharactersPrompt.txt',
 	customCharacterAffectionPrompt: 'customCharacterAffectionPrompt.txt',
-	customCharacterPersonalityPrompt: 'customCharacterPersonalityPrompt.txt',
 	customItemsPrompt: 'customItemsPrompt.txt',
 	customLocationPrompt: 'customLocationPrompt.txt',
 	customRelationshipPrompt: 'customRelationshipPrompt.txt',

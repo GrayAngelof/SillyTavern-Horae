@@ -611,9 +611,11 @@ class HoraeManager {
         ));
         
         const sendTimeline = this.settings?.sendTimeline !== false;
-        const sendCharacters = this.settings?.sendCharacters !== false;
-        const sendCharacterAffection = this.settings?.sendCharacterAffection !== false;
-        const sendMainCharacterPersonality = this.settings?.sendMainCharacterPersonality !== false;
+		const sendCharacters = this.settings?.sendCharacters !== false;
+		const sendCharacterAffection =
+			sendCharacters && this.settings?.sendCharacterAffection !== false;
+		const sendMainCharacterPersonality =
+			sendCharacters && this.settings?.sendMainCharacterPersonality !== false;
         const sendItems = this.settings?.sendItems !== false;
 
         // 主要角色判定：卡片本体 + 置顶 NPC，含别名匹配以兼容 NPC 改名
@@ -3577,24 +3579,11 @@ class HoraeManager {
 			);
 		}
 
-		if (this.settings?.sendMainCharacterPersonality !== false) {
-			const personality = this.settings?.customCharacterPersonalityPrompt;
-			prompt += '\n' + (
-				personality
-					? personality.replace(/\{\{user\}\}/gi, userName).replace(/\{\{char\}\}/gi, charName)
-					: this.getDefaultCharacterPersonalityPrompt()
-			);
-		}
-
 		return '\n' + prompt;
 	}
 
 	getDefaultCharacterAffectionPrompt() {
 		return this._getPromptDefaultFromResource('customCharacterAffectionPrompt');
-	}
-
-	getDefaultCharacterPersonalityPrompt() {
-		return this._getPromptDefaultFromResource('customCharacterPersonalityPrompt');
 	}
 
 	getDefaultItemsPrompt() {
