@@ -10,7 +10,6 @@ const _presetCache = new Map(); // `${lang}::${presetName}` -> prompts object | 
 let _basePath = '';
 const _promptFileMap = Object.freeze({
     customSystemPrompt: 'customSystemPrompt.txt',
-    customAntiParaphrasePrompt: 'customAntiParaphrasePrompt.txt',
     customBatchPrompt: 'customBatchPrompt.txt',
     customAnalysisPrompt: 'customAnalysisPrompt.txt',
     customCompressPrompt: 'customCompressPrompt.txt',
@@ -27,6 +26,7 @@ const _promptFileMap = Object.freeze({
     customRelationshipPrompt: 'customRelationshipPrompt.txt',
     customMoodPrompt: 'customMoodPrompt.txt',
     customRpgPrompt: 'customRpgPrompt.txt',
+    customAntiParaphrasePrompt: 'customAntiParaphrasePrompt.txt',
     vectorQueryRewriteSystemPrompt: 'vectorQueryRewriteSystemPrompt.txt',
 });
 
