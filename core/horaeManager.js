@@ -3673,10 +3673,6 @@ class HoraeManager {
         return this._getPromptDefaultFromResource('customRelationshipPrompt', { userName });
     }
 
-    getDefaultMoodPrompt() {
-        return this._getPromptDefaultFromResource('customMoodPrompt');
-    }
-
     generateRelationshipPrompt() {
         if (!this.settings?.sendRelationships) return '';
         const custom = this.settings?.customRelationshipPrompt;
@@ -3688,6 +3684,15 @@ class HoraeManager {
         return '\n' + this.getDefaultRelationshipPrompt();
     }
 
+    getDefaultMoodPrompt() {
+        return this._getPromptDefaultFromResource('customMoodPrompt');
+    }
+
+	getDefaultAntiParaphrasePrompt() {
+		const userName = this.context?.name1 || '{{user}}';
+		return this._getPromptDefaultFromResource('customAntiParaphrasePrompt', { userName });
+	}
+	
     _generateAntiParaphrasePrompt() {
         if (!this.settings?.antiParaphraseMode) return '';
         const lang = this._getAiOutputLang();

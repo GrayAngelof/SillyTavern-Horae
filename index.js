@@ -189,6 +189,7 @@ const DEFAULT_SETTINGS = {
     auxApiUseForManualCompress: false, // 手动多选压缩
     auxApiFallbackToMain: false,     // 辅助API失败后回退主API
     antiParaphraseMode: false,      // 反转述模式：AI回复时结算上一条USER的内容
+	customAntiParaphrasePrompt: '', // 自定义反转述模式提示词（空=使用默认）
     sideplayMode: false,            // 番外/小剧场模式：启用后可标记消息跳过Horae
     // 自定义日历：开启后插件按 monthNames/monthDays 解析剧情日期；未启用走默认公历+奇幻兜底
     customCalendar: {
@@ -278,6 +279,7 @@ const PROMPT_SETTING_KEYS = [
     'customRelationshipPrompt',
     'customMoodPrompt',
     'customRpgPrompt',
+	'customAntiParaphrasePrompt',
     'vectorQueryRewriteSystemPrompt',
 ];
 
@@ -13622,6 +13624,7 @@ function initSettingsEvents() {
             ['customRelationshipPrompt', 'horae-custom-relationship-prompt', 'horae-relationship-prompt-count', () => horaeManager.getDefaultRelationshipPrompt()],
             ['customMoodPrompt', 'horae-custom-mood-prompt', 'horae-mood-prompt-count', () => horaeManager.getDefaultMoodPrompt()],
             ['customRpgPrompt', 'horae-custom-rpg-prompt', 'horae-rpg-prompt-count', () => horaeManager.getDefaultRpgPromptResolved()],
+			['customAntiParaphrasePrompt', 'horae-custom-anti-paraphrase-prompt', 'horae-anti-paraphrase-prompt-count', () => horaeManager.getDefaultAntiParaphrasePrompt()],
         ];
         for (const [key, textareaId, countId, getDefault] of pairs) {
             const val = settings[key] || getDefault();
@@ -13798,6 +13801,7 @@ function initSettingsEvents() {
             ['customRelationshipPrompt', 'horae-custom-relationship-prompt', 'horae-relationship-prompt-count', () => horaeManager.getDefaultRelationshipPrompt()],
             ['customMoodPrompt', 'horae-custom-mood-prompt', 'horae-mood-prompt-count', () => horaeManager.getDefaultMoodPrompt()],
             ['customRpgPrompt', 'horae-custom-rpg-prompt', 'horae-rpg-prompt-count', () => horaeManager.getDefaultRpgPromptResolved()],
+			['customAntiParaphrasePrompt', 'horae-custom-anti-paraphrase-prompt', 'horae-anti-paraphrase-prompt-count', () => horaeManager.getDefaultAntiParaphrasePrompt()],
         ];
         for (const [, textareaId, countId, getDefault] of pairs) {
             const val = getDefault();
@@ -14133,6 +14137,7 @@ function initSettingsEvents() {
     $('#horae-setting-anti-paraphrase').on('change', function () {
         settings.antiParaphraseMode = this.checked;
         saveSettings();
+		$('#horae-anti-paraphrase-prompt-group').toggle(this.checked);
         horaeManager.init(getContext(), settings);
         _refreshSystemPromptDisplay();
         updateTokenCounter();
@@ -14721,6 +14726,30 @@ function initSettingsEvents() {
         updateTokenCounter();
         showToast(t('toast.promptsRestored'), 'success');
     });
+	
+	// Промпт режима «Без пересказа»
+	$('#horae-custom-anti-paraphrase-prompt').on('input', function () {
+		const val = this.value;
+		settings.customAntiParaphrasePrompt = (val.trim() === horaeManager.getDefaultAntiParaphrasePrompt().trim()) ? '' : val;
+		$('#horae-anti-paraphrase-prompt-count').text(val.length);
+		saveSettings();
+		horaeManager.init(getContext(), settings);
+		updateTokenCounter();
+	});
+
+	$('#horae-btn-reset-anti-paraphrase-prompt').on('click', () => {
+		if (!confirm(t('confirm.restoreRpgPrompts'))) return;
+		settings.customAntiParaphrasePrompt = '';
+		saveSettings();
+
+		const def = horaeManager.getDefaultAntiParaphrasePrompt();
+		$('#horae-custom-anti-paraphrase-prompt').val(def);
+		$('#horae-anti-paraphrase-prompt-count').text(def.length);
+
+		horaeManager.init(getContext(), settings);
+		updateTokenCounter();
+		showToast(t('toast.promptsRestored'), 'success');
+	});
 
     // 提示词区域折叠切换
     $('#horae-prompt-collapse-toggle').on('click', function () {
@@ -16026,6 +16055,7 @@ function syncSettingsToUI() {
 
     // 反转述模式
     $('#horae-setting-anti-paraphrase').prop('checked', !!settings.antiParaphraseMode);
+	$('#horae-anti-paraphrase-prompt-group').toggle(!!settings.antiParaphraseMode);
     // 番外模式
     $('#horae-setting-sideplay-mode').prop('checked', !!settings.sideplayMode);
 
@@ -16116,7 +16146,8 @@ function syncSettingsToUI() {
     const relPromptVal = settings.customRelationshipPrompt || horaeManager.getDefaultRelationshipPrompt();
     const moodPromptVal = settings.customMoodPrompt || horaeManager.getDefaultMoodPrompt();
     const rpgPromptVal = settings.customRpgPrompt || horaeManager.getDefaultRpgPromptResolved();
-
+	const antiParaphrasePromptVal = settings.customAntiParaphrasePrompt || horaeManager.getDefaultAntiParaphrasePrompt();
+	
     $('#horae-custom-system-prompt').val(sysPrompt);
     $('#horae-custom-batch-prompt').val(batchPromptVal);
     $('#horae-custom-analysis-prompt').val(analysisPromptVal);
@@ -16145,7 +16176,9 @@ function syncSettingsToUI() {
     $('#horae-relationship-prompt-count').text(relPromptVal.length);
     $('#horae-mood-prompt-count').text(moodPromptVal.length);
     $('#horae-rpg-prompt-count').text(rpgPromptVal.length);
-
+	$('#horae-custom-anti-paraphrase-prompt').val(antiParaphrasePromptVal);
+	$('#horae-anti-paraphrase-prompt-count').text(antiParaphrasePromptVal.length);
+	
     // 面板宽度和偏移
     $('#horae-setting-panel-width').val(settings.panelWidth || 100);
     const ofs = settings.panelOffset || 0;
