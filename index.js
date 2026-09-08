@@ -21121,7 +21121,7 @@ function _antiParaphraseSnippets() {
             '[MANDATORY] This <horae>/<horaeevent> MUST consolidate every item/location/event/NPC change from the USER actions above; do not settle only the AI narration.',
             '【必須】本ターンの <horae>/<horaeevent> には上記 USER 行為の全アイテム/場所/イベント/NPC 変化を必ず含めること。AI 描写部分のみで完結させない。',
             '【필수】이번 <horae>/<horaeevent>에는 위 USER 행동의 모든 아이템/장소/사건/NPC 변화를 반드시 포함할 것. AI 서술 부분만으로 정산하지 말 것.',
-            '【ОБЯЗАТЕЛЬНО】Этот <horae>/<horaeevent> ДОЛЖЕН включать все изменения предметов/мест/событий/NPC из действий USER выше; нельзя ограничиваться только частью AI.',
+            '【ОБЯЗАТЕЛЬНО】 В пакетном режиме некоторые записи представлены как слияние [ДЕЙСТВИЕ USER] + [ОТВЕТ AI]. При извлечении horae/horaeevent необходимо объединить все значимые изменения (состояния, сущностей, окружения или сюжета) из [ДЕЙСТВИЕ USER] с [ОТВЕТ AI]; запрещается обрабатывать только AI-часть.',
         ),
         // batchAIScan：批量扫描末尾追加
         batchHint: tr(
@@ -21130,7 +21130,7 @@ function _antiParaphraseSnippets() {
             '[Anti-Paraphrase Mode - REQUIRED] Some entries in this batch are concatenations of [USER ACTION] + [AI REPLY]. When extracting horae/horaeevent you MUST merge every item/location/event/NPC change from [USER ACTION] together with [AI REPLY]; do not read only the AI half.',
             '【反転叙述モード · 必読】本バッチの一部項目は [USERの行動] + [AIの返答] を結合した形で渡される。horae/horaeevent を抽出する際は [USERの行動] 側のアイテム/場所/イベント/NPC 変化を [AIの返答] と必ず統合して記録すること。',
             '【반-패러프레이즈 모드 · 필독】 본 배치의 일부 항목은 [USER 행동] + [AI 응답] 두 단락의 결합 형태로 제공된다. horae/horaeevent를 추출할 때 [USER 행동] 측의 아이템/장소/사건/NPC 변화를 [AI 응답]과 반드시 합산해 기록할 것.',
-            '【Режим анти-перефраза — обязательно】Некоторые записи в этом пакете объединяют [ДЕЙСТВИЕ USER] и [ОТВЕТ AI]. При извлечении horae/horaeevent ОБЯЗАТЕЛЬНО объединяйте все изменения предметов/мест/событий/NPC из [ДЕЙСТВИЕ USER] вместе с [ОТВЕТ AI].',
+            '【ОБЯЗАТЕЛЬНО】 В пакетном режиме некоторые записи представлены как слияние [ДЕЙСТВИЕ USER] + [ОТВЕТ AI]. При извлечении horae/horaeevent необходимо объединить все значимые изменения (состояния, сущностей, окружения или сюжета) из [ДЕЙСТВИЕ USER] с [ОТВЕТ AI]; запрещается обрабатывать только AI-часть.',
         ),
         // analyzeMessageWithAI：单条分析末尾追加
         analysisHint: tr(
@@ -21139,7 +21139,7 @@ function _antiParaphraseSnippets() {
             '[Anti-Paraphrase Mode] The previous USER message above describes the user\'s own actions. This turn\'s <horae>/<horaeevent> MUST merge every item/location/event/NPC change from that USER message together with the text being analyzed; do not omit it.',
             '【反転叙述モード】上記の【直前のユーザー行動】は USER 自身の行動を描写する。本ターンの <horae>/<horaeevent> には、その USER 行動のアイテム/場所/イベント/NPC 変化を【分析対象テキスト】と合算して必ず含めること。',
             '【반-패러프레이즈 모드】 위 【직전 USER 행동】은 USER 본인의 행동을 묘사한다. 이번 턴의 <horae>/<horaeevent>는 해당 USER 행동의 아이템/장소/사건/NPC 변화를 【분석 대상 텍스트】와 함께 반드시 기록할 것.',
-            '【Режим анти-перефраза】Сообщение «предыдущее действие USER» выше описывает действия самого USER. <horae>/<horaeevent> в этом ходе ОБЯЗАТЕЛЬНО должно объединять все изменения предметов/мест/событий/NPC из этого сообщения USER с анализируемым текстом.',
+            '【ОБЯЗАТЕЛЬНО】 Предыдущее сообщение USER описывает его собственные действия. Данный <horae>/<horaeevent> обязан объединить все сюжетные и системные последствия этих действий (касающиеся персонажей, предметов, мест или сюжетных линий) с анализируемым текстом; не игнорируйте часть USER.',
         ),
     };
 }

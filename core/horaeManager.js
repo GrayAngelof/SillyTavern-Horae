@@ -3693,15 +3693,33 @@ class HoraeManager {
 		return this._getPromptDefaultFromResource('customAntiParaphrasePrompt', { userName });
 	}
 	
-    _generateAntiParaphrasePrompt() {
-        if (!this.settings?.antiParaphraseMode) return '';
-        const lang = this._getAiOutputLang();
-        const defaults = { 'zh-CN': '主角', 'zh-TW': '主角', 'ja': '主人公', 'ko': '주인공', 'ru': 'протагонист' };
-        const userName = this.context?.name1 || (defaults[lang] || 'protagonist');
-        const text = this._getPromptDefaultFromResource('customAntiParaphrasePrompt', { userName });
-        if (!text || !text.trim()) return '';
-        return '\n' + text.trim();
-    }
+	_generateAntiParaphrasePrompt() {
+		if (!this.settings?.antiParaphraseMode) return '';
+
+		const lang = this._getAiOutputLang();
+		const defaults = {
+			'zh-CN': '主角',
+			'zh-TW': '主角',
+			'ja': '主人公',
+			'ko': '주인공',
+			'ru': 'протагонист'
+		};
+
+		const userName = this.context?.name1 || (defaults[lang] || 'protagonist');
+
+		let text = this.settings.customAntiParaphrasePrompt;
+
+		if (!text || !text.trim()) {
+			text = this._getPromptDefaultFromResource(
+				'customAntiParaphrasePrompt',
+				{ userName }
+			);
+		}
+
+		if (!text || !text.trim()) return '';
+
+		return '\n' + text.trim();
+	}
 
     /** 自定义日历提示词：仅启用且配置完整时注入，告诉 AI 使用指定月名 + 日数 */
     _generateCustomCalendarPrompt() {
