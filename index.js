@@ -115,215 +115,348 @@ const HORAE_REGEX_RULES = [
 // 默认设置
 // ============================================
 const DEFAULT_SETTINGS = {
-    uiLanguage: 'auto',
-    aiOutputLanguage: 'auto',
-    enabled: true,
-    autoParse: true,
-    autoFillPrevTimelineOnSend: false, // 发送前自动补全上一条AI消息的时间线（默认关闭，避免静默误写历史）
-    injectContext: true,
-    useMainPresetForAiTasks: false, // AI分析/批量扫描/手动压缩是否使用酒馆主预设（generate）
-    showMessagePanel: true,
-    injectionDepthSource: 'system', // 注入深度来源: system(原逻辑) / preset(按完整提示词末尾偏移)
-    injectionPosition: 0,
-    timelineInjectionMode: 'inline', // inline(原逻辑合并注入) / separate(剧情轨迹独立前置)
-    lastStoryDate: '',
-    lastStoryTime: '',
-    favoriteNpcs: [],  // 用户标记的星标NPC列表
-    pinnedNpcs: [],    // 用户手动标记的重要角色列表（特殊边框）
-    // 发送给AI的内容控制
-    sendTimeline: true,    // 发送剧情轨迹（关闭则无法计算相对时间）
-    contextDepth: 15,      // 一般级别剧情轨迹数量
-    sendCharacters: true,  // 发送角色信息（服装、好感度）
-    sendCharacterAffection: true,        // 单独控制好感度注入
-    sendMainCharacterPersonality: true,  // 关闭后主要角色（卡片本体 + 置顶 NPC）的性格简述不再注入
-    sendItems: true,       // 发送物品栏
-    panelLayoutStyle: 'classic',         // 'classic' = 默认 / 'glass' = 半透明玻璃 / 'obsidian' = 曜石简约 / 'cyber' = 赛博
-    customTables: [],      // 自定义表格 [{id, name, rows, cols, data, prompt}]
-    customSystemPrompt: '',      // 自定义系统注入提示词（空=使用默认）
-    customBatchPrompt: '',       // 自定义AI摘要提示词（空=使用默认）
-    customAnalysisPrompt: '',    // 自定义AI分析提示词（空=使用默认）
-    customCompressPrompt: '',    // 自定义剧情压缩提示词（空=使用默认）
-    customAutoSummaryPrompt: '', // 自定义自动摘要提示词（空=使用默认；独立于手动压缩）
-    customAutoResummaryPrompt: '', // 自定义二次总结提示词（空=使用默认）
-    aiScanIncludeNpc: false,     // AI摘要是否提取NPC
-    aiScanIncludeAffection: false, // AI摘要是否提取好感度
-    aiScanIncludeScene: false,    // AI摘要是否提取场景记忆
-    aiScanIncludeRelationship: false, // AI摘要是否提取关系网络
-    panelWidth: 100,               // 消息面板宽度百分比（50-100）
-    panelOffset: 0,                // 消息面板右偏移量（px）
-    themeMode: 'dark',             // 插件主题：dark / light / custom-{index}
-    customCSS: '',                 // 用户自定义CSS
-    customThemes: [],              // 导入的美化主题 [{name, author, variables, css}]
-    globalTables: [],              // 全局表格（跨角色卡共享）
-    showTopIcon: true,             // 显示顶部导航栏图标
-    customTablesPrompt: '',        // 自定义表格填写规则提示词（空=使用默认）
-	customItemsPrompt: '',		   // // Отправка памяти Предметов (описание функции фиксированного местоположения)
-    sendLocationMemory: false,     // 发送场景记忆（地点固定特征描述）
-    customLocationPrompt: '',      // 自定义场景记忆提示词（空=使用默认）
-    sendRelationships: false,      // 发送关系网络
-    sendMood: false,               // 发送情绪/心理状态追踪
-    customRelationshipPrompt: '',  // 自定义关系网络提示词（空=使用默认）
-    customMoodPrompt: '',          // 自定义情绪追踪提示词（空=使用默认）
-    // 自动摘要
-    autoSummaryEnabled: false,     // 自动摘要开关
-    autoSummaryKeepRecent: 5,      // 保留最近N条AI消息不压缩（中间用户消息会随全文一起发送）
-    autoSummarySourceMode: 'fulltext', // 'fulltext'(全文+时间线) | 'events'(仅时间线事件)
-    autoSummaryBufferMode: 'messages', // 'messages'(按AI条数) | 'tokens'
-    autoSummaryBufferLimit: 10,     // 旧版缓冲阈值（迁移用）
-    autoSummaryBufferMsgLimit: 10,  // 按AI条数触发的阈值
-    autoSummaryBufferTokenLimit: 30000, // 按Token数触发的阈值
-    autoSummaryResummaryThreshold: 7, // <=0 关闭二次总结；>0 时同层摘要达到此值触发更高层摘要（2->3->4...）
-    autoSummaryResummaryMinChars: 800, // 二次总结输入字数下限；不足时跳过避免对短文本反复压缩降质
-    autoSummaryBatchMaxMsgs: 50,    // 单次摘要最大消息条数
-    autoSummaryBatchMaxTokens: 80000, // 单次摘要最大Token数
-    autoSummaryUseCustomApi: false, // 是否使用独立API端点
-    autoSummaryApiUrl: '',          // 独立API端点地址（OpenAI兼容）
-    autoSummaryApiKey: '',          // 独立API密钥
-    autoSummaryModel: '',           // 独立API模型名称
-    auxApiEnabled: false,            // 辅助API总开关
-    auxApiUrl: '',                   // 辅助API端点地址
-    auxApiKey: '',                   // 辅助API密钥
-    auxApiModel: '',                 // 辅助API模型名称
-    auxApiUseForAnalysis: true,      // AI分析/魔术棒/发送前补全
-    auxApiUseForSummary: true,       // 自动总结/AI智能补全
-    auxApiUseForManualCompress: false, // 手动多选压缩
-    auxApiFallbackToMain: false,     // 辅助API失败后回退主API
-    antiParaphraseMode: false,      // 反转述模式：AI回复时结算上一条USER的内容
-	customAntiParaphrasePrompt: '', // 自定义反转述模式提示词（空=使用默认）
-    sideplayMode: false,            // 番外/小剧场模式：启用后可标记消息跳过Horae
-    // 自定义日历：开启后插件按 monthNames/monthDays 解析剧情日期；未启用走默认公历+奇幻兜底
-    customCalendar: {
-        enabled: false,
-        monthNames: [],
-        monthDays: [],
-    },
-    // 已忽略过自定义日历建议的 chatId 集合，避免同一会话反复弹窗
-    _customCalendarHintDismissed: {},
-    // RPG 模式
-    rpgMode: false,                 // RPG 模式总开关
-    rpgStrictPresentOnly: false,     // 无在场角色时不发送RPG数据
-    sendRpgBars: true,              // 发送属性条（HP/MP/SP/状态）
-    rpgBarsUserOnly: false,         // 属性条仅限主角
-    sendRpgSkills: true,            // 发送技能列表
-    rpgSkillsUserOnly: false,       // 技能仅限主角
-    sendRpgAttributes: true,        // 发送多维属性面板
-    rpgAttrsUserOnly: false,        // 属性面板仅限主角
-    sendRpgReputation: true,        // 发送声望数据
-    rpgReputationUserOnly: false,   // 声望仅限主角
-    sendRpgEquipment: false,        // 发送装备栏（可选）
-    rpgEquipmentUserOnly: false,    // 装备仅限主角
-    sendRpgLevel: false,            // 发送等级/经验值
-    rpgLevelUserOnly: false,        // 等级仅限主角
-    sendRpgCurrency: false,         // 发送货币系统
-    rpgCurrencyUserOnly: false,     // 货币仅限主角
-    rpgUserOnly: false,             // RPG全局仅限主角（总开关，联动所有子模块）
-    sendRpgStronghold: false,       // 发送据点/基地系统
-    rpgBarConfig: [],
-    rpgAttributeConfig: [],
-    rpgAttrViewMode: 'radar',       // 'radar' 或 'text'
-    customRpgPrompt: '',            // 自定义RPG提示词（空=默认）
-    promptPresets: [],              // 提示词预设存档 [{name, prompts:{system,batch,...}}]
-    equipmentTemplates: [],          // 装备格位模板（i18n 初始化后生成）
-    rpgDiceEnabled: false,          // RPG骰子面板
-    dicePosX: null,                 // 骰子面板拖拽位置X（null=默认右下角）
-    dicePosY: null,                 // 骰子面板拖拽位置Y
-    // 教学
-    tutorialCompleted: false,       // 新用户导航教学是否已完成
-    // 向量记忆
-    vectorEnabled: false,
-    vectorSource: 'local',             // 'local' = 本地模型, 'api' = 远程 API
-    vectorModel: 'Xenova/bge-small-zh-v1.5',
-    vectorDtype: 'q8',
-    vectorApiUrl: '',                  // OpenAI 兼容 embedding API 地址
-    vectorApiKey: '',                  // API 密钥
-    vectorApiModel: '',                // 远程 embedding 模型名称
-    vectorPureMode: false,             // 纯向量模式（强模型优化，关闭关键词启发式）
-    vectorRerankEnabled: false,        // 启用 Rerank 二次排序
-    vectorRerankFullText: false,       // Rerank 使用全文而非摘要（需要长上下文模型如 Qwen3-Reranker）
-    vectorRerankModel: '',             // Rerank 模型名称
-    vectorRerankUrl: '',               // Rerank API 地址（留空则复用 embedding 地址）
-    vectorRerankKey: '',               // Rerank API 密钥（留空则复用 embedding 密钥）
-    vectorRerankCandidates: 25,        // Rerank 候选条数（embedding 召回上限）
-    vectorRerankRecallThreshold: 0.3,  // Rerank 路径的 embedding 召回阈值
-    vectorRerankMinScore: 0.5,         // Rerank 最低分；低于此分丢弃
-    vectorRerankContextLimit: 32768,   // Rerank 上下文上限（8K/Cohere/Jina 类用户需手动改小）
-    vectorDebugLog: false,             // 向量召回详细调试日志（默认关闭，开启后输出阈值/频率/去重等明细）
-    vectorRecallPresets: [],           // 用户自定义召回参数预设
-    vectorRecallPresetSelected: 'builtin:small',
-    vectorTopK: 5,
-    vectorThreshold: 0.72,
-    vectorFullTextCount: 3,
-    vectorFullTextThreshold: 0.9,
-    vectorStripTags: '',
-    vectorQueryRewriteEnabled: false,    // 多角度 Query 重写；默认关，强制走辅助 API 避免阻塞主回合
-    vectorQueryRewriteSystemPrompt: '',  // 自定义重写提示词（空=使用默认按语言加载）
-    // 角色卡设置档：把 Horae 配置随卡保存，切卡时按模式套用
-    // ''=未设定（默认，不做任何处理直到用户选定）；ask=切卡时弹窗确认；auto=静默套用；badge=不弹窗只在抽屉挂提示；never=完全不处理
-    cardProfileMode: '',
-    // key=avatar 文件名，value=已忽略的 profile.savedAt；卡作者更新设置档（savedAt 变了）会重新提示
-    _cardProfileHintDismissed: {},
+	// ============================================
+	// 1. CORE PLUGIN SETTINGS
+	// ============================================
+	uiLanguage: 'auto',
+	aiOutputLanguage: 'auto',
+	enabled: true,
+	autoParse: true,
+	autoFillPrevTimelineOnSend: false, // auto‑fill previous AI timeline before sending (off by default)
+	injectContext: true,
+	useMainPresetForAiTasks: false, // use main ST preset for AI tasks (batch scan, manual compress)
+	showMessagePanel: true,
+	panelLayoutStyle: 'classic', // classic / glass / obsidian / cyber
+	panelWidth: 100, // message panel width percentage (50‑100)
+	panelOffset: 0, // right offset in pixels
+	themeMode: 'dark', // dark / light / custom‑{index}
+	customCSS: '',
+	customThemes: [],
+	showTopIcon: true,
+	tutorialCompleted: false,
+
+	// ============================================
+	// 2. INJECTION SETTINGS
+	// ============================================
+	injectionDepthSource: 'system', // system / preset (offset from full prompt end)
+	injectionPosition: 0,
+	timelineInjectionMode: 'inline', // inline / separate (timeline block placed before character etc.)
+	contextDepth: 15, // number of general timeline entries
+
+	// ============================================
+	// 3. AUXILIARY API (for AI tasks)
+	// ============================================
+	auxApiEnabled: false,
+	auxApiUrl: '',
+	auxApiKey: '',
+	auxApiModel: '',
+	auxApiUseForAnalysis: true,
+	auxApiUseForSummary: true,
+	auxApiUseForManualCompress: false,
+	auxApiFallbackToMain: false,
+
+	// ============================================
+	// 4. VECTOR MEMORY
+	// ============================================
+	vectorEnabled: false,
+	vectorSource: 'local', // local / api
+	vectorModel: 'Xenova/bge-small-zh-v1.5',
+	vectorDtype: 'q8',
+	vectorApiUrl: '',
+	vectorApiKey: '',
+	vectorApiModel: '',
+	vectorPureMode: false,
+	vectorRerankEnabled: false,
+	vectorRerankFullText: false,
+	vectorRerankModel: '',
+	vectorRerankUrl: '',
+	vectorRerankKey: '',
+	vectorRerankCandidates: 25,
+	vectorRerankRecallThreshold: 0.3,
+	vectorRerankMinScore: 0.5,
+	vectorRerankContextLimit: 32768,
+	vectorDebugLog: false,
+	vectorRecallPresets: [],
+	vectorRecallPresetSelected: 'builtin:small',
+	vectorTopK: 5,
+	vectorThreshold: 0.72,
+	vectorFullTextCount: 3,
+	vectorFullTextThreshold: 0.9,
+	vectorStripTags: '',
+	vectorQueryRewriteEnabled: false,
+	vectorQueryRewriteSystemPrompt: '',
+
+	// ============================================
+	// 5. CUSTOM SYSTEM PROMPTS
+	// ============================================
+	customSystemPrompt: '',
+	customBatchPrompt: '',
+	customAnalysisPrompt: '',
+	customCompressPrompt: '',
+	customAutoSummaryPrompt: '',
+	customAutoResummaryPrompt: '',
+	customTablesPrompt: '',
+
+	// ============================================
+	// 6. CUSTOM MODULE PROMPTS
+	// ============================================
+	// Timeline
+	sendTimeline: true,
+	customTimelineTimePrompt: '',
+	sendAgenda: true,
+	customTimelineAgendaPrompt: '',
+	sendHistory: true,
+	customTimelineHistoryPrompt: '',
+
+	// Characters
+	sendCharacters: true,
+	customCharactersPrompt: '',
+	sendCharacterAffection: true,
+	customCharacterAffectionPrompt: '',
+	sendMainCharacterPersonality: true,
+
+	// Items
+	sendItems: true,
+	customItemsPrompt: '',
+
+	// Location
+	sendLocationMemory: false,
+	customLocationPrompt: '',
+
+	// Relationships
+	sendRelationships: false,
+	customRelationshipPrompt: '',
+
+	// Mood
+	sendMood: false,
+	customMoodPrompt: '',
+
+	// RPG
+	rpgMode: false,
+	rpgStrictPresentOnly: false,
+	sendRpgBars: true,
+	rpgBarsUserOnly: false,
+	sendRpgSkills: true,
+	rpgSkillsUserOnly: false,
+	sendRpgAttributes: true,
+	rpgAttrsUserOnly: false,
+	sendRpgReputation: true,
+	rpgReputationUserOnly: false,
+	sendRpgEquipment: false,
+	rpgEquipmentUserOnly: false,
+	sendRpgLevel: false,
+	rpgLevelUserOnly: false,
+	sendRpgCurrency: false,
+	rpgCurrencyUserOnly: false,
+	rpgUserOnly: false,
+	sendRpgStronghold: false,
+	rpgBarConfig: [],
+	rpgAttributeConfig: [],
+	rpgAttrViewMode: 'radar',
+	customRpgPrompt: '',
+	equipmentTemplates: [],
+	rpgDiceEnabled: false,
+	dicePosX: null,
+	dicePosY: null,
+
+	// ============================================
+	// 7. OTHER OPTIONS
+	// ============================================
+	// Auto‑summary
+	autoSummaryEnabled: false,
+	autoSummaryKeepRecent: 5,
+	autoSummarySourceMode: 'fulltext', // fulltext / events
+	autoSummaryBufferMode: 'messages', // messages / tokens
+	autoSummaryBufferLimit: 10,
+	autoSummaryBufferMsgLimit: 10,
+	autoSummaryBufferTokenLimit: 30000,
+	autoSummaryResummaryThreshold: 7,
+	autoSummaryResummaryMinChars: 800,
+	autoSummaryBatchMaxMsgs: 50,
+	autoSummaryBatchMaxTokens: 80000,
+	autoSummaryUseCustomApi: false,
+	autoSummaryApiUrl: '',
+	autoSummaryApiKey: '',
+	autoSummaryApiModel: '',
+
+	// Anti‑paraphrase mode
+	antiParaphraseMode: false,
+	customAntiParaphrasePrompt: '',
+
+	// Sideplay / interlude mode
+	sideplayMode: false,
+
+	// Custom calendar
+	customCalendar: {
+	enabled: false,
+	monthNames: [],
+	monthDays: [],
+	},
+	_customCalendarHintDismissed: {},
+
+	// Card profile mode
+	cardProfileMode: '',
+	_cardProfileHintDismissed: {},
+
+	// Other
+	favoriteNpcs: [],
+	pinnedNpcs: [],
+	customTables: [],
+	globalTables: [],
+	promptPresets: [],
+	aiScanIncludeNpc: false,
+	aiScanIncludeAffection: false,
+	aiScanIncludeScene: false,
+	aiScanIncludeRelationship: false,
+	lastStoryDate: '',
+	lastStoryTime: '',
 };
 
 const PROMPT_SETTING_KEYS = [
-    'customSystemPrompt',
-    'customBatchPrompt',
-    'customAnalysisPrompt',
-    'customCompressPrompt',
-    'customAutoSummaryPrompt',
-    'customAutoResummaryPrompt',
-    'customTablesPrompt',
+	'customSystemPrompt',
+	'customBatchPrompt',
+	'customAnalysisPrompt',
+	'customCompressPrompt',
+	'customAutoSummaryPrompt',
+	'customAutoResummaryPrompt',
+	'customTablesPrompt',
 	'customCharactersPrompt',
 	'customCharacterAffectionPrompt',
 	'customItemsPrompt',
-    'customLocationPrompt',
-    'customRelationshipPrompt',
-    'customMoodPrompt',
-    'customRpgPrompt',
+	'customLocationPrompt',
+	'customRelationshipPrompt',
+	'customMoodPrompt',
+	'customRpgPrompt',
 	'customAntiParaphrasePrompt',
-    'vectorQueryRewriteSystemPrompt',
+	'vectorQueryRewriteSystemPrompt',
 ];
 
 // 外部来源弹窗里「重置但保留」的白名单：填起来麻烦或丢失代价大的字段
 const PRESERVED_KEYS_ON_RESET = [
-    ...PROMPT_SETTING_KEYS,
-    'auxApiUrl', 'auxApiKey', 'auxApiModel', 'auxApiEnabled',
-    'auxApiUseForAnalysis', 'auxApiUseForSummary',
-    'auxApiUseForManualCompress', 'auxApiFallbackToMain',
-    'vectorEnabled', 'vectorSource', 'vectorModel', 'vectorDtype',
-    'vectorApiUrl', 'vectorApiKey', 'vectorApiModel',
-    'vectorRerankEnabled', 'vectorRerankFullText',
-    'vectorRerankModel', 'vectorRerankUrl', 'vectorRerankKey',
-    'vectorRerankCandidates', 'vectorRerankRecallThreshold', 'vectorRerankMinScore',
-    'vectorRerankContextLimit',
-    'vectorRecallPresets', 'vectorRecallPresetSelected',
-    'vectorTopK', 'vectorThreshold', 'vectorFullTextCount', 'vectorFullTextThreshold',
-    'vectorStripTags', 'vectorPureMode',
-    'vectorQueryRewriteEnabled',
-    'customThemes', 'globalTables',
-    'uiLanguage', 'aiOutputLanguage',
-    'cardProfileMode', '_cardProfileHintDismissed',
+	// UI & Language
+	'uiLanguage',
+	'aiOutputLanguage',
+
+	// Themes & Global Tables
+	'customThemes',
+	'globalTables',
+
+	// Card Profile
+	'cardProfileMode',
+	'_cardProfileHintDismissed',
+
+	// Auxiliary API
+	'auxApiEnabled',
+	'auxApiUrl',
+	'auxApiKey',
+	'auxApiModel',
+	'auxApiUseForAnalysis',
+	'auxApiUseForSummary',
+	'auxApiUseForManualCompress',
+	'auxApiFallbackToMain',
+
+	// Vector Memory
+	'vectorEnabled',
+	'vectorSource',
+	'vectorModel',
+	'vectorDtype',
+	'vectorApiUrl',
+	'vectorApiKey',
+	'vectorApiModel',
+	'vectorRerankEnabled',
+	'vectorRerankFullText',
+	'vectorRerankModel',
+	'vectorRerankUrl',
+	'vectorRerankKey',
+	'vectorRerankCandidates',
+	'vectorRerankRecallThreshold', 'vectorRerankMinScore',
+	'vectorRerankContextLimit',
+	'vectorRecallPresets',
+	'vectorRecallPresetSelected',
+	'vectorTopK',
+	'vectorThreshold',
+	'vectorFullTextCount',
+	'vectorFullTextThreshold',
+	'vectorStripTags',
+	'vectorPureMode',
+	'vectorQueryRewriteEnabled',
+
+	// Custom Prompts (all custom* keys)
+	...PROMPT_SETTING_KEYS,
 ];
 
 // 配置档导出/导入/角色卡同步共用的字段白名单。
 // 故意排除 API URL/Key/Model、向量召回参数等本地敏感/环境相关字段，避免随卡分享时泄露凭据。
 const _SETTINGS_EXPORT_KEYS = [
-    'enabled', 'autoParse', 'autoFillPrevTimelineOnSend', 'injectContext', 'useMainPresetForAiTasks', 'showMessagePanel', 'showTopIcon',
-    'injectionDepthSource', 'injectionPosition', 'timelineInjectionMode',
-    'sendTimeline', 'contextDepth', 'sendCharacters', 'sendItems',
-    'sendLocationMemory', 'sendRelationships', 'sendMood',
-    'antiParaphraseMode', 'sideplayMode',
-    'aiScanIncludeNpc', 'aiScanIncludeAffection', 'aiScanIncludeScene', 'aiScanIncludeRelationship',
-    'rpgMode', 'sendRpgBars', 'sendRpgSkills', 'sendRpgAttributes', 'sendRpgReputation',
-    'sendRpgEquipment', 'sendRpgLevel', 'sendRpgCurrency', 'sendRpgStronghold', 'rpgDiceEnabled',
-    'rpgStrictPresentOnly', 'rpgBarsUserOnly', 'rpgSkillsUserOnly', 'rpgAttrsUserOnly', 'rpgReputationUserOnly',
-    'rpgEquipmentUserOnly', 'rpgLevelUserOnly', 'rpgCurrencyUserOnly', 'rpgUserOnly',
-    'rpgBarConfig', 'rpgAttributeConfig', 'rpgAttrViewMode', 'equipmentTemplates',
-    'autoSummaryEnabled', 'autoSummaryKeepRecent', 'autoSummarySourceMode',
-    'autoSummaryBufferMode', 'autoSummaryBufferMsgLimit', 'autoSummaryBufferTokenLimit',
-    'autoSummaryResummaryThreshold', 'autoSummaryResummaryMinChars',
-    'autoSummaryBatchMaxMsgs', 'autoSummaryBatchMaxTokens',
-    'cardProfileMode',
-    ...PROMPT_SETTING_KEYS,
+	// CORE
+	'enabled',
+	'autoParse',
+	'autoFillPrevTimelineOnSend',
+	'injectContext',
+	'useMainPresetForAiTasks',
+	'showMessagePanel',
+	'showTopIcon',
+
+	// INJECTION
+	'injectionDepthSource',
+	'injectionPosition',
+	'timelineInjectionMode',
+	'contextDepth',
+
+	// MODULES
+	'sendTimeline',
+	'sendCharacters',
+	'sendItems',
+	'sendLocationMemory',
+	'sendRelationships',
+	'sendMood',
+
+	// RPG
+	'rpgMode',
+	'sendRpgBars',
+	'sendRpgSkills',
+	'sendRpgAttributes',
+	'sendRpgReputation',
+	'sendRpgEquipment',
+	'sendRpgLevel',
+	'sendRpgCurrency',
+	'sendRpgStronghold',
+	'rpgDiceEnabled',
+	'rpgStrictPresentOnly',
+	'rpgBarsUserOnly',
+	'rpgSkillsUserOnly',
+	'rpgAttrsUserOnly',
+	'rpgReputationUserOnly',
+	'rpgEquipmentUserOnly',
+	'rpgLevelUserOnly',
+	'rpgCurrencyUserOnly',
+	'rpgUserOnly',
+	'rpgBarConfig',
+	'rpgAttributeConfig',
+	'rpgAttrViewMode',
+	'equipmentTemplates',
+
+	// OTHER
+	'antiParaphraseMode',
+	'sideplayMode',
+	'aiScanIncludeNpc',
+	'aiScanIncludeAffection',
+	'aiScanIncludeScene',
+	'aiScanIncludeRelationship',
+	'autoSummaryEnabled',
+	'autoSummaryKeepRecent',
+	'autoSummarySourceMode',
+	'autoSummaryBufferMode',
+	'autoSummaryBufferMsgLimit',
+	'autoSummaryBufferTokenLimit',
+	'autoSummaryResummaryThreshold',
+	'autoSummaryResummaryMinChars',
+	'autoSummaryBatchMaxMsgs',
+	'autoSummaryBatchMaxTokens',
+	'cardProfileMode',
+
+	// PROMPTS
+	...PROMPT_SETTING_KEYS,
 ];
 
 // ============================================
@@ -13617,6 +13750,9 @@ function initSettingsEvents() {
             ['customAutoSummaryPrompt', 'horae-custom-auto-summary-prompt', 'horae-auto-summary-prompt-count', () => getDefaultAutoSummaryPrompt()],
             ['customAutoResummaryPrompt', 'horae-custom-auto-resummary-prompt', 'horae-auto-resummary-prompt-count', () => getDefaultAutoResummaryPrompt()],
             ['customTablesPrompt', 'horae-custom-tables-prompt', 'horae-tables-prompt-count', () => horaeManager.getDefaultTablesPrompt()],
+			['customTimelineTimePrompt', 'horae-custom-timeline-prompt', 'horae-timeline-prompt-count', () => horaeManager.getDefaultTimelineTimePrompt()],
+			['customTimelineAgendaPrompt', 'horae-custom-agenda-prompt', 'horae-agenda-prompt-count', () => horaeManager.getDefaultTimelineAgendaPrompt()],
+			['customTimelineHistoryPrompt', 'horae-custom-history-prompt', 'horae-history-prompt-count', () => horaeManager.getDefaultTimelineHistoryPrompt()],
 			['customCharactersPrompt', 'horae-custom-characters-prompt', 'horae-characters-prompt-count', () => horaeManager.getDefaultCharactersPrompt()],
 			['customCharacterAffectionPrompt', 'horae-custom-affection-prompt', 'horae-affection-prompt-count', () => horaeManager.getDefaultCharacterAffectionPrompt()],			
 			['customItemsPrompt', 'horae-custom-items-prompt', 'horae-items-prompt-count', () => horaeManager.getDefaultItemsPrompt()],
@@ -13787,20 +13923,23 @@ function initSettingsEvents() {
         for (const k of _PRESET_PROMPT_KEYS) settings[k] = '';
         saveSettings();
         const pairs = [
-            ['customSystemPrompt', 'horae-custom-system-prompt', 'horae-system-prompt-count', () => horaeManager.getDefaultSystemPrompt()],
-            ['customBatchPrompt', 'horae-custom-batch-prompt', 'horae-batch-prompt-count', () => getDefaultBatchPrompt()],
-            ['customAnalysisPrompt', 'horae-custom-analysis-prompt', 'horae-analysis-prompt-count', () => getDefaultAnalysisPrompt()],
-            ['customCompressPrompt', 'horae-custom-compress-prompt', 'horae-compress-prompt-count', () => getDefaultCompressPrompt()],
-            ['customAutoSummaryPrompt', 'horae-custom-auto-summary-prompt', 'horae-auto-summary-prompt-count', () => getDefaultAutoSummaryPrompt()],
-            ['customAutoResummaryPrompt', 'horae-custom-auto-resummary-prompt', 'horae-auto-resummary-prompt-count', () => getDefaultAutoResummaryPrompt()],
-            ['customTablesPrompt', 'horae-custom-tables-prompt', 'horae-tables-prompt-count', () => horaeManager.getDefaultTablesPrompt()],
+			['customSystemPrompt', 'horae-custom-system-prompt', 'horae-system-prompt-count', () => horaeManager.getDefaultSystemPrompt()],
+			['customBatchPrompt', 'horae-custom-batch-prompt', 'horae-batch-prompt-count', () => getDefaultBatchPrompt()],
+			['customAnalysisPrompt', 'horae-custom-analysis-prompt', 'horae-analysis-prompt-count', () => getDefaultAnalysisPrompt()],
+			['customCompressPrompt', 'horae-custom-compress-prompt', 'horae-compress-prompt-count', () => getDefaultCompressPrompt()],
+			['customAutoSummaryPrompt', 'horae-custom-auto-summary-prompt', 'horae-auto-summary-prompt-count', () => getDefaultAutoSummaryPrompt()],
+			['customAutoResummaryPrompt', 'horae-custom-auto-resummary-prompt', 'horae-auto-resummary-prompt-count', () => getDefaultAutoResummaryPrompt()],
+			['customTablesPrompt', 'horae-custom-tables-prompt', 'horae-tables-prompt-count', () => horaeManager.getDefaultTablesPrompt()],
+			['customTimelineTimePrompt', 'horae-custom-timeline-prompt', 'horae-timeline-prompt-count', () => horaeManager.getDefaultTimelineTimePrompt()],
+			['customTimelineAgendaPrompt', 'horae-custom-agenda-prompt', 'horae-agenda-prompt-count', () => horaeManager.getDefaultTimelineAgendaPrompt()],
+			['customTimelineHistoryPrompt', 'horae-custom-history-prompt', 'horae-history-prompt-count', () => horaeManager.getDefaultTimelineHistoryPrompt()],
 			['customCharactersPrompt', 'horae-custom-characters-prompt', 'horae-characters-prompt-count', () => horaeManager.getDefaultCharactersPrompt()],
 			['customCharacterAffectionPrompt', 'horae-custom-affection-prompt', 'horae-affection-prompt-count', () => horaeManager.getDefaultCharacterAffectionPrompt()],		
 			['customItemsPrompt', 'horae-custom-items-prompt', 'horae-items-prompt-count', () => horaeManager.getDefaultItemsPrompt()],
-            ['customLocationPrompt', 'horae-custom-location-prompt', 'horae-location-prompt-count', () => horaeManager.getDefaultLocationPrompt()],
-            ['customRelationshipPrompt', 'horae-custom-relationship-prompt', 'horae-relationship-prompt-count', () => horaeManager.getDefaultRelationshipPrompt()],
-            ['customMoodPrompt', 'horae-custom-mood-prompt', 'horae-mood-prompt-count', () => horaeManager.getDefaultMoodPrompt()],
-            ['customRpgPrompt', 'horae-custom-rpg-prompt', 'horae-rpg-prompt-count', () => horaeManager.getDefaultRpgPromptResolved()],
+			['customLocationPrompt', 'horae-custom-location-prompt', 'horae-location-prompt-count', () => horaeManager.getDefaultLocationPrompt()],
+			['customRelationshipPrompt', 'horae-custom-relationship-prompt', 'horae-relationship-prompt-count', () => horaeManager.getDefaultRelationshipPrompt()],
+			['customMoodPrompt', 'horae-custom-mood-prompt', 'horae-mood-prompt-count', () => horaeManager.getDefaultMoodPrompt()],
+			['customRpgPrompt', 'horae-custom-rpg-prompt', 'horae-rpg-prompt-count', () => horaeManager.getDefaultRpgPromptResolved()],
 			['customAntiParaphrasePrompt', 'horae-custom-anti-paraphrase-prompt', 'horae-anti-paraphrase-prompt-count', () => horaeManager.getDefaultAntiParaphrasePrompt()],
         ];
         for (const [, textareaId, countId, getDefault] of pairs) {
@@ -13994,12 +14133,48 @@ function initSettingsEvents() {
         showToast(t('toast.itemsRefreshed'), 'info');
     });
 
-    $('#horae-setting-send-timeline').on('change', function () {
-        settings.sendTimeline = this.checked;
-        saveSettings();
-        horaeManager.init(getContext(), settings);
-        updateTokenCounter();
-    });
+	$('#horae-setting-send-timeline').on('change', function () {
+		const enabled = $(this).prop('checked');
+
+		// Управление видимостью дочерних чекбоксов и групп полей
+		$('#horae-setting-send-agenda, #horae-setting-send-history').closest('div').toggle(enabled);
+		if (!enabled) {
+			$('#horae-setting-send-agenda, #horae-setting-send-history').prop('checked', false);
+			$('#horae-agenda-prompt-group, #horae-history-prompt-group').hide();
+		}
+
+		$('#horae-timeline-prompt-group').toggle(enabled);
+		$('.horae-tab[data-tab="timeline"]').toggle(enabled);
+
+		settings.sendTimeline = this.checked;
+		saveSettings();
+		horaeManager.init(getContext(), settings);
+		updateTokenCounter();
+	});
+	
+	// ===== Обработчики для хронологии (по аналогии с персонажами) =====
+	$('#horae-setting-send-timeline').on('change', function() {
+		const enabled = $(this).prop('checked');
+		$('#horae-setting-send-agenda, #horae-setting-send-history').prop('disabled', !enabled).closest('div').toggle(enabled);
+		if (!enabled) {
+			$('#horae-setting-send-agenda, #horae-setting-send-history').prop('checked', false);
+		}
+		saveSettings();
+	});
+
+	$('#horae-setting-send-agenda').on('change', function() {
+		const enabled = $(this).prop('checked');
+		const timelineEnabled = $('#horae-setting-send-timeline').prop('checked');
+		$('#horae-agenda-prompt-group').toggle(timelineEnabled && enabled);
+		saveSettings();
+	});
+
+	$('#horae-setting-send-history').on('change', function() {
+		const enabled = $(this).prop('checked');
+		const timelineEnabled = $('#horae-setting-send-timeline').prop('checked');
+		$('#horae-history-prompt-group').toggle(timelineEnabled && enabled);
+		saveSettings();
+	});
 
     $('#horae-setting-context-depth').on('change', function () {
         const val = parseInt(this.value, 10);
@@ -14587,6 +14762,75 @@ function initSettingsEvents() {
         updateTokenCounter();
         showToast(t('toast.promptsRestored'), 'success');
     });
+	
+	// Промпт Времени
+	$('#horae-custom-timeline-prompt').on('input', function () {
+		const val = this.value;
+		settings.customTimelineTimePrompt =
+			(val.trim() === horaeManager.getDefaultTimelineTimePrompt().trim()) ? '' : val;
+		$('#horae-timeline-prompt-count').text(val.length);
+		saveSettings();
+		horaeManager.init(getContext(), settings);
+		updateTokenCounter();
+	});
+
+	$('#horae-btn-reset-timeline-prompt').on('click', () => {
+		if (!confirm(t('confirm.restoreRpgPrompts'))) return;
+		settings.customTimelineTimePrompt = '';
+		saveSettings();
+		const def = horaeManager.getDefaultTimelineTimePrompt();
+		$('#horae-custom-timeline-prompt').val(def);
+		$('#horae-timeline-prompt-count').text(def.length);
+		horaeManager.init(getContext(), settings);
+		updateTokenCounter();
+		showToast(t('toast.promptsRestored'), 'success');
+	});
+
+	// Промпт Списка дел
+	$('#horae-custom-agenda-prompt').on('input', function () {
+		const val = this.value;
+		settings.customTimelineAgendaPrompt =
+			(val.trim() === horaeManager.getDefaultTimelineAgendaPrompt().trim()) ? '' : val;
+		$('#horae-agenda-prompt-count').text(val.length);
+		saveSettings();
+		horaeManager.init(getContext(), settings);
+		updateTokenCounter();
+	});
+
+	$('#horae-btn-reset-agenda-prompt').on('click', () => {
+		if (!confirm(t('confirm.restoreRpgPrompts'))) return;
+		settings.customTimelineAgendaPrompt = '';
+		saveSettings();
+		const def = horaeManager.getDefaultTimelineAgendaPrompt();
+		$('#horae-custom-agenda-prompt').val(def);
+		$('#horae-agenda-prompt-count').text(def.length);
+		horaeManager.init(getContext(), settings);
+		updateTokenCounter();
+		showToast(t('toast.promptsRestored'), 'success');
+	});
+
+	// Промпт Сюжетной линии
+	$('#horae-custom-history-prompt').on('input', function () {
+		const val = this.value;
+		settings.customTimelineHistoryPrompt =
+			(val.trim() === horaeManager.getDefaultTimelineHistoryPrompt().trim()) ? '' : val;
+		$('#horae-history-prompt-count').text(val.length);
+		saveSettings();
+		horaeManager.init(getContext(), settings);
+		updateTokenCounter();
+	});
+
+	$('#horae-btn-reset-history-prompt').on('click', () => {
+		if (!confirm(t('confirm.restoreRpgPrompts'))) return;
+		settings.customTimelineHistoryPrompt = '';
+		saveSettings();
+		const def = horaeManager.getDefaultTimelineHistoryPrompt();
+		$('#horae-custom-history-prompt').val(def);
+		$('#horae-history-prompt-count').text(def.length);
+		horaeManager.init(getContext(), settings);
+		updateTokenCounter();
+		showToast(t('toast.promptsRestored'), 'success');
+	});
 
 	// Промпт Персонажи
 	$('#horae-custom-characters-prompt').on('input', function () {
@@ -14613,6 +14857,7 @@ function initSettingsEvents() {
     updateTokenCounter();
     showToast(t('toast.promptsRestored'), 'success');
 	});
+	
 	// Промпт Отношение
 	$('#horae-custom-affection-prompt').on('input', function () {
 		const val = this.value;
@@ -15790,6 +16035,9 @@ function _refreshSystemPromptDisplay() {
         ['customAutoSummaryPrompt', 'horae-custom-auto-summary-prompt', 'horae-auto-summary-prompt-count', () => getDefaultAutoSummaryPrompt()],
         ['customAutoResummaryPrompt', 'horae-custom-auto-resummary-prompt', 'horae-auto-resummary-prompt-count', () => getDefaultAutoResummaryPrompt()],
         ['customTablesPrompt', 'horae-custom-tables-prompt', 'horae-tables-prompt-count', () => horaeManager.getDefaultTablesPrompt()],
+		['customTimelineTimePrompt', 'horae-custom-timeline-prompt', 'horae-timeline-prompt-count', () => horaeManager.getDefaultTimelineTimePrompt()],
+		['customTimelineAgendaPrompt', 'horae-custom-agenda-prompt', 'horae-agenda-prompt-count', () => horaeManager.getDefaultTimelineAgendaPrompt()],
+		['customTimelineHistoryPrompt', 'horae-custom-history-prompt', 'horae-history-prompt-count', () => horaeManager.getDefaultTimelineHistoryPrompt()],
 		['customCharactersPrompt', 'horae-custom-characters-prompt', 'horae-characters-prompt-count', () => horaeManager.getDefaultCharactersPrompt()],
 		['customCharacterAffectionPrompt', 'horae-custom-affection-prompt', 'horae-affection-prompt-count', () => horaeManager.getDefaultCharacterAffectionPrompt()],
 		['customItemsPrompt', 'horae-custom-items-prompt', 'horae-items-prompt-count', () => horaeManager.getDefaultItemsPrompt()],
@@ -15996,9 +16244,7 @@ function syncSettingsToUI() {
     $('#horae-ext-show-top-icon').prop('checked', settings.showTopIcon !== false);
     $('#horae-setting-injection-depth-source').val(settings.injectionDepthSource === 'preset' ? 'preset' : 'system');
     $('#horae-setting-injection-position').val(settings.injectionPosition);
-    $('#horae-setting-timeline-injection-mode').val(settings.timelineInjectionMode === 'separate' ? 'separate' : 'inline');
-    $('#horae-setting-send-timeline').prop('checked', settings.sendTimeline);
-    $('#horae-setting-context-depth').val(Number.isFinite(parseInt(settings.contextDepth, 10)) ? Math.max(0, parseInt(settings.contextDepth, 10)) : 15);
+	$('#horae-setting-context-depth').val(Number.isFinite(parseInt(settings.contextDepth, 10)) ? Math.max(0, parseInt(settings.contextDepth, 10)) : 15);
 	$('#horae-setting-show-system-prompt').prop('checked', settings.showSystemPrompt !== false);
 	$('#horae-system-prompt-group').toggle(settings.showSystemPrompt !== false);
 	$('#horae-setting-show-batch-prompt').prop('checked', settings.showBatchPrompt !== false);
@@ -16013,25 +16259,28 @@ function syncSettingsToUI() {
 
     applyTopIconVisibility();
 
+	// Хронология сюжета
+	const timelineEnabled = !!settings.sendTimeline;
+
+	$('#horae-setting-send-timeline').prop('checked', timelineEnabled);
+	$('#horae-setting-send-agenda').prop('checked', settings.sendAgenda !== false).closest('div').toggle(timelineEnabled);
+	$('#horae-setting-send-history').prop('checked', settings.sendHistory !== false).closest('div').toggle(timelineEnabled);
+	$('#horae-timeline-prompt-group').toggle(timelineEnabled);
+	$('#horae-agenda-prompt-group').toggle(timelineEnabled && settings.sendAgenda !== false);
+	$('#horae-history-prompt-group').toggle(timelineEnabled && settings.sendHistory !== false);
+	$('#horae-timeline-prompt-group').toggle(timelineEnabled);
+	$('#horae-agenda-prompt-group').toggle(timelineEnabled && settings.sendAgenda !== false);
+	$('#horae-history-prompt-group').toggle(timelineEnabled && settings.sendHistory !== false);
+	$('.horae-tab[data-tab="timeline"]').toggle(timelineEnabled);
+
 	// Персонажи
 	const charactersEnabled = !!settings.sendCharacters;
 
 	$('#horae-setting-send-characters').prop('checked', charactersEnabled);
-
-	$('#horae-setting-send-character-affection')
-		.prop('checked', settings.sendCharacterAffection !== false)
-		.closest('div')
-		.toggle(charactersEnabled);
-
-	$('#horae-setting-send-main-character-personality')
-		.prop('checked', settings.sendMainCharacterPersonality !== false)
-		.closest('div')
-		.toggle(charactersEnabled);
-
+	$('#horae-setting-send-character-affection').prop('checked', settings.sendCharacterAffection !== false).closest('div').toggle(charactersEnabled);
+	$('#horae-setting-send-main-character-personality').prop('checked', settings.sendMainCharacterPersonality !== false).closest('div').toggle(charactersEnabled);
 	$('#horae-characters-prompt-group').toggle(charactersEnabled);
 	$('#horae-affection-prompt-group').toggle(charactersEnabled && settings.sendCharacterAffection !== false);
-
-
 	$('.horae-tab[data-tab="characters"]').toggle(charactersEnabled);
 
 	//Предметы
@@ -16132,51 +16381,61 @@ function syncSettingsToUI() {
     }
     updateAutoSummaryHint();
 
-    const sysPrompt = settings.customSystemPrompt || horaeManager.getDefaultSystemPrompt();
-    const batchPromptVal = settings.customBatchPrompt || getDefaultBatchPrompt();
-    const analysisPromptVal = settings.customAnalysisPrompt || getDefaultAnalysisPrompt();
-    const compressPromptVal = settings.customCompressPrompt || getDefaultCompressPrompt();
-    const autoSumPromptVal = settings.customAutoSummaryPrompt || getDefaultAutoSummaryPrompt();
-    const autoResumPromptVal = settings.customAutoResummaryPrompt || getDefaultAutoResummaryPrompt();
-    const tablesPromptVal = settings.customTablesPrompt || horaeManager.getDefaultTablesPrompt();
+	const sysPrompt = settings.customSystemPrompt || horaeManager.getDefaultSystemPrompt();
+	const batchPromptVal = settings.customBatchPrompt || getDefaultBatchPrompt();
+	const analysisPromptVal = settings.customAnalysisPrompt || getDefaultAnalysisPrompt();
+	const compressPromptVal = settings.customCompressPrompt || getDefaultCompressPrompt();
+	const autoSumPromptVal = settings.customAutoSummaryPrompt || getDefaultAutoSummaryPrompt();
+	const autoResumPromptVal = settings.customAutoResummaryPrompt || getDefaultAutoResummaryPrompt();
+	const tablesPromptVal = settings.customTablesPrompt || horaeManager.getDefaultTablesPrompt();
+	const timelineTimePromptVal = settings.customTimelineTimePrompt || horaeManager.getDefaultTimelineTimePrompt();
+	const timelineAgendaPromptVal = settings.customTimelineAgendaPrompt || horaeManager.getDefaultTimelineAgendaPrompt();
+	const timelineHistoryPromptVal = settings.customTimelineHistoryPrompt || horaeManager.getDefaultTimelineHistoryPrompt();
 	const charactersPromptVal = settings.customCharactersPrompt || horaeManager.getDefaultCharactersPrompt();
 	const characterAffectionPromptVal = settings.customCharacterAffectionPrompt || horaeManager.getDefaultCharacterAffectionPrompt();
 	const itemsPromptVal = settings.customItemsPrompt || horaeManager.getDefaultItemsPrompt();
-    const locationPromptVal = settings.customLocationPrompt || horaeManager.getDefaultLocationPrompt();
-    const relPromptVal = settings.customRelationshipPrompt || horaeManager.getDefaultRelationshipPrompt();
-    const moodPromptVal = settings.customMoodPrompt || horaeManager.getDefaultMoodPrompt();
-    const rpgPromptVal = settings.customRpgPrompt || horaeManager.getDefaultRpgPromptResolved();
+	const locationPromptVal = settings.customLocationPrompt || horaeManager.getDefaultLocationPrompt();
+	const relPromptVal = settings.customRelationshipPrompt || horaeManager.getDefaultRelationshipPrompt();
+	const moodPromptVal = settings.customMoodPrompt || horaeManager.getDefaultMoodPrompt();
+	const rpgPromptVal = settings.customRpgPrompt || horaeManager.getDefaultRpgPromptResolved();
 	const antiParaphrasePromptVal = settings.customAntiParaphrasePrompt || horaeManager.getDefaultAntiParaphrasePrompt();
 	
-    $('#horae-custom-system-prompt').val(sysPrompt);
-    $('#horae-custom-batch-prompt').val(batchPromptVal);
-    $('#horae-custom-analysis-prompt').val(analysisPromptVal);
-    $('#horae-custom-compress-prompt').val(compressPromptVal);
-    $('#horae-custom-auto-summary-prompt').val(autoSumPromptVal);
-    $('#horae-custom-auto-resummary-prompt').val(autoResumPromptVal);
-    $('#horae-custom-tables-prompt').val(tablesPromptVal);
+	$('#horae-custom-system-prompt').val(sysPrompt);
+	$('#horae-custom-batch-prompt').val(batchPromptVal);
+	$('#horae-custom-analysis-prompt').val(analysisPromptVal);
+	$('#horae-custom-compress-prompt').val(compressPromptVal);
+	$('#horae-custom-auto-summary-prompt').val(autoSumPromptVal);
+	$('#horae-custom-auto-resummary-prompt').val(autoResumPromptVal);
+	$('#horae-custom-tables-prompt').val(tablesPromptVal);
+	$('#horae-custom-timeline-prompt').val(timelineTimePromptVal);
+	$('#horae-custom-agenda-prompt').val(timelineAgendaPromptVal);
+	$('#horae-custom-history-prompt').val(timelineHistoryPromptVal);
 	$('#horae-custom-characters-prompt').val(charactersPromptVal);
-	$('#horae-characters-prompt-count').text(charactersPromptVal.length);
 	$('#horae-custom-affection-prompt').val(characterAffectionPromptVal);
-	$('#horae-affection-prompt-count').text(characterAffectionPromptVal.length);	
 	$('#horae-custom-items-prompt').val(itemsPromptVal);
-    $('#horae-custom-location-prompt').val(locationPromptVal);
-    $('#horae-custom-relationship-prompt').val(relPromptVal);
-    $('#horae-custom-mood-prompt').val(moodPromptVal);
-    $('#horae-custom-rpg-prompt').val(rpgPromptVal);
-    $('#horae-system-prompt-count').text(sysPrompt.length);
-    $('#horae-batch-prompt-count').text(batchPromptVal.length);
-    $('#horae-analysis-prompt-count').text(analysisPromptVal.length);
-    $('#horae-compress-prompt-count').text(compressPromptVal.length);
-    $('#horae-auto-summary-prompt-count').text(autoSumPromptVal.length);
-    $('#horae-auto-resummary-prompt-count').text(autoResumPromptVal.length);
-    $('#horae-tables-prompt-count').text(tablesPromptVal.length);
-	$('#horae-items-prompt-count').text(itemsPromptVal.length);
-    $('#horae-location-prompt-count').text(locationPromptVal.length);
-    $('#horae-relationship-prompt-count').text(relPromptVal.length);
-    $('#horae-mood-prompt-count').text(moodPromptVal.length);
-    $('#horae-rpg-prompt-count').text(rpgPromptVal.length);
+	$('#horae-custom-location-prompt').val(locationPromptVal);
+	$('#horae-custom-relationship-prompt').val(relPromptVal);
+	$('#horae-custom-mood-prompt').val(moodPromptVal);
+	$('#horae-custom-rpg-prompt').val(rpgPromptVal);
 	$('#horae-custom-anti-paraphrase-prompt').val(antiParaphrasePromptVal);
+
+	$('#horae-system-prompt-count').text(sysPrompt.length);
+	$('#horae-batch-prompt-count').text(batchPromptVal.length);
+	$('#horae-analysis-prompt-count').text(analysisPromptVal.length);
+	$('#horae-compress-prompt-count').text(compressPromptVal.length);
+	$('#horae-auto-summary-prompt-count').text(autoSumPromptVal.length);
+	$('#horae-auto-resummary-prompt-count').text(autoResumPromptVal.length);
+	$('#horae-tables-prompt-count').text(tablesPromptVal.length);
+	$('#horae-timeline-prompt-count').text(timelineTimePromptVal.length);
+	$('#horae-agenda-prompt-count').text(timelineAgendaPromptVal.length);
+	$('#horae-history-prompt-count').text(timelineHistoryPromptVal.length);
+	$('#horae-characters-prompt-count').text(charactersPromptVal.length);
+	$('#horae-affection-prompt-count').text(characterAffectionPromptVal.length);	
+	$('#horae-items-prompt-count').text(itemsPromptVal.length);
+	$('#horae-location-prompt-count').text(locationPromptVal.length);
+	$('#horae-relationship-prompt-count').text(relPromptVal.length);
+	$('#horae-mood-prompt-count').text(moodPromptVal.length);
+	$('#horae-rpg-prompt-count').text(rpgPromptVal.length);
 	$('#horae-anti-paraphrase-prompt-count').text(antiParaphrasePromptVal.length);
 	
     // 面板宽度和偏移

@@ -1,23 +1,21 @@
-═══ 【Сеть отношений】условия ═══
-Формат: rel:персонажA>персонажB=тип отношений|примечание
+═══ [Relationship Network] Trigger Conditions ═══
+Format: rel:CharacterA>CharacterB=relationship type|note
+The system automatically records and displays relationship networks between characters, and outputs updates when relationships change.
 
-Выводите строку только если между персонажами возникла новая связь или изменилась уже записанная связь.
+[When to write] (output only if any condition is met)
+  ✦ A new relationship is established/defined between two characters → rel:CharacterA>CharacterB=relationship type
+  ✦ An existing relationship changes (e.g., from colleagues to friends) → rel:CharacterA>CharacterB=new relationship type
+  ✦ Important relationship details need annotation → add |note
+[When not to write]
+  ✗ Relationship unchanged → do not write
+  ✗ Relationship already recorded and not updated → do not write
 
-【Когда писать】
-  ✦ между двумя персонажами установились новые отношения → rel:персонажA>персонажB=тип отношений
-  ✦ существующие отношения изменились (коллеги стали друзьями, союзники стали возлюбленными и т.п.) → rel:персонажA>персонажB=новый тип отношений
-  ✦ у отношений есть важное условие или фон → добавить |примечание
-【Когда не писать】
-  ✗ отношения не изменились
-  ✗ связь уже записана и новой информации нет
-
-【Правила】
-  · персонажA и персонажB должны быть точными полными именами
-  · тип отношений пишите коротко и естественно по-русски: друзья, близкие подруги, друзья детства, возлюбленные, наставник и ученик, вассал и господин, заклятые враги, союзники, спаситель
-  · примечание необязательно; пишите его только для важных деталей
-  · отношения с ${userName} тоже нужно записывать
-
-Примеры:
-  rel:${userName}>Вольф=отношения найма|${userName} держит таверну, а Вольф является постоянным посетителем
-  rel:Вольф>Марина=тайная симпатия|Вольф испытывает чувства к Марине, но ещё не признался
-  rel:${userName}>Марина=близкие подруги
+[Rules]
+  · CharacterA and CharacterB must both use accurate full names
+  · Use concise words for relationship type: friend, lover, superior-subordinate, master-apprentice, nemesis, partner, etc.
+  · Note field is optional, for special relationship details
+  · Relationships involving ${userName} must also be recorded
+  Examples:
+    rel:${userName}>Vol=employment|${userName} runs the tavern, Vol is a regular customer
+    rel:Vol>Eira=crush|Vol has feelings for Eira but has not confessed
+    rel:${userName}>Eira=bestie

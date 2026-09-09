@@ -941,13 +941,38 @@
                         <span data-i18n="settings.tokenCounter">当前注入 Token：</span><strong id="horae-token-value" data-i18n="settings.tokenCalculating" style="color: var(--horae-primary-light);">计算中...</strong>
                     </div>
                     
-                    <div class="horae-setting-item">
-                        <label data-i18n="settings.sendTimeline">
-                            <input type="checkbox" id="horae-setting-send-timeline" checked>
-                            剧情轨迹
-                        </label>
-                        <span class="horae-setting-sub-hint" data-i18n="settings.sendTimelineHint">历史事件总结、相对时间计算。关闭后AI无法知道"几天前"发生了什么。</span>
-                    </div>
+					<!-- ===== Хронология сюжета (родитель) ===== -->
+					<div class="horae-setting-item">
+						<label data-i18n="settings.sendTimeline">
+							<input type="checkbox" id="horae-setting-send-timeline" checked>
+							Хронология сюжета
+						</label>
+						<span class="horae-setting-sub-hint" data-i18n="settings.sendTimelineHint">
+							Включает обработку времени. Без этого AI не сможет отслеживать «дни назад» и текущие планы.
+						</span>
+
+						<!-- Вложенная опция: Список дел (Agenda) -->
+						<div style="margin-top: 6px; padding-left: 22px;">
+							<label data-i18n="settings.sendAgenda" style="font-size: 12px; color: var(--horae-text-muted);">
+								<input type="checkbox" id="horae-setting-send-agenda" checked>
+								Список дел
+							</label>
+							<span class="horae-setting-sub-hint" data-i18n="settings.sendAgendaHint" style="padding-left: 22px;">
+								Обрабатывает активные задачи, планы и будущие события.
+							</span>
+						</div>
+
+						<!-- Вложенная опция: Сюжетная линия (History/Events) -->
+						<div style="margin-top: 6px; padding-left: 22px;">
+							<label data-i18n="settings.sendHistory" style="font-size: 12px; color: var(--horae-text-muted);">
+								<input type="checkbox" id="horae-setting-send-history" checked>
+								Сюжетная линия
+							</label>
+							<span class="horae-setting-sub-hint" data-i18n="settings.sendHistoryHint" style="padding-left: 22px;">
+								Отображает историю прошлых событий.
+							</span>
+						</div>
+					</div>
                     
                     <div class="horae-setting-item">
                         <label data-i18n="settings.sendCharacters">
@@ -1658,6 +1683,66 @@
                                 <span id="horae-tables-prompt-count">0</span> 字符
                             </div>
                         </div>
+
+						<!-- ===== Промпт Времени ===== -->
+						<div id="horae-timeline-prompt-group" class="horae-prompt-editor-group" style="margin-top: 12px; display: none;">
+							<div class="horae-prompt-editor-header">
+								<span>Промпт Времени</span>
+								<button id="horae-btn-reset-timeline-prompt" class="horae-btn-reset-prompt" type="button">
+									<i class="fa-solid fa-rotate-left"></i>
+									Восстановить по умолчанию
+								</button>
+							</div>
+
+							<textarea id="horae-custom-timeline-prompt"
+								class="horae-prompt-textarea"
+								rows="6"
+								placeholder="Оставьте пустым для использования промпта по умолчанию..."></textarea>
+
+							<div class="horae-prompt-char-count">
+								<span id="horae-timeline-prompt-count">0</span> символов
+							</div>
+						</div>
+
+						<!-- ===== Промпт Списка дел (Agenda) ===== -->
+						<div id="horae-agenda-prompt-group" class="horae-prompt-editor-group" style="margin-top: 12px; display: none;">
+							<div class="horae-prompt-editor-header">
+								<span>Промпт Списка дел</span>
+								<button id="horae-btn-reset-agenda-prompt" class="horae-btn-reset-prompt" type="button">
+									<i class="fa-solid fa-rotate-left"></i>
+									Восстановить по умолчанию
+								</button>
+							</div>
+
+							<textarea id="horae-custom-agenda-prompt"
+								class="horae-prompt-textarea"
+								rows="6"
+								placeholder="Оставьте пустым для использования промпта по умолчанию..."></textarea>
+
+							<div class="horae-prompt-char-count">
+								<span id="horae-agenda-prompt-count">0</span> символов
+							</div>
+						</div>
+
+						<!-- ===== Промпт Сюжетной линии (History/Events) ===== -->
+						<div id="horae-history-prompt-group" class="horae-prompt-editor-group" style="margin-top: 12px; display: none;">
+							<div class="horae-prompt-editor-header">
+								<span>Промпт Сюжетной линии</span>
+								<button id="horae-btn-reset-history-prompt" class="horae-btn-reset-prompt" type="button">
+									<i class="fa-solid fa-rotate-left"></i>
+									Восстановить по умолчанию
+								</button>
+							</div>
+
+							<textarea id="horae-custom-history-prompt"
+								class="horae-prompt-textarea"
+								rows="6"
+								placeholder="Оставьте пустым для использования промпта по умолчанию..."></textarea>
+
+							<div class="horae-prompt-char-count">
+								<span id="horae-history-prompt-count">0</span> символов
+							</div>
+						</div>
 
 						<div id="horae-characters-prompt-group" class="horae-prompt-editor-group" style="margin-top: 12px; display: none;">
 							<div class="horae-prompt-editor-header">

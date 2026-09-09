@@ -3474,7 +3474,9 @@ class HoraeManager {
 
     generateSystemPromptAddition() {
         const [userName, charName] = this._getDefaultNames();
-        const subs = this.generateCharactersMemoryPrompt() +  
+        const subs = this.generateTimelineTimePrompt() +
+					this.generateTimelineAgendaPrompt() +
+					this.generateCharactersMemoryPrompt() +  
 					this.generateItemsMemoryPrompt() +
 					this.generateLocationMemoryPrompt() +
 					this.generateCustomTablesPrompt() +
@@ -3482,7 +3484,8 @@ class HoraeManager {
 					this.generateMoodPrompt() +
 					this.generateRpgPrompt() +
 					this._generateAntiParaphrasePrompt() +
-					this._generateCustomCalendarPrompt();
+					this._generateCustomCalendarPrompt() +
+					this.generateTimelineHistoryPrompt();
         const fieldLines = this.getPromptFieldLines();
 
         if (this.settings?.customSystemPrompt) {
@@ -3553,6 +3556,45 @@ class HoraeManager {
 
 	getDefaultTablesPrompt() {
 		return this._getPromptDefaultFromResource('customTablesPrompt');
+	}
+
+	getDefaultTimelineTimePrompt() {
+		return this._getPromptDefaultFromResource('customTimelineTimePrompt');
+	}
+	
+	generateTimelineTimePrompt() {
+		if (!this.settings?.sendTimeline) return '';
+		const custom = this.settings?.customTimelineTimePrompt;
+		if (custom) {
+			return '\n' + custom;
+		}
+		return '\n' + this.getDefaultTimelineTimePrompt();
+	}
+
+	getDefaultTimelineAgendaPrompt() {
+		return this._getPromptDefaultFromResource('customTimelineAgendaPrompt');
+	}
+
+	generateTimelineAgendaPrompt() {
+		if (!this.settings?.sendTimeline || !this.settings?.sendAgenda) return '';
+		const custom = this.settings?.customTimelineAgendaPrompt;
+		if (custom) {
+			return '\n' + custom;
+		}
+		return '\n' + this.getDefaultTimelineAgendaPrompt();
+	}
+
+	getDefaultTimelineHistoryPrompt() {
+		return this._getPromptDefaultFromResource('customTimelineHistoryPrompt');
+	}
+
+	generateTimelineHistoryPrompt() {
+		if (!this.settings?.sendTimeline || !this.settings?.sendHistory) return '';
+		const custom = this.settings?.customTimelineHistoryPrompt;
+		if (custom) {
+			return '\n' + custom;
+		}
+		return '\n' + this.getDefaultTimelineHistoryPrompt();
 	}
 
 	getDefaultCharactersPrompt() {
