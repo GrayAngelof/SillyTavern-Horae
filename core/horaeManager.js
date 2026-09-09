@@ -643,7 +643,7 @@ class HoraeManager {
         };
         
         // 时间
-        if (state.timestamp.story_date) {
+        if (this.settings?.sendTimeline !== false) {
             const fullDateTime = formatFullDateTime(state.timestamp.story_date, state.timestamp.story_time);
             lines.push(`[${L('时间','Time','時間','시간','Время')}|${fullDateTime}]`);
             
@@ -837,8 +837,18 @@ class HoraeManager {
                 }
             }
         }
+		
+		
+		console.log(
+			'Timeline:',
+			this.settings?.sendTimeline,
+			'Agenda:',
+			this.settings?.sendAgenda,
+			'History:',
+			this.settings?.sendHistory
+		);
         const activeAgenda = allAgendaItems.filter(a => !a.done);
-        if (activeAgenda.length > 0) {
+        if (this.settings?.sendTimeline !== false && this.settings?.sendAgenda !== false) {
             lines.push(`\n[${L('待办事项','Agenda','予定事項','할 일 목록','Список дел')}]`);
             for (const item of activeAgenda) {
                 const datePrefix = item.date ? `${item.date} ` : '';
@@ -1072,7 +1082,7 @@ class HoraeManager {
         }
 
         // 剧情轨迹
-        if (sendTimeline) {
+        if (this.settings?.sendTimeline !== false && this.settings?.sendHistory !== false) {
             const allEvents = this.getEvents(0, 'all', skipLast);
             // 过滤掉被活跃摘要覆盖的原始事件（_compressedBy 且摘要为 active）
             const timelineChat = this.getChat();

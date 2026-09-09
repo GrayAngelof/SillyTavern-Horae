@@ -14133,47 +14133,55 @@ function initSettingsEvents() {
         showToast(t('toast.itemsRefreshed'), 'info');
     });
 
+	// ===== Обработчики для хронологии =====
+
 	$('#horae-setting-send-timeline').on('change', function () {
-		const enabled = $(this).prop('checked');
-
-		// Управление видимостью дочерних чекбоксов и групп полей
-		$('#horae-setting-send-agenda, #horae-setting-send-history').closest('div').toggle(enabled);
-		if (!enabled) {
-			$('#horae-setting-send-agenda, #horae-setting-send-history').prop('checked', false);
-			$('#horae-agenda-prompt-group, #horae-history-prompt-group').hide();
-		}
-
-		$('#horae-timeline-prompt-group').toggle(enabled);
-		$('.horae-tab[data-tab="timeline"]').toggle(enabled);
-
 		settings.sendTimeline = this.checked;
+
+		// Дочерние настройки не меняем — только скрываем их вместе с родителем
+		$('#horae-setting-send-agenda')
+			.closest('div')
+			.toggle(this.checked);
+
+		$('#horae-setting-send-history')
+			.closest('div')
+			.toggle(this.checked);
+
+		// Поля редактирования промптов хронологии
+		$('#horae-timeline-prompt-group').toggle(this.checked);
+		$('#horae-agenda-prompt-group')
+			.toggle(this.checked && settings.sendAgenda !== false);
+		$('#horae-history-prompt-group')
+			.toggle(this.checked && settings.sendHistory !== false);
+
+		// Вкладка хронологии
+		$('.horae-tab[data-tab="timeline"]').toggle(this.checked);
+
 		saveSettings();
 		horaeManager.init(getContext(), settings);
 		updateTokenCounter();
 	});
-	
-	// ===== Обработчики для хронологии (по аналогии с персонажами) =====
-	$('#horae-setting-send-timeline').on('change', function() {
-		const enabled = $(this).prop('checked');
-		$('#horae-setting-send-agenda, #horae-setting-send-history').prop('disabled', !enabled).closest('div').toggle(enabled);
-		if (!enabled) {
-			$('#horae-setting-send-agenda, #horae-setting-send-history').prop('checked', false);
-		}
+
+	$('#horae-setting-send-agenda').on('change', function () {
+		settings.sendAgenda = this.checked;
+
+		$('#horae-agenda-prompt-group')
+			.toggle(settings.sendTimeline && this.checked);
+
 		saveSettings();
+		horaeManager.init(getContext(), settings);
+		updateTokenCounter();
 	});
 
-	$('#horae-setting-send-agenda').on('change', function() {
-		const enabled = $(this).prop('checked');
-		const timelineEnabled = $('#horae-setting-send-timeline').prop('checked');
-		$('#horae-agenda-prompt-group').toggle(timelineEnabled && enabled);
-		saveSettings();
-	});
+	$('#horae-setting-send-history').on('change', function () {
+		settings.sendHistory = this.checked;
 
-	$('#horae-setting-send-history').on('change', function() {
-		const enabled = $(this).prop('checked');
-		const timelineEnabled = $('#horae-setting-send-timeline').prop('checked');
-		$('#horae-history-prompt-group').toggle(timelineEnabled && enabled);
+		$('#horae-history-prompt-group')
+			.toggle(settings.sendTimeline && this.checked);
+
 		saveSettings();
+		horaeManager.init(getContext(), settings);
+		updateTokenCounter();
 	});
 
     $('#horae-setting-context-depth').on('change', function () {
