@@ -661,7 +661,7 @@ class HoraeManager {
         }
         
         // 场景
-        if (this.settings?.sendLocationMemory && state.scene.location) {
+        if (state.scene.location) {
             let sceneStr = `[${L('场景','Scene','シーン','장면','Сцена')}|${state.scene.location}`;
             if (state.scene.atmosphere) {
                 sceneStr += `|${state.scene.atmosphere}`;
