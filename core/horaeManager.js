@@ -661,7 +661,7 @@ class HoraeManager {
         }
         
         // 场景
-        if (state.scene.location) {
+        if (this.settings?.sendLocationMemory && state.scene.location) {
             let sceneStr = `[${L('场景','Scene','シーン','장면','Сцена')}|${state.scene.location}`;
             if (state.scene.atmosphere) {
                 sceneStr += `|${state.scene.atmosphere}`;
@@ -837,16 +837,7 @@ class HoraeManager {
                 }
             }
         }
-		
-		
-		console.log(
-			'Timeline:',
-			this.settings?.sendTimeline,
-			'Agenda:',
-			this.settings?.sendAgenda,
-			'History:',
-			this.settings?.sendHistory
-		);
+
         const activeAgenda = allAgendaItems.filter(a => !a.done);
         if (this.settings?.sendTimeline !== false && this.settings?.sendAgenda !== false) {
             lines.push(`\n[${L('待办事项','Agenda','予定事項','할 일 목록','Список дел')}]`);
