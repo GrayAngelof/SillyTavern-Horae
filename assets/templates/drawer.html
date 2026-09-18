@@ -974,27 +974,62 @@
 						</div>
 					</div>
                     
-                    <div class="horae-setting-item">
-                        <label data-i18n="settings.sendCharacters">
-                            <input type="checkbox" id="horae-setting-send-characters" checked>
-                            角色信息
-                        </label>
-                        <span class="horae-setting-sub-hint" data-i18n="settings.sendCharactersHint">在场角色、服装描述、好感度、角色信息。关闭后AI可能描写错误的服装。</span>
-                        <div style="margin-top: 6px; padding-left: 22px;">
-                            <label data-i18n="settings.sendCharacterAffection" style="font-size: 12px; color: var(--horae-text-muted);">
-                                <input type="checkbox" id="horae-setting-send-character-affection" checked>
-                                好感度
-                            </label>
-                            <span class="horae-setting-sub-hint" data-i18n="settings.sendCharacterAffectionHint" style="padding-left: 22px;">关闭后所有角色的好感度数值不再注入；不影响其他角色信息。</span>
-                        </div>
-                        <div style="margin-top: 6px; padding-left: 22px;">
-                            <label data-i18n="settings.sendMainCharacterPersonality" style="font-size: 12px; color: var(--horae-text-muted);">
-                                <input type="checkbox" id="horae-setting-send-main-character-personality" checked>
-                                主要角色性格
-                            </label>
-                            <span class="horae-setting-sub-hint" data-i18n="settings.sendMainCharacterPersonalityHint" style="padding-left: 22px;">关闭后，主要角色（卡片本体 + 置顶 NPC）的性格简述不再注入；不影响其他 NPC。</span>
-                        </div>
-                    </div>
+					<div class="horae-setting-item">
+						<label data-i18n="settings.sendCharacters">
+							<input type="checkbox" id="horae-setting-send-characters" checked>
+							角色信息
+						</label>
+						<span class="horae-setting-sub-hint" data-i18n="settings.sendCharactersHint">
+							在场角色、服装描述、好感度、角色信息。关闭后AI可能描写错误的服装。
+						</span>
+
+						<div style="margin-top: 6px; padding-left: 22px;">
+							<label data-i18n="settings.sendCharacterAffection" style="font-size: 12px; color: var(--horae-text-muted);">
+								<input type="checkbox" id="horae-setting-send-character-affection" checked>
+								好感度
+							</label>
+							<span class="horae-setting-sub-hint"
+								  data-i18n="settings.sendCharacterAffectionHint"
+								  style="padding-left: 22px;">
+								关闭后所有角色的好感度数值不再注入；不影响其他角色信息。
+							</span>
+						</div>
+						<div style="margin-top: 6px; padding-left: 22px;">
+							<label data-i18n="settings.sendRelationships" style="font-size: 12px; color: var(--horae-text-muted);">
+								<input type="checkbox" id="horae-setting-send-relationships">
+								关系网络
+							</label>
+							<span class="horae-setting-sub-hint"
+								  data-i18n="settings.sendRelationshipsHint"
+								  style="padding-left: 22px;">
+								追踪角色间的关系变化（朋友、恋人、敌对等）。关闭后不生成rel:标签，不注入关系网络提示词。
+							</span>
+						</div>
+
+						<div style="margin-top: 6px; padding-left: 22px;">
+							<label data-i18n="settings.sendMood" style="font-size: 12px; color: var(--horae-text-muted);">
+								<input type="checkbox" id="horae-setting-send-mood">
+								Отслеживание эмоций
+							</label>
+							<span class="horae-setting-sub-hint"
+								  data-i18n="settings.sendMoodHint"
+								  style="padding-left: 22px;">
+								Отслеживает изменения эмоционального/психологического состояния персонажей. AI использует только согласованные изменения эмоций.
+							</span>
+						</div>
+						
+						<div style="margin-top: 6px; padding-left: 22px;">
+							<label data-i18n="settings.sendMainCharacterPersonality" style="font-size: 12px; color: var(--horae-text-muted);">
+								<input type="checkbox" id="horae-setting-send-main-character-personality" checked>
+								主要角色性格
+							</label>
+							<span class="horae-setting-sub-hint"
+								  data-i18n="settings.sendMainCharacterPersonalityHint"
+								  style="padding-left: 22px;">
+								关闭后，主要角色（卡片本体 + 置顶 NPC）的性格简述不再注入；不影响其他 NPC。
+							</span>
+						</div>
+					</div>
                     
                     <div class="horae-setting-item">
                         <label data-i18n="settings.sendItems">
@@ -1011,22 +1046,7 @@
                         </label>
                         <span class="horae-setting-sub-hint" data-i18n="settings.sendLocationMemoryHint">记录地点的固定物理特征，保持跨回合场景描写一致性。开启后AI会在首次到达新地点时记录特征描述。</span>
                     </div>
-                    
-                    <div class="horae-setting-item">
-                        <label data-i18n="settings.sendRelationships">
-                            <input type="checkbox" id="horae-setting-send-relationships">
-                            关系网络
-                        </label>
-                        <span class="horae-setting-sub-hint" data-i18n="settings.sendRelationshipsHint">追踪角色间的关系变化（朋友、恋人、敌对等），AI仅在关系变化时输出。关闭后不生成rel:标签，不注入关系网络提示词。</span>
-                    </div>
-                    
-                    <div class="horae-setting-item">
-                        <label data-i18n="settings.sendMood">
-                            <input type="checkbox" id="horae-setting-send-mood">
-                            情绪追踪
-                        </label>
-                        <span class="horae-setting-sub-hint" data-i18n="settings.sendMoodHint">追踪在场角色的情绪/心理状态变化，帮助AI保持角色情绪连贯性。AI仅在情绪明显变化时输出。</span>
-                    </div>
+
                     <div class="horae-setting-item">
                         <label data-i18n="settings.rpgMode">
                             <input type="checkbox" id="horae-setting-rpg-mode">
@@ -1693,12 +1713,10 @@
 									Восстановить по умолчанию
 								</button>
 							</div>
-
 							<textarea id="horae-custom-timeline-prompt"
 								class="horae-prompt-textarea"
 								rows="6"
 								placeholder="Оставьте пустым для использования промпта по умолчанию..."></textarea>
-
 							<div class="horae-prompt-char-count">
 								<span id="horae-timeline-prompt-count">0</span> символов
 							</div>
@@ -1718,7 +1736,6 @@
 								class="horae-prompt-textarea"
 								rows="6"
 								placeholder="Оставьте пустым для использования промпта по умолчанию..."></textarea>
-
 							<div class="horae-prompt-char-count">
 								<span id="horae-agenda-prompt-count">0</span> символов
 							</div>
@@ -1738,7 +1755,6 @@
 								class="horae-prompt-textarea"
 								rows="6"
 								placeholder="Оставьте пустым для использования промпта по умолчанию..."></textarea>
-
 							<div class="horae-prompt-char-count">
 								<span id="horae-history-prompt-count">0</span> символов
 							</div>
@@ -1757,7 +1773,6 @@
 								class="horae-prompt-textarea"
 								rows="6"
 								placeholder="Оставьте пустым для использования промпта по умолчанию..."></textarea>
-
 							<div class="horae-prompt-char-count">
 								<span id="horae-characters-prompt-count">0</span> символов
 							</div>
@@ -1776,9 +1791,34 @@
 								class="horae-prompt-textarea"
 								rows="6"
 								placeholder="Оставьте пустым для использования промпта по умолчанию..."></textarea>
-
 							<div class="horae-prompt-char-count">
 								<span id="horae-affection-prompt-count">0</span> символов
+							</div>
+						</div>
+
+						<div id="horae-relationship-prompt-group" class="horae-prompt-editor-group" style="margin-top: 12px; display: none;">
+							<div class="horae-prompt-editor-header">
+								<span data-i18n="prompts.relationshipPrompt">关系网络提示词</span>
+								<button id="horae-btn-reset-relationship-prompt" class="horae-btn-reset-prompt" data-i18n="common.restoreDefault" data-i18n-title="tooltip.restoreDefault" title="">
+									<i class="fa-solid fa-rotate-left"></i> 恢复默认
+								</button>
+							</div>
+							<textarea id="horae-custom-relationship-prompt" class="horae-prompt-textarea" rows="6" placeholder="留空使用默认提示词..."></textarea>
+							<div class="horae-prompt-char-count">
+								<span id="horae-relationship-prompt-count">0</span> 字符
+							</div>
+						</div>
+
+						<div id="horae-mood-prompt-group" class="horae-prompt-editor-group" style="margin-top: 12px; display: none;">
+							<div class="horae-prompt-editor-header">
+								<span data-i18n="prompts.moodPrompt">情绪追踪提示词</span>
+								<button id="horae-btn-reset-mood-prompt" class="horae-btn-reset-prompt" data-i18n="common.restoreDefault" data-i18n-title="tooltip.restoreDefault" title="">
+									<i class="fa-solid fa-rotate-left"></i> 恢复默认
+								</button>
+							</div>
+							<textarea id="horae-custom-mood-prompt" class="horae-prompt-textarea" rows="6" placeholder="留空使用默认提示词..."></textarea>
+							<div class="horae-prompt-char-count">
+								<span id="horae-mood-prompt-count">0</span> 字符
 							</div>
 						</div>
 
@@ -1806,32 +1846,6 @@
                             <textarea id="horae-custom-location-prompt" class="horae-prompt-textarea" rows="6" placeholder="留空使用默认提示词..."></textarea>
                             <div class="horae-prompt-char-count">
                                 <span id="horae-location-prompt-count">0</span> 字符
-                            </div>
-                        </div>
-
-                        <div id="horae-relationship-prompt-group" class="horae-prompt-editor-group" style="margin-top: 12px; display: none;">
-                            <div class="horae-prompt-editor-header">
-                                <span data-i18n="prompts.relationshipPrompt">关系网络提示词</span>
-                                <button id="horae-btn-reset-relationship-prompt" class="horae-btn-reset-prompt" data-i18n="common.restoreDefault" data-i18n-title="tooltip.restoreDefault" title="">
-                                    <i class="fa-solid fa-rotate-left"></i> 恢复默认
-                                </button>
-                            </div>
-                            <textarea id="horae-custom-relationship-prompt" class="horae-prompt-textarea" rows="6" placeholder="留空使用默认提示词..."></textarea>
-                            <div class="horae-prompt-char-count">
-                                <span id="horae-relationship-prompt-count">0</span> 字符
-                            </div>
-                        </div>
-
-                        <div id="horae-mood-prompt-group" class="horae-prompt-editor-group" style="margin-top: 12px; display: none;">
-                            <div class="horae-prompt-editor-header">
-                                <span data-i18n="prompts.moodPrompt">情绪追踪提示词</span>
-                                <button id="horae-btn-reset-mood-prompt" class="horae-btn-reset-prompt" data-i18n="common.restoreDefault" data-i18n-title="tooltip.restoreDefault" title="">
-                                    <i class="fa-solid fa-rotate-left"></i> 恢复默认
-                                </button>
-                            </div>
-                            <textarea id="horae-custom-mood-prompt" class="horae-prompt-textarea" rows="6" placeholder="留空使用默认提示词..."></textarea>
-                            <div class="horae-prompt-char-count">
-                                <span id="horae-mood-prompt-count">0</span> 字符
                             </div>
                         </div>
 

@@ -607,7 +607,7 @@ class HoraeManager {
             '[Current State Snapshot — compare with this round\'s plot, only output substantively changed fields in <horae>]',
             '[現在の状態スナップショット——今回のストーリーと比較し、実質的に変化したフィールドのみ<horae>に出力]',
             '[현재 상태 스냅샷——이번 라운드의 스토리와 비교하여 실질적으로 변경된 필드만 <horae>에 출력]',
-            '[Снимок текущего состояния — сравните с сюжетом этого раунда, выводите в <horae> только существенно изменившиеся поля]',
+            '[Текущее состояние мира — база сравнения. Извлекайте только изменения, произошедшие в текущем раунде.]',
         ));
         
         const sendTimeline = this.settings?.sendTimeline !== false;
@@ -648,10 +648,18 @@ class HoraeManager {
             lines.push(`[${L('时间','Time','時間','시간','Время')}|${fullDateTime}]`);
             
             // 时间参考
-            if (sendTimeline) {
+            if (this.settings?.sendTimeline !== false) {
                 const timeRef = generateTimeReference(state.timestamp.story_date);
                 if (timeRef && timeRef.type === 'standard') {
-                    lines.push(`[${L('时间参考','Time Ref','時間参考','시간 참조','Время (справка)')}|${L('昨天','yesterday','昨日','어제','вчера')}=${timeRef.yesterday}|${L('前天','day before','一昨日','그저께','позавчера')}=${timeRef.dayBefore}|${L('3天前','3 days ago','3日前','3일 전','3 дня назад')}=${timeRef.threeDaysAgo}]`);
+					lines.push(
+						`[${L('时间参考','Time Ref','時間参考','시간 참조','Время (справка)')}` +
+						`|${L('昨天','yesterday','昨日','어제','вчера')}=${timeRef.yesterday}` +
+						`|${L('前天','day before','一昨日','그저께','позавчера')}=${timeRef.dayBefore}` +
+						`|${L('3天前','3 days ago','3日前','3일 전','3 дня назад')}=${timeRef.threeDaysAgo}` +
+						`|${L('明天','tomorrow','明日','내일','завтра')}=${timeRef.tomorrow}` +
+						`|${L('后天','day after tomorrow','明後日','모레','послезавтра')}=${timeRef.dayAfterTomorrow}` +
+						`|${L('大后天','in three days','明々後日','글피','через три дня')}=${timeRef.inThreeDays}]`
+					);
                 } else if (timeRef && timeRef.type === 'fantasy') {
                     lines.push(`[${L('时间参考','Time Ref','時間参考','시간 참조','Время (справка)')}|${L('奇幻日历模式，参见剧情轨迹中的相对时间标记','Fantasy calendar mode, see relative time markers in story timeline','ファンタジー暦モード、ストーリー軌跡の相対時間マーカーを参照','판타지 달력 모드, 스토리 궤적의 상대 시간 마커 참조','Режим фэнтезийного календаря, см. относительные метки времени в сюжетной линии')}]`);
                 } else if (timeRef && timeRef.type === 'custom') {
@@ -662,7 +670,7 @@ class HoraeManager {
         
         // 场景
         if (this.settings?.sendLocationMemory && state.scene.location) {
-            let sceneStr = `[${L('场景','Scene','シーン','장면','Сцена')}|${state.scene.location}`;
+            let sceneStr = `[${L('场景','Scene','シーン','장면','Локация:')}|${state.scene.location}`;
             if (state.scene.atmosphere) {
                 sceneStr += `|${state.scene.atmosphere}`;
             }
@@ -674,13 +682,13 @@ class HoraeManager {
                 const loc = state.scene.location;
                 const entry = this._findLocationMemory(loc, locMem, state._previousLocation);
                 if (entry?.desc) {
-                    lines.push(`[${L('场景记忆','Scene Memory','シーン記憶','장면 기억','Память сцены')}|${entry.desc}]`);
+                    lines.push(`[${L('场景记忆','Scene Memory','シーン記憶','장면 기억','Профиль локации:')}|${entry.desc}]`);
                 }
                 const sepMatch = loc.match(/[·・\-\/\|]/);
                 if (sepMatch) {
                     const parent = loc.substring(0, sepMatch.index).trim();
                     if (parent && locMem[parent] && locMem[parent].desc && parent !== entry?._matchedName) {
-                        lines.push(`[${L('场景记忆','Scene Memory','シーン記憶','장면 기억','Память сцены')}:${parent}|${locMem[parent].desc}]`);
+                        lines.push(`[${L('场景记忆','Scene Memory','シーン記憶','장면 기억','Профиль локации:')}:${parent}|${locMem[parent].desc}]`);
                     }
                 }
             }
@@ -723,7 +731,7 @@ class HoraeManager {
             if (this.settings?.sendRelationships) {
                 const rels = this.getRelationshipsForCharacters(presentChars);
                 if (rels.length > 0) {
-                    lines.push(`\n[${L('关系网络','Relationship Network','関係ネットワーク','관계 네트워크','Сеть отношений')}]`);
+                    lines.push(`\n[${L('关系网络','Relationship Network','関係ネットワーク','관계 네트워크','Связи персонажей')}]`);
                     for (const r of rels) {
                         const noteStr = r.note ? `(${r.note})` : '';
                         lines.push(`${r.from}→${r.to}: ${r.type}${noteStr}`);
@@ -768,7 +776,7 @@ class HoraeManager {
             const affections = Object.entries(state.affection).filter(([_, v]) => v !== 0);
             if (affections.length > 0) {
                 const affStr = affections.map(([k, v]) => `${k}:${v > 0 ? '+' : ''}${v}`).join('|');
-                lines.push(`[${L('好感','Affection','好感度','호감도','Расположение')}|${affStr}]`);
+                lines.push(`[${L('好感','Affection','好感度','호감도','Отношения')}|${affStr}]`);
             }
         }
 
@@ -3478,15 +3486,16 @@ class HoraeManager {
         const subs = this.generateTimelineTimePrompt() +
 					this.generateTimelineAgendaPrompt() +
 					this.generateCharactersMemoryPrompt() +  
+					this.generateRelationshipPrompt() +
+					this.generateMoodPrompt() +
 					this.generateItemsMemoryPrompt() +
 					this.generateLocationMemoryPrompt() +
 					this.generateCustomTablesPrompt() +
-					this.generateRelationshipPrompt() +
-					this.generateMoodPrompt() +
 					this.generateRpgPrompt() +
 					this._generateAntiParaphrasePrompt() +
 					this._generateCustomCalendarPrompt() +
-					this.generateTimelineHistoryPrompt();
+					this.generateTimelineHistoryPrompt() +
+					this._generateOutputAnchorPrompt();
         const fieldLines = this.getPromptFieldLines();
 
         if (this.settings?.customSystemPrompt) {
@@ -3628,7 +3637,39 @@ class HoraeManager {
 	getDefaultCharacterAffectionPrompt() {
 		return this._getPromptDefaultFromResource('customCharacterAffectionPrompt');
 	}
+	
+	getDefaultRelationshipPrompt() {
+		const userName = this.context?.name1 || '{{user}}';
+		return this._getPromptDefaultFromResource('customRelationshipPrompt', { userName });
+	}
 
+	generateRelationshipPrompt() {
+		if (!this.settings?.sendCharacters || !this.settings?.sendRelationships) return '';
+		const custom = this.settings?.customRelationshipPrompt;
+		if (custom) {
+			const userName = this.context?.name1 || '主角';
+			const charName = this.context?.name2 || '角色';
+			return '\n' + custom.replace(/\{\{user\}\}/gi, userName).replace(/\{\{char\}\}/gi, charName);
+		}
+		return '\n' + this.getDefaultRelationshipPrompt();
+	}
+	
+	
+	getDefaultMoodPrompt() {
+		return this._getPromptDefaultFromResource('customMoodPrompt');
+	}
+
+    generateMoodPrompt() {
+		if (!this.settings?.sendCharacters || !this.settings?.sendMood) return '';
+		const custom = this.settings?.customMoodPrompt;
+		if (custom) {
+			const userName = this.context?.name1 || '主角';
+			const charName = this.context?.name2 || '角色';
+			return '\n' + custom.replace(/\{\{user\}\}/gi, userName).replace(/\{\{char\}\}/gi, charName);
+		}
+		return '\n' + this.getDefaultMoodPrompt();
+	}
+	
 	getDefaultItemsPrompt() {
 		return this._getPromptDefaultFromResource('customItemsPrompt');
 	}
@@ -3711,26 +3752,6 @@ class HoraeManager {
         return prompt;
     }
 
-    getDefaultRelationshipPrompt() {
-        const userName = this.context?.name1 || '{{user}}';
-        return this._getPromptDefaultFromResource('customRelationshipPrompt', { userName });
-    }
-
-    generateRelationshipPrompt() {
-        if (!this.settings?.sendRelationships) return '';
-        const custom = this.settings?.customRelationshipPrompt;
-        if (custom) {
-            const userName = this.context?.name1 || '主角';
-            const charName = this.context?.name2 || '角色';
-            return '\n' + custom.replace(/\{\{user\}\}/gi, userName).replace(/\{\{char\}\}/gi, charName);
-        }
-        return '\n' + this.getDefaultRelationshipPrompt();
-    }
-
-    getDefaultMoodPrompt() {
-        return this._getPromptDefaultFromResource('customMoodPrompt');
-    }
-
 	getDefaultAntiParaphrasePrompt() {
 		const userName = this.context?.name1 || '{{user}}';
 		return this._getPromptDefaultFromResource('customAntiParaphrasePrompt', { userName });
@@ -3797,16 +3818,6 @@ class HoraeManager {
         );
     }
 
-    generateMoodPrompt() {
-        if (!this.settings?.sendMood) return '';
-        const custom = this.settings?.customMoodPrompt;
-        if (custom) {
-            const userName = this.context?.name1 || '主角';
-            const charName = this.context?.name2 || '角色';
-            return '\n' + custom.replace(/\{\{user\}\}/gi, userName).replace(/\{\{char\}\}/gi, charName);
-        }
-        return '\n' + this.getDefaultMoodPrompt();
-    }
 
     /** RPG 提示词（rpgMode 开启才注入） */
     generateRpgPrompt() {
@@ -4461,6 +4472,57 @@ class HoraeManager {
         }
         return `Your reply MUST end with ${joined} (${tags.length} tags total).\nMissing any tag = unacceptable.`;
     }
+	
+	
+	_generateOutputAnchorPrompt() {
+		let prompt = '\nAt the end of every reply, you must write tags:\n<horae>\n';
+
+		if (this.settings?.sendTimeline) {
+			prompt += 'time:date time ← current date and time\n';
+		
+			if (this.settings?.sendAgenda) {
+				prompt += 'agenda: <creation date> | <content> (<scheduled date, if applicable>) ← only when a new agenda item appears\n';
+				prompt += 'agenda-: <content keyword> ← only when an agenda item is completed, cancelled, or invalidated\n';
+			}
+		}
+
+		if (this.settings?.sendCharacters) {
+			prompt += 'characters:<names, comma-separated> ← every turn\n';
+			prompt += 'costume:<name>=<outfit description> ← only on first appearance or when the outfit changes\n';
+			prompt += 'npc:name|appearance=personality @relationship ~gender:value ~age:value ~race:value ~job:value ~birthday:value ← FOLLOW THIS FORMAT EXACTLY. WRITE EACH EXTENDED FIELD AS ~key:value. Write npc only on first appearance or when at least one NPC profile field changes..\n';
+
+				if (this.settings?.sendCharacterAffection) {
+					prompt += 'affection:<name>=<number> ← only on first appearance or when affection meaningfully changes\n';
+				}
+				
+				if (this.settings?.sendMood) {
+					prompt += 'mood:<name>=<emotional state> ← only on first appearance with an established emotion or when the emotional state changes\n';
+				}
+
+				if (this.settings?.sendRelationships) {
+					prompt += 'rel:<A>><B>=<type>|<note> ← only when a relationship between two NPCs is created or changed\n';
+				}
+		}
+
+		if (this.settings?.sendItems) {
+			prompt += 'item/item!/item!!:<emoji><name>(<quantity>)|<description>=<owner>@<placement> ← on first appearance or when quantity, owner, placement, or properties change\n';
+			prompt += 'item-:<name> ← when the item is consumed, lost, destroyed, or removed\n';
+		}
+
+		prompt += '</horae>\n';
+
+		if (this.settings?.sendTimeline && this.settings?.sendHistory) {
+			prompt += '\n<horaeevent>\n';
+			prompt += 'event:<importance>|<summary>\n';
+			prompt += '</horaeevent>\n';
+		}
+
+		prompt += 'The fields required by the active modules must follow their module rules.';
+
+		return prompt;
+	}
+	
+	
 
     /** 宽松正则解析（不需要标签包裹） */
     parseLooseFormat(message) {

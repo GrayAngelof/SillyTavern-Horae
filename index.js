@@ -14238,17 +14238,17 @@ function initSettingsEvents() {
 	$('#horae-setting-send-characters').on('change', function () {
 		settings.sendCharacters = this.checked;
 
-		$('#horae-setting-send-character-affection')
-			.closest('div')
-			.toggle(this.checked);
-
-		$('#horae-setting-send-main-character-personality')
-			.closest('div')
-			.toggle(this.checked);
+		$('#horae-setting-send-character-affection').closest('div').toggle(this.checked);
+		$('#horae-setting-send-relationships').closest('div').toggle(this.checked);
+		$('#horae-setting-send-mood').closest('div').toggle(this.checked);
+		$('#horae-setting-send-main-character-personality').closest('div').toggle(this.checked);
 
 		$('#horae-characters-prompt-group').toggle(this.checked);
 		$('#horae-affection-prompt-group').toggle(this.checked && settings.sendCharacterAffection !== false);
-
+		$('#horae-relationship-prompt-group').toggle(this.checked && settings.sendRelationships);
+		$('#horae-mood-prompt-group').toggle(this.checked && settings.sendMood !== false);
+		
+		$('#horae-relationship-section').toggle(this.checked && settings.sendRelationships);
 
 		$('.horae-tab[data-tab="characters"]').toggle(this.checked);
 
@@ -14259,19 +14259,39 @@ function initSettingsEvents() {
 
 	$('#horae-setting-send-character-affection').on('change', function () {
 		settings.sendCharacterAffection = this.checked;
-
 		$('#horae-affection-prompt-group').toggle(settings.sendCharacters && this.checked);
-
 		saveSettings();
 		horaeManager.init(getContext(), settings);
 		updateTokenCounter();
 	});
 
+	$('#horae-setting-send-relationships').on('change', function () {
+		settings.sendRelationships = this.checked;
+
+		$('#horae-relationship-section').toggle(settings.sendCharacters && this.checked);
+		$('#horae-relationship-prompt-group').toggle(settings.sendCharacters && this.checked);
+
+		saveSettings();
+		horaeManager.init(getContext(), settings);
+		_refreshSystemPromptDisplay();
+		updateTokenCounter();
+
+		if (settings.sendCharacters && this.checked) {
+			updateRelationshipDisplay();
+		}
+	});
+
+	$('#horae-setting-send-mood').on('change', function () {
+		settings.sendMood = this.checked;
+		saveSettings();
+		$('#horae-mood-prompt-group').toggle(this.checked);
+		horaeManager.init(getContext(), settings);
+		_refreshSystemPromptDisplay();
+		updateTokenCounter();
+	});
+
 	$('#horae-setting-send-main-character-personality').on('change', function () {
 		settings.sendMainCharacterPersonality = this.checked;
-
-
-
 		saveSettings();
 		horaeManager.init(getContext(), settings);
 		updateTokenCounter();
@@ -14297,25 +14317,6 @@ function initSettingsEvents() {
         updateTokenCounter();
     });
 
-    $('#horae-setting-send-relationships').on('change', function () {
-        settings.sendRelationships = this.checked;
-        saveSettings();
-        $('#horae-relationship-section').toggle(this.checked);
-        $('#horae-relationship-prompt-group').toggle(this.checked);
-        horaeManager.init(getContext(), settings);
-        _refreshSystemPromptDisplay();
-        updateTokenCounter();
-        if (this.checked) updateRelationshipDisplay();
-    });
-
-    $('#horae-setting-send-mood').on('change', function () {
-        settings.sendMood = this.checked;
-        saveSettings();
-        $('#horae-mood-prompt-group').toggle(this.checked);
-        horaeManager.init(getContext(), settings);
-        _refreshSystemPromptDisplay();
-        updateTokenCounter();
-    });
 
     $('#horae-setting-anti-paraphrase').on('change', function () {
         settings.antiParaphraseMode = this.checked;
@@ -14891,51 +14892,7 @@ function initSettingsEvents() {
     updateTokenCounter();
     showToast(t('toast.promptsRestored'), 'success');
 	});
-
-	// Промпт Предметы
-	$('#horae-custom-items-prompt').on('input', function () {
-		const val = this.value;
-		settings.customItemsPrompt = (val.trim() === horaeManager.getDefaultItemsPrompt().trim()) ? '' : val;
-		$('#horae-items-prompt-count').text(val.length);
-		saveSettings();
-		horaeManager.init(getContext(), settings);
-		updateTokenCounter();
-	});
-
-	$('#horae-btn-reset-items-prompt').on('click', () => {
-		if (!confirm(t('confirm.restoreRpgPrompts'))) return;
-		settings.customItemsPrompt = '';
-		saveSettings();
-		const def = horaeManager.getDefaultItemsPrompt();
-		$('#horae-custom-items-prompt').val(def);
-		$('#horae-items-prompt-count').text(def.length);
-		horaeManager.init(getContext(), settings);
-		updateTokenCounter();
-		showToast(t('toast.promptsRestored'), 'success');
-	});
-
-    // 场景记忆提示词
-    $('#horae-custom-location-prompt').on('input', function () {
-        const val = this.value;
-        settings.customLocationPrompt = (val.trim() === horaeManager.getDefaultLocationPrompt().trim()) ? '' : val;
-        $('#horae-location-prompt-count').text(val.length);
-        saveSettings();
-        horaeManager.init(getContext(), settings);
-        updateTokenCounter();
-    });
 	
-    $('#horae-btn-reset-location-prompt').on('click', () => {
-        if (!confirm(t('confirm.restoreRpgPrompts'))) return;
-        settings.customLocationPrompt = '';
-        saveSettings();
-        const def = horaeManager.getDefaultLocationPrompt();
-        $('#horae-custom-location-prompt').val(def);
-        $('#horae-location-prompt-count').text(def.length);
-        horaeManager.init(getContext(), settings);
-        updateTokenCounter();
-        showToast(t('toast.promptsRestored'), 'success');
-    });
-
     // 关系网络提示词
     $('#horae-custom-relationship-prompt').on('input', function () {
         const val = this.value;
@@ -14980,6 +14937,50 @@ function initSettingsEvents() {
         showToast(t('toast.promptsRestored'), 'success');
     });
 	
+	// Промпт Предметы
+	$('#horae-custom-items-prompt').on('input', function () {
+		const val = this.value;
+		settings.customItemsPrompt = (val.trim() === horaeManager.getDefaultItemsPrompt().trim()) ? '' : val;
+		$('#horae-items-prompt-count').text(val.length);
+		saveSettings();
+		horaeManager.init(getContext(), settings);
+		updateTokenCounter();
+	});
+
+	$('#horae-btn-reset-items-prompt').on('click', () => {
+		if (!confirm(t('confirm.restoreRpgPrompts'))) return;
+		settings.customItemsPrompt = '';
+		saveSettings();
+		const def = horaeManager.getDefaultItemsPrompt();
+		$('#horae-custom-items-prompt').val(def);
+		$('#horae-items-prompt-count').text(def.length);
+		horaeManager.init(getContext(), settings);
+		updateTokenCounter();
+		showToast(t('toast.promptsRestored'), 'success');
+	});
+
+    // 场景记忆提示词
+    $('#horae-custom-location-prompt').on('input', function () {
+        const val = this.value;
+        settings.customLocationPrompt = (val.trim() === horaeManager.getDefaultLocationPrompt().trim()) ? '' : val;
+        $('#horae-location-prompt-count').text(val.length);
+        saveSettings();
+        horaeManager.init(getContext(), settings);
+        updateTokenCounter();
+    });
+	
+    $('#horae-btn-reset-location-prompt').on('click', () => {
+        if (!confirm(t('confirm.restoreRpgPrompts'))) return;
+        settings.customLocationPrompt = '';
+        saveSettings();
+        const def = horaeManager.getDefaultLocationPrompt();
+        $('#horae-custom-location-prompt').val(def);
+        $('#horae-location-prompt-count').text(def.length);
+        horaeManager.init(getContext(), settings);
+        updateTokenCounter();
+        showToast(t('toast.promptsRestored'), 'success');
+    });
+
 	// Промпт режима «Без пересказа»
 	$('#horae-custom-anti-paraphrase-prompt').on('input', function () {
 		const val = this.value;
@@ -16287,8 +16288,15 @@ function syncSettingsToUI() {
 	$('#horae-setting-send-characters').prop('checked', charactersEnabled);
 	$('#horae-setting-send-character-affection').prop('checked', settings.sendCharacterAffection !== false).closest('div').toggle(charactersEnabled);
 	$('#horae-setting-send-main-character-personality').prop('checked', settings.sendMainCharacterPersonality !== false).closest('div').toggle(charactersEnabled);
+	$('#horae-setting-send-relationships').prop('checked', !!settings.sendRelationships !== false).closest('div').toggle(charactersEnabled);
+	$('#horae-setting-send-mood').prop('checked', settings.sendMood !== false).closest('div').toggle(charactersEnabled);
+	
 	$('#horae-characters-prompt-group').toggle(charactersEnabled);
 	$('#horae-affection-prompt-group').toggle(charactersEnabled && settings.sendCharacterAffection !== false);
+	$('#horae-relationship-section').toggle(charactersEnabled && settings.sendRelationships !== false);
+	$('#horae-relationship-prompt-group').toggle(charactersEnabled && settings.sendRelationships !== false);
+	$('#horae-mood-prompt-group').toggle(charactersEnabled && settings.sendMood !== false);
+
 	$('.horae-tab[data-tab="characters"]').toggle(charactersEnabled);
 
 	//Предметы
@@ -16301,14 +16309,6 @@ function syncSettingsToUI() {
     $('#horae-location-prompt-group').toggle(!!settings.sendLocationMemory);
     $('.horae-tab[data-tab="locations"]').toggle(!!settings.sendLocationMemory);
 
-    // 关系网络
-    $('#horae-setting-send-relationships').prop('checked', !!settings.sendRelationships);
-    $('#horae-relationship-section').toggle(!!settings.sendRelationships);
-    $('#horae-relationship-prompt-group').toggle(!!settings.sendRelationships);
-
-    // 情绪追踪
-    $('#horae-setting-send-mood').prop('checked', !!settings.sendMood);
-    $('#horae-mood-prompt-group').toggle(!!settings.sendMood);
 
     // 反转述模式
     $('#horae-setting-anti-paraphrase').prop('checked', !!settings.antiParaphraseMode);
