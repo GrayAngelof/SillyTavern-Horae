@@ -211,6 +211,8 @@ const DEFAULT_SETTINGS = {
 	// Characters
 	sendCharacters: true,
 	customCharactersPrompt: '',
+	sendCharacterCostume: true,
+	customCharacterCostumePrompt: '',
 	sendCharacterAffection: true,
 	customCharacterAffectionPrompt: '',
 	sendMainCharacterPersonality: true,
@@ -218,6 +220,8 @@ const DEFAULT_SETTINGS = {
 	// Items
 	sendItems: true,
 	customItemsPrompt: '',
+	sendItemsQuantity: false,
+	customItemsQuantityPrompt: '',
 
 	// Location
 	sendLocationMemory: false,
@@ -321,8 +325,10 @@ const PROMPT_SETTING_KEYS = [
 	'customAutoResummaryPrompt',
 	'customTablesPrompt',
 	'customCharactersPrompt',
+	'customCharacterCostumePrompt',
 	'customCharacterAffectionPrompt',
 	'customItemsPrompt',
+	'customItemsQuantityPrompt',
 	'customLocationPrompt',
 	'customRelationshipPrompt',
 	'customMoodPrompt',
@@ -405,11 +411,15 @@ const _SETTINGS_EXPORT_KEYS = [
 
 	// MODULES
 	'sendTimeline',
+	'sendAgenda',
+	'sendHistory',
 	'sendCharacters',
-	'sendItems',
-	'sendLocationMemory',
+	'sendCharacterCostume',
 	'sendRelationships',
 	'sendMood',
+	'sendItems',
+	'sendItemsQuantity',
+	'sendLocationMemory',
 
 	// RPG
 	'rpgMode',
@@ -13754,8 +13764,10 @@ function initSettingsEvents() {
 			['customTimelineAgendaPrompt', 'horae-custom-agenda-prompt', 'horae-agenda-prompt-count', () => horaeManager.getDefaultTimelineAgendaPrompt()],
 			['customTimelineHistoryPrompt', 'horae-custom-history-prompt', 'horae-history-prompt-count', () => horaeManager.getDefaultTimelineHistoryPrompt()],
 			['customCharactersPrompt', 'horae-custom-characters-prompt', 'horae-characters-prompt-count', () => horaeManager.getDefaultCharactersPrompt()],
+			['customCharacterCostumePrompt', 'horae-custom-costume-prompt', 'horae-costume-prompt-count', () => horaeManager.getDefaultCharacterCostumePrompt()],
 			['customCharacterAffectionPrompt', 'horae-custom-affection-prompt', 'horae-affection-prompt-count', () => horaeManager.getDefaultCharacterAffectionPrompt()],			
 			['customItemsPrompt', 'horae-custom-items-prompt', 'horae-items-prompt-count', () => horaeManager.getDefaultItemsPrompt()],
+			['customItemsQuantityPrompt', 'horae-custom-items-quantity-prompt', 'horae-items-quantity-prompt-count', () => horaeManager.getDefaultItemsQuantityPrompt()],
             ['customLocationPrompt', 'horae-custom-location-prompt', 'horae-location-prompt-count', () => horaeManager.getDefaultLocationPrompt()],
             ['customRelationshipPrompt', 'horae-custom-relationship-prompt', 'horae-relationship-prompt-count', () => horaeManager.getDefaultRelationshipPrompt()],
             ['customMoodPrompt', 'horae-custom-mood-prompt', 'horae-mood-prompt-count', () => horaeManager.getDefaultMoodPrompt()],
@@ -13934,8 +13946,10 @@ function initSettingsEvents() {
 			['customTimelineAgendaPrompt', 'horae-custom-agenda-prompt', 'horae-agenda-prompt-count', () => horaeManager.getDefaultTimelineAgendaPrompt()],
 			['customTimelineHistoryPrompt', 'horae-custom-history-prompt', 'horae-history-prompt-count', () => horaeManager.getDefaultTimelineHistoryPrompt()],
 			['customCharactersPrompt', 'horae-custom-characters-prompt', 'horae-characters-prompt-count', () => horaeManager.getDefaultCharactersPrompt()],
+			['customCharacterCostumePrompt', 'horae-custom-costume-prompt', 'horae-costume-prompt-count', () => horaeManager.getDefaultCharacterCostumePrompt()],
 			['customCharacterAffectionPrompt', 'horae-custom-affection-prompt', 'horae-affection-prompt-count', () => horaeManager.getDefaultCharacterAffectionPrompt()],		
 			['customItemsPrompt', 'horae-custom-items-prompt', 'horae-items-prompt-count', () => horaeManager.getDefaultItemsPrompt()],
+			['customItemsQuantityPrompt', 'horae-custom-items-quantity-prompt', 'horae-items-quantity-prompt-count', () => horaeManager.getDefaultItemsQuantityPrompt()],
 			['customLocationPrompt', 'horae-custom-location-prompt', 'horae-location-prompt-count', () => horaeManager.getDefaultLocationPrompt()],
 			['customRelationshipPrompt', 'horae-custom-relationship-prompt', 'horae-relationship-prompt-count', () => horaeManager.getDefaultRelationshipPrompt()],
 			['customMoodPrompt', 'horae-custom-mood-prompt', 'horae-mood-prompt-count', () => horaeManager.getDefaultMoodPrompt()],
@@ -14137,26 +14151,15 @@ function initSettingsEvents() {
 
 	$('#horae-setting-send-timeline').on('change', function () {
 		settings.sendTimeline = this.checked;
-
 		// Дочерние настройки не меняем — только скрываем их вместе с родителем
-		$('#horae-setting-send-agenda')
-			.closest('div')
-			.toggle(this.checked);
-
-		$('#horae-setting-send-history')
-			.closest('div')
-			.toggle(this.checked);
-
+		$('#horae-setting-send-agenda').closest('div').toggle(this.checked);
+		$('#horae-setting-send-history').closest('div').toggle(this.checked);
 		// Поля редактирования промптов хронологии
 		$('#horae-timeline-prompt-group').toggle(this.checked);
-		$('#horae-agenda-prompt-group')
-			.toggle(this.checked && settings.sendAgenda !== false);
-		$('#horae-history-prompt-group')
-			.toggle(this.checked && settings.sendHistory !== false);
-
+		$('#horae-agenda-prompt-group').toggle(this.checked && settings.sendAgenda !== false);
+		$('#horae-history-prompt-group').toggle(this.checked && settings.sendHistory !== false);
 		// Вкладка хронологии
 		$('.horae-tab[data-tab="timeline"]').toggle(this.checked);
-
 		saveSettings();
 		horaeManager.init(getContext(), settings);
 		updateTokenCounter();
@@ -14238,12 +14241,14 @@ function initSettingsEvents() {
 	$('#horae-setting-send-characters').on('change', function () {
 		settings.sendCharacters = this.checked;
 
+		$('#horae-setting-send-character-costume').closest('div').toggle(this.checked);
 		$('#horae-setting-send-character-affection').closest('div').toggle(this.checked);
 		$('#horae-setting-send-relationships').closest('div').toggle(this.checked);
 		$('#horae-setting-send-mood').closest('div').toggle(this.checked);
 		$('#horae-setting-send-main-character-personality').closest('div').toggle(this.checked);
 
 		$('#horae-characters-prompt-group').toggle(this.checked);
+        $('#horae-costume-prompt-group').toggle(this.checked && settings.sendCharacterCostume !== false);
 		$('#horae-affection-prompt-group').toggle(this.checked && settings.sendCharacterAffection !== false);
 		$('#horae-relationship-prompt-group').toggle(this.checked && settings.sendRelationships);
 		$('#horae-mood-prompt-group').toggle(this.checked && settings.sendMood !== false);
@@ -14252,6 +14257,14 @@ function initSettingsEvents() {
 
 		$('.horae-tab[data-tab="characters"]').toggle(this.checked);
 
+		saveSettings();
+		horaeManager.init(getContext(), settings);
+		updateTokenCounter();
+	});
+
+	$('#horae-setting-send-character-costume').on('change', function () {
+		settings.sendCharacterCostume = this.checked;
+		$('#horae-costume-prompt-group').toggle(settings.sendCharacters && this.checked);
 		saveSettings();
 		horaeManager.init(getContext(), settings);
 		updateTokenCounter();
@@ -14299,9 +14312,20 @@ function initSettingsEvents() {
 
 	$('#horae-setting-send-items').on('change', function () {
 		settings.sendItems = this.checked;
-		saveSettings();
+		$('#horae-setting-send-items-quantity').closest('div').toggle(this.checked);
 		$('#horae-items-prompt-group').toggle(this.checked);
+		$('#horae-items-quantity-prompt-group').toggle(this.checked && settings.sendItemsQuantity);
 		$('.horae-tab[data-tab="items"]').toggle(this.checked);
+		saveSettings();
+		horaeManager.init(getContext(), settings);
+		_refreshSystemPromptDisplay();
+		updateTokenCounter();
+	});
+	
+	$('#horae-setting-send-items-quantity').on('change', function () {
+		settings.sendItemsQuantity = this.checked;
+		$('#horae-items-quantity-prompt-group').toggle(settings.sendItems && this.checked);
+		saveSettings();
 		horaeManager.init(getContext(), settings);
 		_refreshSystemPromptDisplay();
 		updateTokenCounter();
@@ -14866,7 +14890,30 @@ function initSettingsEvents() {
     updateTokenCounter();
     showToast(t('toast.promptsRestored'), 'success');
 	});
-	
+
+	// Промпт Наряды персонажей
+	$('#horae-custom-costume-prompt').on('input', function () {
+		const val = this.value;
+		settings.customCharacterCostumePrompt =
+			(val.trim() === horaeManager.getDefaultCharacterCostumePrompt().trim()) ? '' : val;
+		$('#horae-costume-prompt-count').text(val.length);
+		saveSettings();
+		horaeManager.init(getContext(), settings);
+		updateTokenCounter();
+	});
+
+	$('#horae-btn-reset-costume-prompt').on('click', () => {
+		if (!confirm(t('confirm.restoreRpgPrompts'))) return;
+		settings.customCharacterCostumePrompt = '';
+		saveSettings();
+		const def = horaeManager.getDefaultCharacterCostumePrompt();
+		$('#horae-custom-costume-prompt').val(def);
+		$('#horae-costume-prompt-count').text(def.length);
+		horaeManager.init(getContext(), settings);
+		updateTokenCounter();
+		showToast(t('toast.promptsRestored'), 'success');
+	});
+
 	// Промпт Отношение
 	$('#horae-custom-affection-prompt').on('input', function () {
 		const val = this.value;
@@ -14877,22 +14924,19 @@ function initSettingsEvents() {
 		horaeManager.init(getContext(), settings);
 		updateTokenCounter();
 	});
-	
+
 	$('#horae-btn-reset-affection-prompt').on('click', () => {
     if (!confirm(t('confirm.restoreRpgPrompts'))) return;
-
     settings.customCharacterAffectionPrompt = '';
     saveSettings();
-
     const def = horaeManager.getDefaultCharacterAffectionPrompt();
     $('#horae-custom-affection-prompt').val(def);
     $('#horae-affection-prompt-count').text(def.length);
-
     horaeManager.init(getContext(), settings);
     updateTokenCounter();
     showToast(t('toast.promptsRestored'), 'success');
 	});
-	
+
     // 关系网络提示词
     $('#horae-custom-relationship-prompt').on('input', function () {
         const val = this.value;
@@ -14954,6 +14998,28 @@ function initSettingsEvents() {
 		const def = horaeManager.getDefaultItemsPrompt();
 		$('#horae-custom-items-prompt').val(def);
 		$('#horae-items-prompt-count').text(def.length);
+		horaeManager.init(getContext(), settings);
+		updateTokenCounter();
+		showToast(t('toast.promptsRestored'), 'success');
+	});
+
+	// Промпт Количественный учёт
+	$('#horae-custom-items-quantity-prompt').on('input', function () {
+		const val = this.value;
+		settings.customItemsQuantityPrompt = (val.trim() === horaeManager.getDefaultItemsQuantityPrompt().trim()) ? '' : val;
+		$('#horae-items-quantity-prompt-count').text(val.length);
+		saveSettings();
+		horaeManager.init(getContext(), settings);
+		updateTokenCounter();
+	});
+
+	$('#horae-btn-reset-items-quantity-prompt').on('click', () => {
+		if (!confirm(t('confirm.restoreRpgPrompts'))) return;
+		settings.customItemsQuantityPrompt = '';
+		saveSettings();
+		const def = horaeManager.getDefaultItemsQuantityPrompt();
+		$('#horae-custom-items-quantity-prompt').val(def);
+		$('#horae-items-quantity-prompt-count').text(def.length);
 		horaeManager.init(getContext(), settings);
 		updateTokenCounter();
 		showToast(t('toast.promptsRestored'), 'success');
@@ -16048,8 +16114,10 @@ function _refreshSystemPromptDisplay() {
 		['customTimelineAgendaPrompt', 'horae-custom-agenda-prompt', 'horae-agenda-prompt-count', () => horaeManager.getDefaultTimelineAgendaPrompt()],
 		['customTimelineHistoryPrompt', 'horae-custom-history-prompt', 'horae-history-prompt-count', () => horaeManager.getDefaultTimelineHistoryPrompt()],
 		['customCharactersPrompt', 'horae-custom-characters-prompt', 'horae-characters-prompt-count', () => horaeManager.getDefaultCharactersPrompt()],
+		['customCharacterCostumePrompt', 'horae-custom-costume-prompt', 'horae-costume-prompt-count', () => horaeManager.getDefaultCharacterCostumePrompt()],
 		['customCharacterAffectionPrompt', 'horae-custom-affection-prompt', 'horae-affection-prompt-count', () => horaeManager.getDefaultCharacterAffectionPrompt()],
 		['customItemsPrompt', 'horae-custom-items-prompt', 'horae-items-prompt-count', () => horaeManager.getDefaultItemsPrompt()],
+		['customItemsQuantityPrompt', 'horae-custom-items-quantity-prompt', 'horae-items-quantity-prompt-count', () => horaeManager.getDefaultItemsQuantityPrompt()],
         ['customLocationPrompt', 'horae-custom-location-prompt', 'horae-location-prompt-count', () => horaeManager.getDefaultLocationPrompt()],
         ['customRelationshipPrompt', 'horae-custom-relationship-prompt', 'horae-relationship-prompt-count', () => horaeManager.getDefaultRelationshipPrompt()],
         ['customMoodPrompt', 'horae-custom-mood-prompt', 'horae-mood-prompt-count', () => horaeManager.getDefaultMoodPrompt()],
@@ -16286,12 +16354,14 @@ function syncSettingsToUI() {
 	const charactersEnabled = !!settings.sendCharacters;
 
 	$('#horae-setting-send-characters').prop('checked', charactersEnabled);
+	$('#horae-setting-send-character-costume').prop('checked', settings.sendCharacterCostume !== false).closest('div').toggle(charactersEnabled);
 	$('#horae-setting-send-character-affection').prop('checked', settings.sendCharacterAffection !== false).closest('div').toggle(charactersEnabled);
 	$('#horae-setting-send-main-character-personality').prop('checked', settings.sendMainCharacterPersonality !== false).closest('div').toggle(charactersEnabled);
 	$('#horae-setting-send-relationships').prop('checked', !!settings.sendRelationships !== false).closest('div').toggle(charactersEnabled);
 	$('#horae-setting-send-mood').prop('checked', settings.sendMood !== false).closest('div').toggle(charactersEnabled);
 	
 	$('#horae-characters-prompt-group').toggle(charactersEnabled);
+	$('#horae-costume-prompt-group').toggle(charactersEnabled && settings.sendCharacterCostume !== false);
 	$('#horae-affection-prompt-group').toggle(charactersEnabled && settings.sendCharacterAffection !== false);
 	$('#horae-relationship-section').toggle(charactersEnabled && settings.sendRelationships !== false);
 	$('#horae-relationship-prompt-group').toggle(charactersEnabled && settings.sendRelationships !== false);
@@ -16300,9 +16370,14 @@ function syncSettingsToUI() {
 	$('.horae-tab[data-tab="characters"]').toggle(charactersEnabled);
 
 	//Предметы
-	$('#horae-setting-send-items').prop('checked', settings.sendItems);
-	$('#horae-items-prompt-group').toggle(!!settings.sendItems);
-	$('.horae-tab[data-tab="items"]').toggle(!!settings.sendItems);
+	const itemsEnabled = !!settings.sendItems;
+	const itemsQuantityEnabled = itemsEnabled && !!settings.sendItemsQuantity;
+
+	$('#horae-setting-send-items').prop('checked', itemsEnabled);
+	$('#horae-setting-send-items-quantity').prop('checked', !!settings.sendItemsQuantity).closest('div').toggle(itemsEnabled);
+	$('#horae-items-prompt-group').toggle(itemsEnabled);
+	$('#horae-items-quantity-prompt-group').toggle(itemsQuantityEnabled);
+	$('.horae-tab[data-tab="items"]').toggle(itemsEnabled);
 	
     // 场景记忆
     $('#horae-setting-send-location-memory').prop('checked', !!settings.sendLocationMemory);
@@ -16400,8 +16475,10 @@ function syncSettingsToUI() {
 	const timelineAgendaPromptVal = settings.customTimelineAgendaPrompt || horaeManager.getDefaultTimelineAgendaPrompt();
 	const timelineHistoryPromptVal = settings.customTimelineHistoryPrompt || horaeManager.getDefaultTimelineHistoryPrompt();
 	const charactersPromptVal = settings.customCharactersPrompt || horaeManager.getDefaultCharactersPrompt();
+	const characterCostumePromptVal = settings.customCharacterCostumePrompt || horaeManager.getDefaultCharacterCostumePrompt();
 	const characterAffectionPromptVal = settings.customCharacterAffectionPrompt || horaeManager.getDefaultCharacterAffectionPrompt();
 	const itemsPromptVal = settings.customItemsPrompt || horaeManager.getDefaultItemsPrompt();
+	const itemsQuantityPromptVal =settings.customItemsQuantityPrompt || horaeManager.getDefaultItemsQuantityPrompt();
 	const locationPromptVal = settings.customLocationPrompt || horaeManager.getDefaultLocationPrompt();
 	const relPromptVal = settings.customRelationshipPrompt || horaeManager.getDefaultRelationshipPrompt();
 	const moodPromptVal = settings.customMoodPrompt || horaeManager.getDefaultMoodPrompt();
@@ -16419,8 +16496,10 @@ function syncSettingsToUI() {
 	$('#horae-custom-agenda-prompt').val(timelineAgendaPromptVal);
 	$('#horae-custom-history-prompt').val(timelineHistoryPromptVal);
 	$('#horae-custom-characters-prompt').val(charactersPromptVal);
+	$('#horae-custom-costume-prompt').val(characterCostumePromptVal);
 	$('#horae-custom-affection-prompt').val(characterAffectionPromptVal);
 	$('#horae-custom-items-prompt').val(itemsPromptVal);
+	$('#horae-custom-items-quantity-prompt').val(itemsQuantityPromptVal);
 	$('#horae-custom-location-prompt').val(locationPromptVal);
 	$('#horae-custom-relationship-prompt').val(relPromptVal);
 	$('#horae-custom-mood-prompt').val(moodPromptVal);
@@ -16438,8 +16517,10 @@ function syncSettingsToUI() {
 	$('#horae-agenda-prompt-count').text(timelineAgendaPromptVal.length);
 	$('#horae-history-prompt-count').text(timelineHistoryPromptVal.length);
 	$('#horae-characters-prompt-count').text(charactersPromptVal.length);
+	$('#horae-costume-prompt-count').text(characterCostumePromptVal.length);
 	$('#horae-affection-prompt-count').text(characterAffectionPromptVal.length);	
 	$('#horae-items-prompt-count').text(itemsPromptVal.length);
+	$('#horae-items-quantity-prompt-count').text(itemsQuantityPromptVal.length);
 	$('#horae-location-prompt-count').text(locationPromptVal.length);
 	$('#horae-relationship-prompt-count').text(relPromptVal.length);
 	$('#horae-mood-prompt-count').text(moodPromptVal.length);

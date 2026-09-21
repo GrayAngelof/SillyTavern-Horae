@@ -600,7 +600,7 @@ class HoraeManager {
             if (lang === 'ru') return ru;
             return en;
         };
-        
+
         // 状态快照头
         lines.push(L(
             '[当前状态快照——对比本回合剧情，仅在<horae>中输出发生实质变化的字段]',
@@ -609,13 +609,12 @@ class HoraeManager {
             '[현재 상태 스냅샷——이번 라운드의 스토리와 비교하여 실질적으로 변경된 필드만 <horae>에 출력]',
             '[Текущее состояние мира — база сравнения. Извлекайте только изменения, произошедшие в текущем раунде.]',
         ));
-        
+
         const sendTimeline = this.settings?.sendTimeline !== false;
 		const sendCharacters = this.settings?.sendCharacters !== false;
-		const sendCharacterAffection =
-			sendCharacters && this.settings?.sendCharacterAffection !== false;
-		const sendMainCharacterPersonality =
-			sendCharacters && this.settings?.sendMainCharacterPersonality !== false;
+		const sendCharacterCostume = sendCharacters && this.settings?.sendCharacterCostume !== false;
+		const sendCharacterAffection = sendCharacters && this.settings?.sendCharacterAffection !== false;
+		const sendMainCharacterPersonality = sendCharacters && this.settings?.sendMainCharacterPersonality !== false;
         const sendItems = this.settings?.sendItems !== false;
 
         // 主要角色判定：卡片本体 + 置顶 NPC，含别名匹配以兼容 NPC 改名
@@ -695,50 +694,52 @@ class HoraeManager {
         }
         
         // 在场角色和服装
-        if (sendCharacters) {
-            const presentChars = state.scene.characters_present || [];
+		if (presentChars.length > 0) {
+			const charStrs = [];
+
+			for (const char of presentChars) {
+				if (sendCharacterCostume) {
+					const costumeKey = Object.keys(state.costumes || {}).find(
+						k => k === char || k.includes(char) || char.includes(k)
+					);
+
+					if (costumeKey && state.costumes[costumeKey]) {
+						charStrs.push(`${char}(${state.costumes[costumeKey]})`);
+					} else {
+						charStrs.push(char);
+					}
+				} else {
+					charStrs.push(char);
+				}
+			}
+
+			lines.push(`[${L('在场','Present','出席','참석','Присутствуют')}|${charStrs.join('|')}]`);
+		}
             
-            if (presentChars.length > 0) {
-                const charStrs = [];
-                for (const char of presentChars) {
-                    // 模糊匹配服装
-                    const costumeKey = Object.keys(state.costumes || {}).find(
-                        k => k === char || k.includes(char) || char.includes(k)
-                    );
-                    if (costumeKey && state.costumes[costumeKey]) {
-                        charStrs.push(`${char}(${state.costumes[costumeKey]})`);
-                    } else {
-                        charStrs.push(char);
-                    }
-                }
-                lines.push(`[${L('在场','Present','出席','참석','Присутствуют')}|${charStrs.join('|')}]`);
-            }
+		// 情绪状态（仅在场角色，变化驱动）
+		if (this.settings?.sendMood) {
+			const moodEntries = [];
+			for (const char of presentChars) {
+				if (state.mood[char]) {
+					moodEntries.push(`${char}:${state.mood[char]}`);
+				}
+			}
+			if (moodEntries.length > 0) {
+				lines.push(`[${L('情绪','Mood','感情','감정','Настроение')}|${moodEntries.join('|')}]`);
+			}
+		}
             
-            // 情绪状态（仅在场角色，变化驱动）
-            if (this.settings?.sendMood) {
-                const moodEntries = [];
-                for (const char of presentChars) {
-                    if (state.mood[char]) {
-                        moodEntries.push(`${char}:${state.mood[char]}`);
-                    }
-                }
-                if (moodEntries.length > 0) {
-                    lines.push(`[${L('情绪','Mood','感情','감정','Настроение')}|${moodEntries.join('|')}]`);
-                }
-            }
-            
-            // 关系网络（仅在场角色相关的关系，从 chat[0] 读取，零AI输出token）
-            if (this.settings?.sendRelationships) {
-                const rels = this.getRelationshipsForCharacters(presentChars);
-                if (rels.length > 0) {
-                    lines.push(`\n[${L('关系网络','Relationship Network','関係ネットワーク','관계 네트워크','Связи персонажей')}]`);
-                    for (const r of rels) {
-                        const noteStr = r.note ? `(${r.note})` : '';
-                        lines.push(`${r.from}→${r.to}: ${r.type}${noteStr}`);
-                    }
-                }
-            }
-        }
+		// 关系网络（仅在场角色相关的关系，从 chat[0] 读取，零AI输出token）
+		if (this.settings?.sendRelationships) {
+			const rels = this.getRelationshipsForCharacters(presentChars);
+			if (rels.length > 0) {
+				lines.push(`\n[${L('关系网络','Relationship Network','関係ネットワーク','관계 네트워크','Связи персонажей')}]`);
+				for (const r of rels) {
+					const noteStr = r.note ? `(${r.note})` : '';
+					lines.push(`${r.from}→${r.to}: ${r.type}${noteStr}`);
+				}
+			}
+		}
         
         // 物品（已装备的物品不在此处显示，避免重复）
         if (sendItems) {
@@ -3486,8 +3487,6 @@ class HoraeManager {
         const subs = this.generateTimelineTimePrompt() +
 					this.generateTimelineAgendaPrompt() +
 					this.generateCharactersMemoryPrompt() +  
-					this.generateRelationshipPrompt() +
-					this.generateMoodPrompt() +
 					this.generateItemsMemoryPrompt() +
 					this.generateLocationMemoryPrompt() +
 					this.generateCustomTablesPrompt() +
@@ -3611,78 +3610,112 @@ class HoraeManager {
 		return this._getPromptDefaultFromResource('customCharactersPrompt');
 	}
 
-	generateCharactersMemoryPrompt() {
-		if (!this.settings?.sendCharacters) return '';
-
-		const custom = this.settings?.customCharactersPrompt;
-		const userName = this.context?.name1 || '主角';
-		const charName = this.context?.name2 || '角色';
-
-		let prompt = custom
-			? custom.replace(/\{\{user\}\}/gi, userName).replace(/\{\{char\}\}/gi, charName)
-			: this.getDefaultCharactersPrompt();
-
-		if (this.settings?.sendCharacterAffection !== false) {
-			const affection = this.settings?.customCharacterAffectionPrompt;
-			prompt += '\n' + (
-				affection
-					? affection.replace(/\{\{user\}\}/gi, userName).replace(/\{\{char\}\}/gi, charName)
-					: this.getDefaultCharacterAffectionPrompt()
-			);
-		}
-
-		return '\n' + prompt;
+	getDefaultCharacterCostumePrompt() {
+		return this._getPromptDefaultFromResource('customCharacterCostumePrompt');
 	}
 
 	getDefaultCharacterAffectionPrompt() {
 		return this._getPromptDefaultFromResource('customCharacterAffectionPrompt');
 	}
-	
+
 	getDefaultRelationshipPrompt() {
 		const userName = this.context?.name1 || '{{user}}';
 		return this._getPromptDefaultFromResource('customRelationshipPrompt', { userName });
 	}
 
-	generateRelationshipPrompt() {
-		if (!this.settings?.sendCharacters || !this.settings?.sendRelationships) return '';
-		const custom = this.settings?.customRelationshipPrompt;
-		if (custom) {
-			const userName = this.context?.name1 || '主角';
-			const charName = this.context?.name2 || '角色';
-			return '\n' + custom.replace(/\{\{user\}\}/gi, userName).replace(/\{\{char\}\}/gi, charName);
-		}
-		return '\n' + this.getDefaultRelationshipPrompt();
-	}
-	
-	
 	getDefaultMoodPrompt() {
 		return this._getPromptDefaultFromResource('customMoodPrompt');
 	}
 
-    generateMoodPrompt() {
-		if (!this.settings?.sendCharacters || !this.settings?.sendMood) return '';
-		const custom = this.settings?.customMoodPrompt;
-		if (custom) {
-			const userName = this.context?.name1 || '主角';
-			const charName = this.context?.name2 || '角色';
-			return '\n' + custom.replace(/\{\{user\}\}/gi, userName).replace(/\{\{char\}\}/gi, charName);
+	generateCharactersMemoryPrompt() {
+		if (!this.settings?.sendCharacters) return '';
+
+		const userName = this.context?.name1 || '主角';
+		const charName = this.context?.name2 || '角色';
+
+		const replaceMacros = (prompt) =>
+			prompt.replace(/\{\{user\}\}/gi, userName)
+				.replace(/\{\{char\}\}/gi, charName);
+
+		const custom = this.settings?.customCharactersPrompt;
+
+		let prompt = custom
+			? replaceMacros(custom)
+			: this.getDefaultCharactersPrompt();
+
+		if (this.settings?.sendCharacterCostume !== false) {
+			const costume = this.settings?.customCharacterCostumePrompt;
+
+			prompt += '\n' + (
+				costume
+					? replaceMacros(costume)
+					: this.getDefaultCharacterCostumePrompt()
+			);
 		}
-		return '\n' + this.getDefaultMoodPrompt();
+
+		if (this.settings?.sendCharacterAffection !== false) {
+			const affection = this.settings?.customCharacterAffectionPrompt;
+
+			prompt += '\n' + (
+				affection
+					? replaceMacros(affection)
+					: this.getDefaultCharacterAffectionPrompt()
+			);
+		}
+
+		if (this.settings?.sendRelationships !== false) {
+			const relationship = this.settings?.customRelationshipPrompt;
+
+			prompt += '\n' + (
+				relationship
+					? replaceMacros(relationship)
+					: this.getDefaultRelationshipPrompt()
+			);
+		}
+
+		if (this.settings?.sendMood !== false) {
+			const mood = this.settings?.customMoodPrompt;
+
+			prompt += '\n' + (
+				mood
+					? replaceMacros(mood)
+					: this.getDefaultMoodPrompt()
+			);
+		}
+
+		return '\n' + prompt;
 	}
 	
 	getDefaultItemsPrompt() {
 		return this._getPromptDefaultFromResource('customItemsPrompt');
 	}
 	
+	getDefaultItemsQuantityPrompt() {
+		return this._getPromptDefaultFromResource('customItemsQuantityPrompt');
+	}
+	
 	generateItemsMemoryPrompt() {
 		if (!this.settings?.sendItems) return '';
+
 		const custom = this.settings?.customItemsPrompt;
-		if (custom) {
-			const userName = this.context?.name1 || '主角';
-			const charName = this.context?.name2 || '角色';
-			return '\n' + custom.replace(/\{\{user\}\}/gi, userName).replace(/\{\{char\}\}/gi, charName);
+		const userName = this.context?.name1 || '主角';
+		const charName = this.context?.name2 || '角色';
+
+		let prompt = custom
+			? custom.replace(/\{\{user\}\}/gi, userName).replace(/\{\{char\}\}/gi, charName)
+			: this.getDefaultItemsPrompt();
+
+		if (this.settings?.sendItemsQuantity) {
+			const quantity = this.settings?.customItemsQuantityPrompt;
+
+			prompt += '\n' + (
+				quantity
+					? quantity.replace(/\{\{user\}\}/gi, userName).replace(/\{\{char\}\}/gi, charName)
+					: this.getDefaultItemsQuantityPrompt()
+			);
 		}
-		return '\n' + this.getDefaultItemsPrompt();
+
+		return '\n' + prompt;
 	}
     
 	getDefaultLocationPrompt() {

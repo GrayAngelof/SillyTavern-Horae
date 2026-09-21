@@ -984,6 +984,18 @@
 						</span>
 
 						<div style="margin-top: 6px; padding-left: 22px;">
+							<label data-i18n="settings.sendCharacterCostume" style="font-size: 12px; color: var(--horae-text-muted);">
+								<input type="checkbox" id="horae-setting-send-character-costume" checked>
+								Наряды персонажей
+							</label>
+							<span class="horae-setting-sub-hint"
+								  data-i18n="settings.sendCharacterCostumeHint"
+								  style="padding-left: 22px;">
+								Передаёт текущие наряды присутствующих персонажей.
+							</span>
+						</div>
+
+						<div style="margin-top: 6px; padding-left: 22px;">
 							<label data-i18n="settings.sendCharacterAffection" style="font-size: 12px; color: var(--horae-text-muted);">
 								<input type="checkbox" id="horae-setting-send-character-affection" checked>
 								好感度
@@ -1031,13 +1043,31 @@
 						</div>
 					</div>
                     
-                    <div class="horae-setting-item">
-                        <label data-i18n="settings.sendItems">
-                            <input type="checkbox" id="horae-setting-send-items" checked>
-                            物品栏
-                        </label>
-                        <span class="horae-setting-sub-hint" data-i18n="settings.sendItemsHint">当前持有的物品及位置。关闭后AI可能"凭空"取出不存在的物品。</span>
-                    </div>
+					<div class="horae-setting-item">
+						<label data-i18n="settings.sendItems">
+							<input type="checkbox" id="horae-setting-send-items" checked>
+							Инвентарь
+						</label>
+
+						<span class="horae-setting-sub-hint"
+							  data-i18n="settings.sendItemsHint">
+							...
+						</span>
+
+						<div style="margin-top: 6px; padding-left: 22px;">
+							<label data-i18n="settings.sendItemsQuantity"
+								   style="font-size: 12px; color: var(--horae-text-muted);">
+								<input type="checkbox" id="horae-setting-send-items-quantity">
+								Количественный учёт
+							</label>
+
+							<span class="horae-setting-sub-hint"
+								  data-i18n="settings.sendItemsQuantityHint"
+								  style="padding-left: 22px;">
+								Точный учёт отдельных количественных групп предметов.
+							</span>
+						</div>
+					</div>
 
                     <div class="horae-setting-item">
                         <label data-i18n="settings.sendLocationMemory">
@@ -1778,6 +1808,24 @@
 							</div>
 						</div>
 
+						<div id="horae-costume-prompt-group" class="horae-prompt-editor-group" style="margin-top: 12px; display: none;">
+							<div class="horae-prompt-editor-header">
+								<span>Промпт Наряды персонажей</span>
+								<button id="horae-btn-reset-costume-prompt" class="horae-btn-reset-prompt" type="button">
+									<i class="fa-solid fa-rotate-left"></i>
+									Восстановить по умолчанию
+								</button>
+							</div>
+
+							<textarea id="horae-custom-costume-prompt"
+								class="horae-prompt-textarea"
+								rows="6"
+								placeholder="Оставьте пустым для использования промпта по умолчанию..."></textarea>
+							<div class="horae-prompt-char-count">
+								<span id="horae-costume-prompt-count">0</span> символов
+							</div>
+						</div>
+
 						<div id="horae-affection-prompt-group" class="horae-prompt-editor-group" style="margin-top: 12px; display: none;">
 							<div class="horae-prompt-editor-header">
 								<span>Промпт Отношения</span>
@@ -1833,6 +1881,31 @@
 							<textarea id="horae-custom-items-prompt" class="horae-prompt-textarea" rows="6" placeholder="Оставьте пустым для использования промпта по умолчанию..."></textarea>
 							<div class="horae-prompt-char-count">
 								<span id="horae-items-prompt-count">0</span> символов
+							</div>
+						</div>
+
+						<div id="horae-items-quantity-prompt-group"
+							 class="horae-prompt-editor-group"
+							 style="margin-top: 12px; display: none;">
+
+							<div class="horae-prompt-editor-header">
+								<span>Промпт Количественный учёт</span>
+
+								<button id="horae-btn-reset-items-quantity-prompt"
+										class="horae-btn-reset-prompt"
+										type="button">
+									<i class="fa-solid fa-rotate-left"></i>
+									Восстановить по умолчанию
+								</button>
+							</div>
+
+							<textarea id="horae-custom-items-quantity-prompt"
+									  class="horae-prompt-textarea"
+									  rows="6"
+									  placeholder="Оставьте пустым для использования промпта по умолчанию..."></textarea>
+
+							<div class="horae-prompt-char-count">
+								<span id="horae-items-quantity-prompt-count">0</span> символов
 							</div>
 						</div>
 
