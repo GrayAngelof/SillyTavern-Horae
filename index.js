@@ -317,24 +317,42 @@ const DEFAULT_SETTINGS = {
 };
 
 const PROMPT_SETTING_KEYS = [
-	'customSystemPrompt',
-	'customBatchPrompt',
-	'customAnalysisPrompt',
-	'customCompressPrompt',
-	'customAutoSummaryPrompt',
-	'customAutoResummaryPrompt',
-	'customTablesPrompt',
-	'customCharactersPrompt',
-	'customCharacterCostumePrompt',
-	'customCharacterAffectionPrompt',
-	'customItemsPrompt',
-	'customItemsQuantityPrompt',
-	'customLocationPrompt',
-	'customRelationshipPrompt',
-	'customMoodPrompt',
-	'customRpgPrompt',
-	'customAntiParaphrasePrompt',
-	'vectorQueryRewriteSystemPrompt',
+      // Core prompts
+    'customSystemPrompt',
+    'customBatchPrompt',
+    'customAnalysisPrompt',
+    'customCompressPrompt',
+    'customAutoSummaryPrompt',
+    'customAutoResummaryPrompt',
+    'customTablesPrompt',
+
+    // Timeline prompts
+    'customTimelineTimePrompt',
+    'customTimelineAgendaPrompt',
+    'customTimelineHistoryPrompt',
+
+    // Character prompts
+    'customCharactersPrompt',
+    'customCharacterCostumePrompt',
+    'customCharacterAffectionPrompt',
+    'customRelationshipPrompt',
+    'customMoodPrompt',
+
+    // Inventory prompts
+    'customItemsPrompt',
+    'customItemsQuantityPrompt',
+
+    // Scene prompts
+    'customLocationPrompt',
+
+    // Roleplay prompts
+    'customRpgPrompt',
+
+    // Narrative control prompts:
+    'customAntiParaphrasePrompt',
+
+    // Internal utility prompts
+    'vectorQueryRewriteSystemPrompt',
 ];
 
 // 外部来源弹窗里「重置但保留」的白名单：填起来麻烦或丢失代价大的字段
