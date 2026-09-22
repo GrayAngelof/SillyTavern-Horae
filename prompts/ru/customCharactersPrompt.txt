@@ -1,40 +1,45 @@
-═══ [Characters & NPC] Rules ═══
-You must always include characters present and their outfits.
+## Characters
 
-[Required fields - must appear in <horae> every turn]
-characters:comma-separated list of all characters present (required)
-costume:character name=outfit description (required; one line per character, semicolon merge is forbidden)
+Отслеживает персонажей, присутствующих в сцене, и их сохранённые профили.
+Состояние characters представляет, кто присутствует и что о них известно.
 
-[When to write NPC entries]
-  ✦ NPC first appearance → write full npc: line (see format below)
-  ✦ Permanent appearance change → write only appearance field
-  ✦ Personality change → write only personality field
-  ✦ Relationship with {{user}} changed → write only relationship field
-  ✦ New information about this NPC obtained → append to corresponding field
-  ✦ Extended field changed → write only changed ~extended field
-[When NOT to write]
-  ✗ NPC present but no new info → do not write npc:
-  ✗ NPC leaves and returns with unchanged info → do not rewrite
-  ✗ Rewriting existing description with synonyms/abbreviations → forbidden
+### Формат
+characters:<имена через запятую>
+npc:<имя>|<appearance>=<personality>@<relationship>~<extended fields>
 
-[Format for NPC]
-npc:name|appearance=personality@relationship~gender:value~age:value~race:value~occupation:value~birthday:value
-Separators: | separates name, = separates appearance and personality, @ separates relationship, ~ separates extended fields (key:value)
+### Правила
+* characters перечисляет всех персонажей, присутствующих в текущей сцене.
+* npc записывается при первом появлении или когда хотя бы одно поле профиля NPC меняется.
 
-[Incremental update examples]
-  First time: npc:Vol|silver-gray fur/green eyes/height 220cm/full-body battle scars=taciturn heavily armored mercenary@{{user}}'s first customer~gender:male~age:about 35~race:wolf beastman~occupation:mercenary
-  Relationship only: npc:Vol|=@{{user}}'s boyfriend
-  Appearance append: npc:Vol|silver-gray fur/green eyes/height 220cm/full-body battle scars/left arm bandage
-  Personality only: npc:Vol|=no longer silent/occasionally smiles
-  Occupation only: npc:Vol|~occupation:retired mercenary
+### NPC
+* npc хранит только постоянные данные профиля персонажа.
+* Поля профиля: appearance, personality, relationship, gender, age, race, job, birthday.
+* Поле профиля меняется только тогда, когда новое значение явно установлено или подтверждено. Просьбы, предложения, планы, черновики или предполагаемые значения не меняют сохранённое поле.
+* Если ранее сохранённая информация явно устарела, замените её.
 
-[Birthday field] (optional extended)
-  ~birthday:yyyy/mm/dd or ~birthday:mm/dd – write only if explicitly stated in character settings; do not guess.
+### NPC — Первое появление
+При первом появлении запишите полный профиль со всеми доступными полями:
+* Имя
+* Appearance — постоянные физические особенности: тело, лицо, волосы, глаза, кожа, шрамы, татуировки
+* Personality
+* Relationship
+* Gender
+* Age
+* Race
+* Job
+* Birthday
 
-[Relationship description rules]
-  Must include exact target name: ❌ customer ✅ {{user}}'s new visitor / ❌ creditor ✅ person holding {{user}}'s IOU / ❌ landlord ✅ {{user}}'s landlord / ❌ boyfriend ✅ {{user}}'s boyfriend / ❌ benefactor ✅ person who saved {{user}}'s life / ❌ bully ✅ person who bullies {{user}} / ❌ secret admirer ✅ person secretly in love with {{user}} / ❌ enemy ✅ person whose biological father was killed by {{user}}
-  For subordinate relations, include the owner NPC's name: ✅ Ivan's hound; a pet of {{user}}'s guest / Ivan's girlfriend; {{user}}'s guest / {{user}}'s bestie; Ivan's wife / {{user}}'s stepfather; Ivan's father / {{user}}'s lover; Ivan's younger brother / {{user}}'s bestie; mistress of {{user}}'s husband; a third party who interfered in {{user}} and Ivan's marriage
+### NPC — Инкрементальные обновления
+После первого появления запись npc должна содержать только то поле или поля профиля, которые изменились в текущем ходе.
+* Только relationship: npc:<имя>|=@<новые отношения>
+* Добавление appearance: npc:<имя>|<существующее appearance>/<добавленное appearance>
+* Только personality: npc:<имя>|=<новая personality>
+* Только extended field: npc:<имя>|~<поле>:<значение>
 
-[Important]
-  - NPC first appearance must include all fields: name, appearance, personality, relationship, gender, age, race, occupation (birthday only if known).
-  - Unchanged fields must not be written – system retains previous data.
+### Правила полей
+* `@relationship` описывает, кем NPC является по отношению к пользователю (секретарь, возлюбленный, наставник, соперник). Не чувства, настроения или отношения.
+* `appearance` — постоянные физические особенности: тело, лицо, волосы, глаза, кожа, шрамы, татуировки. Не одежда.
+* `personality` — устойчивые внутренние черты, независимые от текущих отношений, чувств или отношения.
+* Временные чувства, настроения, реакции не относятся к `personality`.
+* Extended fields: gender, age, race, job, birthday.
+* Формат birthday: yyyy/mm/dd или mm/dd.

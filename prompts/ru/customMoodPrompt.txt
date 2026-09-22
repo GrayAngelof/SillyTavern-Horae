@@ -1,13 +1,24 @@
-═══ [Emotion/Psychological State Tracking] Trigger Conditions ═══
-Format: mood:CharacterName=emotional state (concise phrases, e.g. "tense/anxious", "happy/expectant", "angry", "calm but alert")
-The system tracks emotional changes of characters present to help maintain psychological continuity.
+## Mood
 
-[When to write] (output only if any condition is met)
-  ✦ A character's emotion changes significantly (e.g., from calm to angry) → mood:CharacterName=new emotion
-  ✦ A character appears for the first time with a clear emotional trait → mood:CharacterName=current emotion
-[When not to write]
-  ✗ No emotional change for the character → do not write
-  ✗ Character not present → do not write
-[Rules]
-  · Use 1-4 words for emotion description; use / to separate mixed emotions
-  · Only record emotions of characters currently present
+Отслеживает текущее эмоциональное состояние присутствующих персонажей.
+Состояние mood представляет, что каждый персонаж чувствует прямо сейчас, как локальную реакцию на текущую ситуацию.
+
+### Формат
+mood:<имя>=<эмоциональное состояние>
+
+### Правила
+* Записывается только для персонажей, присутствующих в текущей сцене.
+* Записывается только тогда, когда эмоциональное состояние персонажа меняется на другое.
+* Записывается, когда персонаж впервые появляется с явно установленным эмоциональным состоянием.
+* Не записывается для персонажей, отсутствующих в сцене.
+
+### Что считается изменением
+* Изменение — это переход от одного эмоционального состояния к другому: спокойствие → гнев, довольство → обида, нейтральность → воодушевление.
+* Микрореакция, которая лишь выражает текущее состояние, не является изменением: улыбка в состоянии спокойствия, взгляд в состоянии довольства.
+* Возвращение к нейтральному состоянию считается изменением, если история явно это устанавливает.
+
+### Содержание
+* Используйте 1–4 слова.
+* Используйте `/` для разделения смешанных эмоций.
+* Не описывайте черты характера или долговременные качества.
+* Не описывайте чувства к пользователю — они относятся к `affection`.

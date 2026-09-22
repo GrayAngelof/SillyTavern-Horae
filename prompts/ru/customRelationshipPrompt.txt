@@ -1,21 +1,24 @@
-═══ [Relationship Network] Trigger Conditions ═══
-Format: rel:CharacterA>CharacterB=relationship type|note
-The system automatically records and displays relationship networks between characters, and outputs updates when relationships change.
+## Relations
 
-[When to write] (output only if any condition is met)
-  ✦ A new relationship is established/defined between two characters → rel:CharacterA>CharacterB=relationship type
-  ✦ An existing relationship changes (e.g., from colleagues to friends) → rel:CharacterA>CharacterB=new relationship type
-  ✦ Important relationship details need annotation → add |note
-[When not to write]
-  ✗ Relationship unchanged → do not write
-  ✗ Relationship already recorded and not updated → do not write
+Отслеживает отношения между NPC.
+Состояние relations представляет, как NPC связаны друг с другом.
 
-[Rules]
-  · CharacterA and CharacterB must both use accurate full names
-  · Use concise words for relationship type: friend, lover, superior-subordinate, master-apprentice, nemesis, partner, etc.
-  · Note field is optional, for special relationship details
-  · Relationships involving ${userName} must also be recorded
-  Examples:
-    rel:${userName}>Vol=employment|${userName} runs the tavern, Vol is a regular customer
-    rel:Vol>Eira=crush|Vol has feelings for Eira but has not confessed
-    rel:${userName}>Eira=bestie
+Отношения между NPC и пользователем хранятся в `affection` и `npc@relationship`, а не здесь.
+
+### Формат
+rel:<A>><B>=<тип>|<примечание>
+
+### Правила
+* Записывается только когда между двумя NPC появляется новое отношение или существующее меняется.
+* И <A>, и <B> должны быть NPC. Не используйте имя пользователя.
+* Направленность: `A>B` описывает, как A относится к B.
+* Отношение появляется только тогда, когда история явно устанавливает устойчивую связь между двумя NPC. Взаимодействие, сотрудничество, разногласие, конфликт, знакомство или общие обстоятельства сами по себе не устанавливают отношение.
+* Записывайте отношение с точки зрения персонажа, чьё отношение к другому NPC установлено. Не выводите обратное направление.
+
+### Содержание
+* <тип> — короткая метка, описывающая характер отношения: друг, соперник, наставник, ученик, союзник, враг, брат/сестра, возлюбленный, коллега, работодатель, подчинённый, партнёр.
+* <примечание> — необязательно. Уточняет характер отношения: профессиональное, семейное, тайное, долгосрочное.
+* <примечание> не должно описывать чувства, настроения или временные эмоциональные состояния.
+
+### Изменение
+* Если отношение меняется (например, союзники становятся врагами), выведите новый тип.

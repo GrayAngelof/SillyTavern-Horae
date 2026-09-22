@@ -1,38 +1,55 @@
-═══ [Items] Trigger Conditions and Rules ═══
-Refer to IDs (#ID) in [Item List], and strictly decide whether to output based on the conditions below.
+## Inventory
 
-[When to write] (output if any condition is met)
-  ✦ New item acquired → item:/item!:/item!!:
-  ✦ Existing item's quantity/ownership/location/properties changed → item: (write only changed parts)
-  ✦ Item consumed/lost/used up → item-:item name
-[When not to write]
-  ✗ Item has no change at all → do not output any item line
-  ✗ Item is only mentioned but state does not change → do not write
+Отслеживает предметы, которыми владеют или которые носят персонажи.
+Состояние inventory представляет, какие предметы существуют, кому принадлежат и где находятся в конце текущего хода.
 
-[Format]
-  Newly acquired: item:emoji item name(quantity)|description=holder@exact location (description can be omitted. But if the item has special meaning, such as a gift or keepsake, add description.)
-  Newly acquired (important): item!:emoji item name(quantity)|description=holder@exact location (important item; description required: appearance + function + source)
-  Newly acquired (key): item!!:emoji item name(quantity)|description=holder@exact location (key item; description must be detailed)
-  Existing item changed: item:emoji item name(new quantity)=new holder@new location (update only changed parts; if "|" is omitted, original description is retained)
-  Consumed/lost: item-:item name
+### Формат
+item:<эмодзи><название>(<количество>)|<описание>=<владелец>@<размещение>
+item-:<название>
 
-[Field-Level Rules]
-  · Description: record essential attributes of item (appearance/function/source). Can be omitted for ordinary items; required at first entry for important/key items
-    ★ Appearance features (color, material, size, etc., for later consistency)
-    ★ Function/use
-    ★ Source (who gave it/how it was obtained)
-       - Examples (if examples appear below, they are demonstrations only; do not reuse original sentences directly in main text):
-         - Example 1: item!:🌹Eternal Rose Bouquet|deep-red preserved roses tied with a black ribbon, a Valentine's gift from C to U=U@on U's room desk
-         - Example 2: item!:🎫Lucky Ten-Draw Voucher|a golden-glowing paper ticket, newbie benefit for one ten-pull in the system prize pool=U@space ring
-         - Example 3: item!!:🏧Interdimensional Currency Auto-Exchange Machine|looks like a small ATM and can exchange currencies across dimensions at real-time rates=U@tavern bar counter
-  · Quantity: do not write (1)/(1 piece)/(1 sword), etc. Only write parentheses when there is a measurable unit, e.g., (5 jin)(1L)(1 box)
-  · Location: must be a precise fixed location
-    ❌ in front of someone on the ground, by someone's feet, beside someone, floor, on the table
-    ✅ tavern hall floor, on the restaurant bar counter, home kitchen, in backpack, on U's room desk
-  · Do not count fixed furniture or building facilities as items
-  · Temporary borrowing ≠ ownership transfer
+### Основное правило
+Для каждого отслеживаемого предмета, релевантного текущей сцене:
+1. Определите состояние предмета в начале хода из сохранённого состояния.
+2. Прочитайте весь текущий ответ и выявите все явные изменения, касающиеся этого предмета.
+3. Определите итоговое явно установленное состояние предмета в конце ответа.
+4. Сравните итоговое состояние с сохранённым состоянием.
+5. Выводите предмет только если итоговое состояние отличается от сохранённого.
+6. Если итоговое состояние идентично сохранённому, не выводите предмет, даже если он временно менялся в течение ответа.
+Итоговое состояние всегда имеет приоритет над промежуточными состояниями.
 
-Example (Ale Lifecycle):
-  Acquired: item:🍺Aged Ale(50L)|ale found in the storage room, sour in taste=U@tavern back-kitchen ingredient cabinet
-  Quantity change: item:🍺Aged Ale(25L)=U@tavern back-kitchen ingredient cabinet
-  Used up: item-:Aged Ale
+### Изменения состояния
+Состояние включает: количество, владельца, размещение, релевантные свойства предмета.
+Если предмет меняется несколько раз в течение одного ответа, игнорируйте все промежуточные состояния и используйте только итоговое явно установленное состояние.
+
+### Количество
+Всегда используйте итоговое явно установленное количество.
+Для расходуемых предметов рассчитывайте остаток от явного потребления, использования, уничтожения или потери.
+Никогда не сохраняйте предыдущее количество, если текущий ответ устанавливает другое итоговое количество.
+
+### Размещение
+Всегда используйте итоговое явно установленное размещение.
+Не выводите промежуточное размещение, если предмет впоследствии перемещён.
+
+### Содержание
+* Включайте эмодзи перед названием.
+* Количество: пишите итоговое количество, когда оно измеримо. Не пишите `(1)`.
+* Описание: обязательно для важных и ключевых предметов при первом появлении. Необязательно для обычных предметов.
+* Размещение должно быть точным и устойчивым.
+* Временное использование не равно передаче собственности.
+* Сохраняйте установленную идентичность существующего предмета. Не переименовывайте его только потому, что текущий ответ использует другие слова.
+
+### Уровни
+* item: — обычные предметы: расходники, инструменты, мелкие объекты.
+* item!: — важные предметы: сюжетно значимые объекты, подарки, памятные вещи.
+* item!!: — ключевые предметы: уникальные объекты, центральные для истории.
+
+### Удаление
+Когда предмет потреблён, потерян, уничтожен или навсегда удалён из истории:
+item-:<название>
+Используйте только название предмета после `item-:`.
+Не используйте `item-:` для предмета, который лишь изменил размещение или был временно использован.
+
+### Правило вывода
+Выводите только итоговые изменения состояния, необходимые для обновления сохранённого инвентаря.
+Не выводите: неизменённые предметы, промежуточные состояния, временные состояния, которые были впоследствии отменены, предыдущие количества или размещения, когда установлено новое итоговое состояние.
+Предмет, который возвращается к своему исходному сохранённому состоянию в течение того же ответа, не создаёт обновления инвентаря.
