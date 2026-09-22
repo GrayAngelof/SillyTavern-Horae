@@ -616,6 +616,7 @@ class HoraeManager {
 		const sendCharacterAffection = sendCharacters && this.settings?.sendCharacterAffection !== false;
 		const sendMainCharacterPersonality = sendCharacters && this.settings?.sendMainCharacterPersonality !== false;
         const sendItems = this.settings?.sendItems !== false;
+        const presentChars = state.scene.characters_present || [];
 
         // 主要角色判定：卡片本体 + 置顶 NPC，含别名匹配以兼容 NPC 改名
         const mainCharName = this.context?.name2 || '';
@@ -868,7 +869,6 @@ class HoraeManager {
             for (const b of _barCfg) _barNames[b.key] = b.name;
 
             // 按在场角色过滤 RPG 数据
-            const presentChars = state.scene.characters_present || [];
             const userName = this.context?.name1 || '';
             const _cUoB = !!this.settings?.rpgBarsUserOnly;
             const _cUoS = !!this.settings?.rpgSkillsUserOnly;
@@ -4542,6 +4542,11 @@ class HoraeManager {
 			prompt += 'item-:<name> ← when the item is consumed, lost, destroyed, or removed\n';
 		}
 
+        if (this.settings?.sendLocationMemory) {
+            prompt += 'location:<Building·Area> ← every turn. Use `·` for hierarchy. Same place = same name.\n';
+            prompt += 'atmosphere:<brief description> ← every turn. Current mood or ambiance of the scene.\n';
+            prompt += 'scene_desc:Located at <position>. <permanent physical features> ← only on first arrival or permanent change. Child locations describe only position within parent.\n';
+        }
 		prompt += '</horae>\n';
 
 		if (this.settings?.sendTimeline && this.settings?.sendHistory) {

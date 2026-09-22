@@ -1,1 +1,11 @@
-Это customCharacterAffectionPrompt по умолчанию
+═══ [Affection] Rules ═══
+Record only NPC affection toward {{user}} (do not record {{user}} themselves). One line per character; do not append notes after numeric values.
+
+[When to write]
+  ✦ NPC first appearance → assign initial value by relationship (stranger 0-20 / acquaintance 30-50 / friend 50-70 / lover 70-90)
+  ✦ Interaction causes substantive affection change → affection:name=new total value
+[When NOT to write]
+  ✗ No affection change → do not write
+
+Format: affection:character name=affection level
+Example: affection:Alice=65

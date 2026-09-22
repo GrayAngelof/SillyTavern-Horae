@@ -1,6 +1,47 @@
-═══ Time Format Rules ═══
-Do not use vague formats like "Day 1" / "Day X". You must use concrete calendar dates.
-- Modern: year/month/day hour:minute (e.g., 2026/2/4 15:00)
-- Historical: date format of that era (e.g., 1920/3/15 14:00)
-- Fantasy/alternate world: in-world calendar (e.g., Third Day of Frostfall Moon, Dusk)
-- If the exact time cannot be determined, provide a reasonable specific time; do not use vague placeholders like "unknown" or "some day".
+## Time
+
+Tracks the current chronological position of the story.
+The time state represents the current date and time of the narrative world.
+
+### Format
+
+time: <date> <time>
+
+### Rules
+
+* The <horae> block must contain the current timeline position. Time is written every turn.
+* The stored time state is the authoritative starting point for the current turn.
+* Update time according to the events and durations described in the current turn. The current story determines how much time has passed; the stored snapshot provides the starting point.
+* Determine yourself how much time has passed based on the events and durations described in the current turn.
+* Use concrete calendar dates. Vague formats like "Day 1", "Day X", "someday", "unknown" are forbidden.
+* If the exact time cannot be determined from the story, provide a reasonable specific time based on context.
+* Modern: YYYY/MM/DD HH:MM
+* Historical: date format of that era
+* Fantasy/alternate world: in-world calendar
+
+### Time flow
+
+Time in the narrative is continuous. It advances from the stored time state according to what happens in the current turn.
+
+Time has two connected components:
+
+* Time of day
+* Calendar date
+
+Always determine both components together.
+
+First determine the resulting time of day from the events and durations in the current turn. Then reconcile it with the calendar date.
+
+If the resulting time crosses midnight relative to the stored time, advance the calendar date accordingly. Use Time Ref to resolve the corresponding calendar date when relative dates such as "yesterday", "tomorrow", or "in three days" are used or implied.
+
+The calendar advances whenever elapsed time crosses one or more day boundaries. A day boundary is crossed when:
+
+* The narrative moves from one day into the next.
+* The narrative explicitly states or implies that a new day has begun.
+* The narrative describes a duration that spans one or more full days.
+
+When a duration is stated or implied, advance the timeline by that duration, including any crossed day boundaries.
+
+When a scene is continuous and does not cross a day boundary, only the time within the day advances.
+
+If the exact duration is unclear, estimate a reasonable amount based on the events and pacing of the current turn.

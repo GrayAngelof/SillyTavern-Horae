@@ -1,0 +1,16 @@
+## Costume
+
+Tracks the current outfit and worn equipment of each character present in the scene.
+The costume state represents what each character is wearing right now.
+
+### Format
+costume:<name>=<outfit description>
+
+### Rules
+* Written when a character first appears or when their outfit changes.
+* Do not write for a character whose outfit has not changed.
+
+### Content
+* Describe only clothing and worn equipment.
+* Do not include appearance features: scars, hairstyle, eye colour.
+* If a character changes clothes, output the new full outfit, replacing the stored one.

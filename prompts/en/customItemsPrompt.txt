@@ -1,0 +1,55 @@
+## Inventory
+
+Tracks items owned or carried by characters.
+The inventory state represents what items exist, who owns them, and where they are at the end of the current turn.
+
+### Format
+item:<emoji><name>(<quantity>)|<description>=<owner>@<placement>
+item-:<name>
+
+### Core Rule
+For every tracked item relevant to the current scene:
+1. Determine the item's state at the start of the turn from the stored state.
+2. Read the entire current reply and identify all explicit changes involving that item.
+3. Determine the item's final explicitly established state at the end of the reply.
+4. Compare the final state with the stored state.
+5. Output the item only if the final state differs from the stored state.
+6. If the final state is identical to the stored state, do not output the item, even if it changed temporarily during the reply.
+The final state always takes priority over intermediate states.
+
+### State Changes
+A state includes: quantity, owner, placement, relevant item properties.
+If an item changes several times during one reply, ignore all intermediate states and use only the final explicitly established state.
+
+### Quantity
+Always use the final explicitly established quantity.
+For consumables, calculate remaining quantity from explicit consumption, use, destruction, or loss.
+Never preserve the previous quantity when the current reply establishes a different final quantity.
+
+### Placement
+Always use the final explicitly established placement.
+Do not output an intermediate placement if the item is subsequently moved.
+
+### Content
+* Include an emoji before the name.
+* Quantity: write the final quantity when measurable. Do not write `(1)`.
+* Description: required for important and key items at first appearance. Optional for ordinary items.
+* Placement must be precise and stable.
+* Temporary use does not equal ownership transfer.
+* Preserve the established identity of an existing item. Do not rename it merely because the current reply uses different wording.
+
+### Tiers
+* item: — ordinary items: consumables, tools, small objects.
+* item!: — important items: plot-relevant objects, gifts, keepsakes.
+* item!!: — key items: unique objects central to the story.
+
+### Removal
+When an item is consumed, lost, destroyed, or permanently removed:
+item-:<name>
+Use only the item name after `item-:`.
+Do not use `item-:` for an item that merely changed placement or was temporarily used.
+
+### Output Rule
+Output only the final state changes required to update the stored inventory.
+Do not output: unchanged items, intermediate states, temporary states that were later reversed, previous quantities or placements when a new final state is established.
+An item that returns to its original stored state during the same reply produces no inventory update.

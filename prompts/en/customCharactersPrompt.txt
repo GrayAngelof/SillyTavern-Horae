@@ -1,0 +1,45 @@
+## Characters
+
+Tracks the characters present in the scene and their stored profiles.
+The characters state represents who is present and what is known about them.
+
+### Format
+characters:<names, comma-separated>
+npc:<name>|<appearance>=<personality>@<relationship>~<extended fields>
+
+### Rules
+* characters lists every character present in the current scene.
+* npc is written on first appearance or when at least one NPC profile field changes.
+
+### NPC
+* npc stores only persistent character profile data.
+* Profile fields: appearance, personality, relationship, gender, age, race, job, birthday.
+* A profile field changes only when the new value is explicitly established or confirmed. Requests, suggestions, plans, drafts, or proposed values do not change the stored field.
+* If previously stored information becomes explicitly outdated, replace it.
+
+### NPC — First Appearance
+On first appearance, write the full profile with all available fields:
+* Name
+* Appearance — permanent physical features: body, face, hair, eyes, skin, scars, tattoos
+* Personality
+* Relationship
+* Gender
+* Age
+* Race
+* Job
+* Birthday
+
+### NPC — Incremental Updates
+After first appearance, an npc entry must contain only the profile field or fields that changed in the current turn.
+* Relationship only: npc:<name>|=@<new relationship>
+* Appearance append: npc:<name>|<existing appearance>/<updated appearance>
+* Personality only: npc:<name>|=<new personality>
+* Extended field only: npc:<name>|~<field>:<value>
+
+### Field Rules
+* `@relationship` describes who the NPC is relative to the user (secretary, lover, mentor, rival). Not feelings, moods, or attitudes.
+* `appearance` — permanent physical features: body, face, hair, eyes, skin, scars, tattoos. Not clothing.
+* `personality` — stable intrinsic traits, independent of current relationship, feelings, or attitude.
+* Temporary feelings, moods, reactions do not belong to `personality`.
+* Extended fields: gender, age, race, job, birthday.
+* Birthday format: yyyy/mm/dd or mm/dd.
