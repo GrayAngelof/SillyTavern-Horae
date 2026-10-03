@@ -4567,9 +4567,9 @@ generateItemsMemoryPrompt() {
 
         if (this.settings?.sendItems) {
             if (this.settings?.sendItemsAdvanced) {
-                prompt += 'item/item!/item!!: <emoji><naitem nameme>(<quantity>)|<description>=<holder>@<placement> ← character`s items\n';
+                prompt += 'item/item!/item!!: <emoji><naitem nameme>(<quantity>)|<description>=<holder>@<placement> ← new or changed character`s item\n';
             } else {
-                prompt += 'item: <emoji> <item name>(<quantity>)|<description>=<holder> ← character`s items\n';
+                prompt += 'item: <emoji> <item name>(<quantity>)|<description>=<holder> ← new or changed character`s item\n';
             }
 
             prompt += 'item-: item name ← when the item is consumed, lost, destroyed, or removed\n';
