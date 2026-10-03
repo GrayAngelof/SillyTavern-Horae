@@ -1,0 +1,32 @@
+## Affection
+
+Tracks how each NPC feels about the user.
+The affection state represents the NPC's current emotional attachment to the user.
+
+### Format
+affection:<name>=<number>
+
+### Rules
+* Written on first appearance, with an initial value.
+* Written when the NPC's affection toward the user meaningfully changes.
+* Record only the NPC's affection toward the user. Not the user's own feelings.
+* One line per character. No notes or comments after the number.
+* Do not infer an affection change from an isolated action, dialogue, mood, or tone unless the story establishes a meaningful change.
+* A change in role or relationship type does not automatically change affection.
+
+### Initial Value
+Affection measures emotional attachment, not role.
+
+On first appearance, assign a starting value based on established emotional closeness:
+* no attachment — 10
+* weak attachment — 30
+* moderate attachment — 50
+* strong attachment — 70
+* very strong attachment — 85
+
+Do not infer affection from role alone.
+
+### Change
+When the story explicitly establishes a meaningful change, output the new total value.
+* Always output the new total value, not the amount of change.
+* Do not output relative changes such as `+5` or `-10`.

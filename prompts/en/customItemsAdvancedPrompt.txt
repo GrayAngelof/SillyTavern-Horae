@@ -1,0 +1,15 @@
+### Tiers
+Use three item tiers:
+item:  — ordinary items: consumables, tools, small objects.
+item!: — important items: plot-relevant objects, gifts, keepsakes.
+item!!: — key items: unique objects central to the story.
+Use the highest tier clearly supported by the story.
+Do not promote an item merely because it is useful, expensive, unusual, or called "important".
+Do not invent significance.
+
+For item! and item!!, preserve significant established details in the description.
+
+### Placement
+Placement changes only through an explicit physical action involving the item.
+Do not output intermediate placements.
+Do not invent a placement that is not established by an explicit action.

@@ -1,0 +1,53 @@
+## Inventory
+Tracks persistent items currently held by characters.
+
+### Format
+item: <emoji> <item name>(<quantity>)|<description>=<holder>
+item-: <item name>
+
+### Core Rules
+The snapshot is the saved state from the previous turn.
+Output only changes relative to the snapshot.
+If an item is absent from the snapshot and is held by a character at the end of the current turn, create a new record.
+If an item is taken, extracted, obtained, received, or otherwise comes into a character's possession and remains with them at the end of the reply, create a record.
+The final state takes priority over intermediate states.
+If the final state matches the saved state, output nothing.
+Do not invent an item's properties, history, or state.
+
+### Holder
+Every tracked item must have a holder.
+The holder is the character who has the item at the end of the current turn.
+
+### Description
+Description preserves significant information about the item.
+It must include:
+appearance — color, material, size, shape, and other distinguishing features;
+function — purpose or use;
+source — who gave it, where it came from, or how it was obtained, if known.
+Description is optional.
+Add a description when the item has significant properties or information that should persist.
+Do not invent unknown information.
+Do not repeat an unchanged description.
+Only add or change information when the item's stored properties actually change.
+
+### Quantity
+Do not specify quantity for a single item.
+Specify quantity only when it uses a measurable unit: (5 jin), (1L), (1 box).
+Do not use (1), (1 piece), (1 sword), or similar expressions for a single item.
+When quantity changes, output the new final quantity. A partial decrease is not removal.
+
+### Changes
+After an item has been recorded, output it again only when its stored data changes.
+Changed holder → output the new holder.
+Changed significant property → output the updated description.
+If the holder changes, the item remains the same item; update its holder.
+If an intermediate change is reverted by the end of the turn, do not output it.
+
+### Removal
+Use `item-:` only when an existing tracked item is permanently removed.
+This includes:
+consumed;
+destroyed;
+discarded;
+permanently lost;
+otherwise no longer possessed by any tracked character.

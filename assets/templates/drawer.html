@@ -748,68 +748,119 @@
                     </div>
                 </div>
                 
-                <div class="horae-settings-section">
-                    <div class="horae-section-header horae-collapse-header" id="horae-advanced-collapse-toggle" data-i18n="settings.advanced">
-                        <i class="fa-solid fa-sliders"></i>
-                        高级设置
-                        <i class="fa-solid fa-chevron-down horae-collapse-icon collapsed"></i>
-                    </div>
-                    <div id="horae-advanced-collapse-body" style="display: none;">
-                    <div class="horae-setting-item">
-                        <label data-i18n="settings.contextDepth">
-                            上下文深度
-                            <input type="number" id="horae-setting-context-depth" min="0" max="99999" value="15">
-                        </label>
-                        <span class="horae-setting-sub-hint" data-i18n="settings.contextDepthHint">
-                            控制发送给 AI 的一般级别剧情轨迹数量。0 = 不发送一般事件；重要/关键/摘要仍会发送。
-                        </span>
-                    </div>
+				<div class="horae-settings-section">
+					<div class="horae-section-header horae-collapse-header" id="horae-advanced-collapse-toggle" data-i18n="settings.advanced">
+						<i class="fa-solid fa-sliders"></i>
+						高级设置
+						<i class="fa-solid fa-chevron-down horae-collapse-icon collapsed"></i>
+					</div>
+					<div id="horae-advanced-collapse-body" style="display: none;">
+					<div class="horae-setting-item">
+						<label data-i18n="settings.contextDepth">
+							上下文深度
+							<input type="number" id="horae-setting-context-depth" min="0" max="99999" value="15">
+						</label>
+						<span class="horae-setting-sub-hint" data-i18n="settings.contextDepthHint">
+							控制发送给 AI 的一般级别剧情轨迹数量。0 = 不发送一般事件；重要/关键/摘要仍会发送。
+						</span>
+					</div>
 
-                    <div class="horae-setting-item">
-                        <label data-i18n="settings.injectionDepth">
-                            注入深度
-                        </label>
-                        <div class="horae-setting-inline-controls">
-                            <select id="horae-setting-injection-depth-source">
-                                <option value="system" data-i18n="settings.injectionDepthSystem">系统 @D</option>
-                                <option value="preset" data-i18n="settings.injectionDepthPreset">预设 @D</option>
-                            </select>
-                            <input type="number" id="horae-setting-injection-position" min="0" max="10" value="1">
-                        </div>
-                        <span class="horae-setting-hint" data-i18n="settings.injectionDepthHint">
-                            <i class="fa-solid fa-circle-info"></i>
-                            选择 @D 来源并设置注入深度数值。<br>
-                            系统 @D = 与世界书同理<br>
-                            预设 @D = 在整个预设中从末端开始定位，例如0是注入到预设最末尾，1就是注入到最后一条前
-                        </span>
-                    </div>
+					<div class="horae-setting-item">
+						<label data-i18n="settings.injectionDepth">
+							注入深度
+						</label>
+						<div class="horae-setting-inline-controls">
+							<select id="horae-setting-injection-depth-source">
+								<option value="system" data-i18n="settings.injectionDepthSystem">系统 @D</option>
+								<option value="preset" data-i18n="settings.injectionDepthPreset">预设 @D</option>
+							</select>
+							<input type="number" id="horae-setting-injection-position" min="0" max="10" value="1">
+						</div>
+						<span class="horae-setting-hint" data-i18n="settings.injectionDepthHint">
+							<i class="fa-solid fa-circle-info"></i>
+							选择 @D 来源并设置注入深度数值。<br>
+							系统 @D = 与世界书同理<br>
+							预设 @D = 在整个预设中从末端开始定位，例如0是注入到预设最末尾，1就是注入到最后一条前
+						</span>
+					</div>
 
-                    <div class="horae-setting-item">
-                        <label data-i18n="settings.timelineInjectionMode">
-                            剧情轨迹注入模式
-                        </label>
-                        <div class="horae-setting-inline-controls">
-                            <select id="horae-setting-timeline-injection-mode">
-                                <option value="inline" data-i18n="settings.timelineInjectionInline">原版合并注入</option>
-                                <option value="separate" data-i18n="settings.timelineInjectionSeparate">独立前置注入</option>
-                            </select>
-                        </div>
-                        <div class="horae-setting-hint horae-timeline-injection-hint">
-                            <i class="fa-solid fa-circle-info"></i>
-                            <div class="horae-timeline-injection-hint-body">
-                                <div class="horae-timeline-injection-hint-row">
-                                    <strong data-i18n="settings.timelineInjectionInline">原版合并注入</strong>
-                                    <span data-i18n="settings.timelineInjectionInlineHint">会把剧情轨迹和状态信息放在同一注入块。</span>
-                                </div>
-                                <div class="horae-timeline-injection-hint-row">
-                                    <strong data-i18n="settings.timelineInjectionSeparate">独立前置注入</strong>
-                                    <span data-i18n="settings.timelineInjectionSeparateHint">会把剧情轨迹单独放到聊天记录更靠前的位置。</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    </div>
-                </div>
+					<div class="horae-setting-item">
+						<label data-i18n="settings.timelineInjectionMode">
+							剧情轨迹注入模式
+						</label>
+						<div class="horae-setting-inline-controls">
+							<select id="horae-setting-timeline-injection-mode">
+								<option value="inline" data-i18n="settings.timelineInjectionInline">原版合并注入</option>
+								<option value="separate" data-i18n="settings.timelineInjectionSeparate">独立前置注入</option>
+							</select>
+						</div>
+						<div class="horae-setting-hint horae-timeline-injection-hint">
+							<i class="fa-solid fa-circle-info"></i>
+							<div class="horae-timeline-injection-hint-body">
+								<div class="horae-timeline-injection-hint-row">
+									<strong data-i18n="settings.timelineInjectionInline">原版合并注入</strong>
+									<span data-i18n="settings.timelineInjectionInlineHint">会把剧情轨迹和状态信息放在同一注入块。</span>
+								</div>
+								<div class="horae-timeline-injection-hint-row">
+									<strong data-i18n="settings.timelineInjectionSeparate">独立前置注入</strong>
+									<span data-i18n="settings.timelineInjectionSeparateHint">会把剧情轨迹单独放到聊天记录更靠前的位置。</span>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="horae-setting-item">
+						<label>
+							<input type="checkbox" id="horae-setting-show-system-prompt" checked>
+							Системный промпт инъекции
+						</label>
+						<span class="horae-setting-sub-hint">
+							Показывать редактор системного промпта, который используется для формирования инъекции Horae.
+						</span>
+					</div>
+
+					<div class="horae-setting-item">
+						<label>
+							<input type="checkbox" id="horae-setting-show-batch-prompt" checked>
+							Промпт ИИ-сводки
+						</label>
+						<span class="horae-setting-sub-hint">
+							Показывать редактор промпта ИИ-сводки.
+						</span>
+					</div>
+
+					<div class="horae-setting-item">
+						<label>
+							<input type="checkbox" id="horae-setting-show-analysis-prompt" checked>
+							Промпт ИИ-анализа
+						</label>
+						<span class="horae-setting-sub-hint">
+							Показывать редактор промпта ИИ-анализа для дополнительного извлечения информации из сюжета.
+						</span>
+					</div>
+
+					<div class="horae-setting-item">
+						<label>
+							<input type="checkbox" id="horae-setting-show-compress-prompt" checked>
+							Промпт сжатия сюжета
+						</label>
+						<span class="horae-setting-sub-hint">
+							Показывать редактор промпта ручного сжатия сюжета.
+						</span>
+					</div>
+
+					<div class="horae-setting-item">
+						<label>
+							<input type="checkbox" id="horae-setting-show-tables-prompt" checked>
+							Промпт правил заполнения таблиц
+						</label>
+						<span class="horae-setting-sub-hint">
+							Показывать редактор правил, используемых ИИ при заполнении таблиц.
+						</span>
+					</div>
+
+					</div>
+				</div>
                 
                 <div class="horae-settings-section">
                     <div class="horae-section-header horae-collapse-header" id="horae-custom-tables-collapse-toggle" data-i18n="settings.customTables">
@@ -890,43 +941,147 @@
                         <span data-i18n="settings.tokenCounter">当前注入 Token：</span><strong id="horae-token-value" data-i18n="settings.tokenCalculating" style="color: var(--horae-primary-light);">计算中...</strong>
                     </div>
                     
-                    <div class="horae-setting-item">
-                        <label data-i18n="settings.sendTimeline">
-                            <input type="checkbox" id="horae-setting-send-timeline" checked>
-                            剧情轨迹
-                        </label>
-                        <span class="horae-setting-sub-hint" data-i18n="settings.sendTimelineHint">历史事件总结、相对时间计算。关闭后AI无法知道"几天前"发生了什么。</span>
-                    </div>
+					<!-- ===== Хронология сюжета (родитель) ===== -->
+					<div class="horae-setting-item">
+						<label data-i18n="settings.sendTimeline">
+							<input type="checkbox" id="horae-setting-send-timeline" checked>
+							Хронология сюжета
+						</label>
+						<span class="horae-setting-sub-hint" data-i18n="settings.sendTimelineHint">
+							Включает обработку времени. Без этого AI не сможет отслеживать «дни назад» и текущие планы.
+						</span>
+
+						<!-- Вложенная опция: Список дел (Agenda) -->
+						<div style="margin-top: 6px; padding-left: 22px;">
+							<label data-i18n="settings.sendAgenda" style="font-size: 12px; color: var(--horae-text-muted);">
+								<input type="checkbox" id="horae-setting-send-agenda" checked>
+								Список дел
+							</label>
+							<span class="horae-setting-sub-hint" data-i18n="settings.sendAgendaHint" style="padding-left: 22px;">
+								Обрабатывает активные задачи, планы и будущие события.
+							</span>
+						</div>
+
+						<!-- Вложенная опция: Сюжетная линия (History/Events) -->
+						<div style="margin-top: 6px; padding-left: 22px;">
+							<label data-i18n="settings.sendHistory" style="font-size: 12px; color: var(--horae-text-muted);">
+								<input type="checkbox" id="horae-setting-send-history" checked>
+								Сюжетная линия
+							</label>
+							<span class="horae-setting-sub-hint" data-i18n="settings.sendHistoryHint" style="padding-left: 22px;">
+								Отображает историю прошлых событий.
+							</span>
+						</div>
+					</div>
                     
-                    <div class="horae-setting-item">
-                        <label data-i18n="settings.sendCharacters">
-                            <input type="checkbox" id="horae-setting-send-characters" checked>
-                            角色信息
-                        </label>
-                        <span class="horae-setting-sub-hint" data-i18n="settings.sendCharactersHint">在场角色、服装描述、好感度、角色信息。关闭后AI可能描写错误的服装。</span>
-                        <div style="margin-top: 6px; padding-left: 22px;">
-                            <label data-i18n="settings.sendCharacterAffection" style="font-size: 12px; color: var(--horae-text-muted);">
-                                <input type="checkbox" id="horae-setting-send-character-affection" checked>
-                                好感度
-                            </label>
-                            <span class="horae-setting-sub-hint" data-i18n="settings.sendCharacterAffectionHint" style="padding-left: 22px;">关闭后所有角色的好感度数值不再注入；不影响其他角色信息。</span>
-                        </div>
-                        <div style="margin-top: 6px; padding-left: 22px;">
-                            <label data-i18n="settings.sendMainCharacterPersonality" style="font-size: 12px; color: var(--horae-text-muted);">
-                                <input type="checkbox" id="horae-setting-send-main-character-personality" checked>
-                                主要角色性格
-                            </label>
-                            <span class="horae-setting-sub-hint" data-i18n="settings.sendMainCharacterPersonalityHint" style="padding-left: 22px;">关闭后，主要角色（卡片本体 + 置顶 NPC）的性格简述不再注入；不影响其他 NPC。</span>
-                        </div>
-                    </div>
+					<div class="horae-setting-item">
+						<label data-i18n="settings.sendCharacters">
+							<input type="checkbox" id="horae-setting-send-characters" checked>
+							角色信息
+						</label>
+						<span class="horae-setting-sub-hint" data-i18n="settings.sendCharactersHint">
+							在场角色、服装描述、好感度、角色信息。关闭后AI可能描写错误的服装。
+						</span>
+
+						<div style="margin-top: 6px; padding-left: 22px;">
+							<label data-i18n="settings.sendCharacterCostume" style="font-size: 12px; color: var(--horae-text-muted);">
+								<input type="checkbox" id="horae-setting-send-character-costume" checked>
+								Наряды персонажей
+							</label>
+							<span class="horae-setting-sub-hint"
+								  data-i18n="settings.sendCharacterCostumeHint"
+								  style="padding-left: 22px;">
+								Передаёт текущие наряды присутствующих персонажей.
+							</span>
+						</div>
+
+						<div style="margin-top: 6px; padding-left: 22px;">
+							<label data-i18n="settings.sendCharacterAffection" style="font-size: 12px; color: var(--horae-text-muted);">
+								<input type="checkbox" id="horae-setting-send-character-affection" checked>
+								好感度
+							</label>
+							<span class="horae-setting-sub-hint"
+								  data-i18n="settings.sendCharacterAffectionHint"
+								  style="padding-left: 22px;">
+								关闭后所有角色的好感度数值不再注入；不影响其他角色信息。
+							</span>
+						</div>
+						<div style="margin-top: 6px; padding-left: 22px;">
+							<label data-i18n="settings.sendRelationships" style="font-size: 12px; color: var(--horae-text-muted);">
+								<input type="checkbox" id="horae-setting-send-relationships">
+								关系网络
+							</label>
+							<span class="horae-setting-sub-hint"
+								  data-i18n="settings.sendRelationshipsHint"
+								  style="padding-left: 22px;">
+								追踪角色间的关系变化（朋友、恋人、敌对等）。关闭后不生成rel:标签，不注入关系网络提示词。
+							</span>
+						</div>
+
+						<div style="margin-top: 6px; padding-left: 22px;">
+							<label data-i18n="settings.sendMood" style="font-size: 12px; color: var(--horae-text-muted);">
+								<input type="checkbox" id="horae-setting-send-mood">
+								Отслеживание эмоций
+							</label>
+							<span class="horae-setting-sub-hint"
+								  data-i18n="settings.sendMoodHint"
+								  style="padding-left: 22px;">
+								Отслеживает изменения эмоционального/психологического состояния персонажей. AI использует только согласованные изменения эмоций.
+							</span>
+						</div>
+						
+						<div style="margin-top: 6px; padding-left: 22px;">
+							<label data-i18n="settings.sendMainCharacterPersonality" style="font-size: 12px; color: var(--horae-text-muted);">
+								<input type="checkbox" id="horae-setting-send-main-character-personality" checked>
+								主要角色性格
+							</label>
+							<span class="horae-setting-sub-hint"
+								  data-i18n="settings.sendMainCharacterPersonalityHint"
+								  style="padding-left: 22px;">
+								关闭后，主要角色（卡片本体 + 置顶 NPC）的性格简述不再注入；不影响其他 NPC。
+							</span>
+						</div>
+					</div>
                     
-                    <div class="horae-setting-item">
-                        <label data-i18n="settings.sendItems">
-                            <input type="checkbox" id="horae-setting-send-items" checked>
-                            物品栏
-                        </label>
-                        <span class="horae-setting-sub-hint" data-i18n="settings.sendItemsHint">当前持有的物品及位置。关闭后AI可能"凭空"取出不存在的物品。</span>
-                    </div>
+					<div class="horae-setting-item">
+						<label data-i18n="settings.sendItems">
+							<input type="checkbox" id="horae-setting-send-items" checked>
+							Инвентарь
+						</label>
+
+						<span class="horae-setting-sub-hint"
+							  data-i18n="settings.sendItemsHint">
+							...
+						</span>
+
+                        <div style="margin-top: 6px; padding-left: 22px;">
+                            <label data-i18n="settings.sendItemsAdvanced"
+                                style="font-size: 12px; color: var(--horae-text-muted);">
+                                <input type="checkbox" id="horae-setting-send-items-advanced">
+                                Расширенные правила
+                            </label>
+
+                            <span class="horae-setting-sub-hint"
+                                data-i18n="settings.sendItemsAdvancedHint"
+                                style="padding-left: 22px;">
+                                Обработка неоднозначных и нетривиальных изменений инвентаря.
+                            </span>
+                        </div>                        
+
+						<div style="margin-top: 6px; padding-left: 22px;">
+							<label data-i18n="settings.sendItemsQuantity"
+								   style="font-size: 12px; color: var(--horae-text-muted);">
+								<input type="checkbox" id="horae-setting-send-items-quantity">
+								Количественный учёт
+							</label>
+
+							<span class="horae-setting-sub-hint"
+								  data-i18n="settings.sendItemsQuantityHint"
+								  style="padding-left: 22px;">
+								Точный учёт отдельных количественных групп предметов.
+							</span>
+						</div>
+					</div>
 
                     <div class="horae-setting-item">
                         <label data-i18n="settings.sendLocationMemory">
@@ -935,22 +1090,7 @@
                         </label>
                         <span class="horae-setting-sub-hint" data-i18n="settings.sendLocationMemoryHint">记录地点的固定物理特征，保持跨回合场景描写一致性。开启后AI会在首次到达新地点时记录特征描述。</span>
                     </div>
-                    
-                    <div class="horae-setting-item">
-                        <label data-i18n="settings.sendRelationships">
-                            <input type="checkbox" id="horae-setting-send-relationships">
-                            关系网络
-                        </label>
-                        <span class="horae-setting-sub-hint" data-i18n="settings.sendRelationshipsHint">追踪角色间的关系变化（朋友、恋人、敌对等），AI仅在关系变化时输出。关闭后不生成rel:标签，不注入关系网络提示词。</span>
-                    </div>
-                    
-                    <div class="horae-setting-item">
-                        <label data-i18n="settings.sendMood">
-                            <input type="checkbox" id="horae-setting-send-mood">
-                            情绪追踪
-                        </label>
-                        <span class="horae-setting-sub-hint" data-i18n="settings.sendMoodHint">追踪在场角色的情绪/心理状态变化，帮助AI保持角色情绪连贯性。AI仅在情绪明显变化时输出。</span>
-                    </div>
+
                     <div class="horae-setting-item">
                         <label data-i18n="settings.rpgMode">
                             <input type="checkbox" id="horae-setting-rpg-mode">
@@ -1517,7 +1657,7 @@
                             <button id="horae-prompt-reset-all" class="horae-rpg-btn-sm" data-i18n="prompts.resetAll" data-i18n-title="tooltip.resetAllPrompts" title="" style="color:#ef4444;"><i class="fa-solid fa-rotate-left"></i> 全部重置</button>
                         </div>
                         
-                        <div class="horae-prompt-editor-group">
+                        <div id="horae-system-prompt-group"class="horae-prompt-editor-group">
                             <div class="horae-prompt-editor-header">
                                 <span data-i18n="prompts.systemPrompt">系统注入提示词</span>
                                 <button id="horae-btn-reset-system-prompt" class="horae-btn-reset-prompt" data-i18n="common.restoreDefault" data-i18n-title="tooltip.restoreDefault" title="">
@@ -1530,7 +1670,7 @@
                             </div>
                         </div>
                         
-                        <div class="horae-prompt-editor-group" style="margin-top: 12px;">
+                        <div id="horae-batch-prompt-group" class="horae-prompt-editor-group" style="margin-top: 12px;">
                             <div class="horae-prompt-editor-header">
                                 <span data-i18n="prompts.batchPrompt">AI 智能补全提示词</span>
                                 <button id="horae-btn-reset-batch-prompt" class="horae-btn-reset-prompt" data-i18n="common.restoreDefault" data-i18n-title="tooltip.restoreDefault" title="">
@@ -1543,7 +1683,7 @@
                             </div>
                         </div>
 
-                        <div class="horae-prompt-editor-group" style="margin-top: 12px;">
+                        <div id="horae-analysis-prompt-group" class="horae-prompt-editor-group" style="margin-top: 12px;">
                             <div class="horae-prompt-editor-header">
                                 <span data-i18n="prompts.analysisPrompt">AI 分析提示词</span>
                                 <button id="horae-btn-reset-analysis-prompt" class="horae-btn-reset-prompt" data-i18n="common.restoreDefault" data-i18n-title="tooltip.restoreDefault" title="">
@@ -1556,7 +1696,7 @@
                             </div>
                         </div>
 
-                        <div class="horae-prompt-editor-group" style="margin-top: 12px;">
+                        <div id="horae-compress-prompt-group" class="horae-prompt-editor-group" style="margin-top: 12px;">
                             <div class="horae-prompt-editor-header">
                                 <span data-i18n="prompts.compressPrompt">剧情压缩提示词（手动压缩）</span>
                                 <button id="horae-btn-reset-compress-prompt" class="horae-btn-reset-prompt" data-i18n="common.restoreDefault" data-i18n-title="tooltip.restoreDefault" title="">
@@ -1569,7 +1709,7 @@
                             </div>
                         </div>
 
-                        <div class="horae-prompt-editor-group" style="margin-top: 12px;">
+                        <div id="horae-auto-summary-prompt-group" class="horae-prompt-editor-group" style="margin-top: 12px;">
                             <div class="horae-prompt-editor-header">
                                 <span data-i18n="prompts.autoSummaryPrompt">自动总结提示词（自动总结&隐藏）</span>
                                 <button id="horae-btn-reset-auto-summary-prompt" class="horae-btn-reset-prompt" data-i18n="common.restoreDefault" data-i18n-title="tooltip.restoreDefault" title="">
@@ -1582,7 +1722,7 @@
                             </div>
                         </div>
 
-                        <div class="horae-prompt-editor-group" style="margin-top: 12px;">
+                        <div id="horae-auto-resummary-prompt-group" class="horae-prompt-editor-group" style="margin-top: 12px;">
                             <div class="horae-prompt-editor-header">
                                 <span data-i18n="prompts.autoResummaryPrompt">二次总结提示词（多级总结）</span>
                                 <button id="horae-btn-reset-auto-resummary-prompt" class="horae-btn-reset-prompt" data-i18n="common.restoreDefault" data-i18n-title="tooltip.restoreDefault" title="">
@@ -1595,7 +1735,7 @@
                             </div>
                         </div>
 
-                        <div class="horae-prompt-editor-group" style="margin-top: 12px;">
+                        <div id="horae-tables-prompt-group" class="horae-prompt-editor-group" style="margin-top: 12px;">
                             <div class="horae-prompt-editor-header">
                                 <span data-i18n="prompts.tablesPrompt">表格填写规则提示词</span>
                                 <button id="horae-btn-reset-tables-prompt" class="horae-btn-reset-prompt" data-i18n="common.restoreDefault" data-i18n-title="tooltip.restoreDefault" title="">
@@ -1608,6 +1748,206 @@
                             </div>
                         </div>
 
+						<!-- ===== Промпт Времени ===== -->
+						<div id="horae-timeline-prompt-group" class="horae-prompt-editor-group" style="margin-top: 12px; display: none;">
+							<div class="horae-prompt-editor-header">
+								<span>Промпт Времени</span>
+								<button id="horae-btn-reset-timeline-prompt" class="horae-btn-reset-prompt" type="button">
+									<i class="fa-solid fa-rotate-left"></i>
+									Восстановить по умолчанию
+								</button>
+							</div>
+							<textarea id="horae-custom-timeline-prompt"
+								class="horae-prompt-textarea"
+								rows="6"
+								placeholder="Оставьте пустым для использования промпта по умолчанию..."></textarea>
+							<div class="horae-prompt-char-count">
+								<span id="horae-timeline-prompt-count">0</span> символов
+							</div>
+						</div>
+
+						<!-- ===== Промпт Списка дел (Agenda) ===== -->
+						<div id="horae-agenda-prompt-group" class="horae-prompt-editor-group" style="margin-top: 12px; display: none;">
+							<div class="horae-prompt-editor-header">
+								<span>Промпт Списка дел</span>
+								<button id="horae-btn-reset-agenda-prompt" class="horae-btn-reset-prompt" type="button">
+									<i class="fa-solid fa-rotate-left"></i>
+									Восстановить по умолчанию
+								</button>
+							</div>
+
+							<textarea id="horae-custom-agenda-prompt"
+								class="horae-prompt-textarea"
+								rows="6"
+								placeholder="Оставьте пустым для использования промпта по умолчанию..."></textarea>
+							<div class="horae-prompt-char-count">
+								<span id="horae-agenda-prompt-count">0</span> символов
+							</div>
+						</div>
+
+						<!-- ===== Промпт Сюжетной линии (History/Events) ===== -->
+						<div id="horae-history-prompt-group" class="horae-prompt-editor-group" style="margin-top: 12px; display: none;">
+							<div class="horae-prompt-editor-header">
+								<span>Промпт Сюжетной линии</span>
+								<button id="horae-btn-reset-history-prompt" class="horae-btn-reset-prompt" type="button">
+									<i class="fa-solid fa-rotate-left"></i>
+									Восстановить по умолчанию
+								</button>
+							</div>
+
+							<textarea id="horae-custom-history-prompt"
+								class="horae-prompt-textarea"
+								rows="6"
+								placeholder="Оставьте пустым для использования промпта по умолчанию..."></textarea>
+							<div class="horae-prompt-char-count">
+								<span id="horae-history-prompt-count">0</span> символов
+							</div>
+						</div>
+
+						<div id="horae-characters-prompt-group" class="horae-prompt-editor-group" style="margin-top: 12px; display: none;">
+							<div class="horae-prompt-editor-header">
+								<span>Промпт Персонажи</span>
+								<button id="horae-btn-reset-characters-prompt" class="horae-btn-reset-prompt" type="button">
+									<i class="fa-solid fa-rotate-left"></i>
+									Восстановить по умолчанию
+								</button>
+							</div>
+
+							<textarea id="horae-custom-characters-prompt"
+								class="horae-prompt-textarea"
+								rows="6"
+								placeholder="Оставьте пустым для использования промпта по умолчанию..."></textarea>
+							<div class="horae-prompt-char-count">
+								<span id="horae-characters-prompt-count">0</span> символов
+							</div>
+						</div>
+
+						<div id="horae-costume-prompt-group" class="horae-prompt-editor-group" style="margin-top: 12px; display: none;">
+							<div class="horae-prompt-editor-header">
+								<span>Промпт Наряды персонажей</span>
+								<button id="horae-btn-reset-costume-prompt" class="horae-btn-reset-prompt" type="button">
+									<i class="fa-solid fa-rotate-left"></i>
+									Восстановить по умолчанию
+								</button>
+							</div>
+
+							<textarea id="horae-custom-costume-prompt"
+								class="horae-prompt-textarea"
+								rows="6"
+								placeholder="Оставьте пустым для использования промпта по умолчанию..."></textarea>
+							<div class="horae-prompt-char-count">
+								<span id="horae-costume-prompt-count">0</span> символов
+							</div>
+						</div>
+
+						<div id="horae-affection-prompt-group" class="horae-prompt-editor-group" style="margin-top: 12px; display: none;">
+							<div class="horae-prompt-editor-header">
+								<span>Промпт Отношения</span>
+								<button id="horae-btn-reset-affection-prompt" class="horae-btn-reset-prompt" type="button">
+									<i class="fa-solid fa-rotate-left"></i>
+									Восстановить по умолчанию
+								</button>
+							</div>
+
+							<textarea id="horae-custom-affection-prompt"
+								class="horae-prompt-textarea"
+								rows="6"
+								placeholder="Оставьте пустым для использования промпта по умолчанию..."></textarea>
+							<div class="horae-prompt-char-count">
+								<span id="horae-affection-prompt-count">0</span> символов
+							</div>
+						</div>
+
+						<div id="horae-relationship-prompt-group" class="horae-prompt-editor-group" style="margin-top: 12px; display: none;">
+							<div class="horae-prompt-editor-header">
+								<span data-i18n="prompts.relationshipPrompt">关系网络提示词</span>
+								<button id="horae-btn-reset-relationship-prompt" class="horae-btn-reset-prompt" data-i18n="common.restoreDefault" data-i18n-title="tooltip.restoreDefault" title="">
+									<i class="fa-solid fa-rotate-left"></i> 恢复默认
+								</button>
+							</div>
+							<textarea id="horae-custom-relationship-prompt" class="horae-prompt-textarea" rows="6" placeholder="留空使用默认提示词..."></textarea>
+							<div class="horae-prompt-char-count">
+								<span id="horae-relationship-prompt-count">0</span> 字符
+							</div>
+						</div>
+
+						<div id="horae-mood-prompt-group" class="horae-prompt-editor-group" style="margin-top: 12px; display: none;">
+							<div class="horae-prompt-editor-header">
+								<span data-i18n="prompts.moodPrompt">情绪追踪提示词</span>
+								<button id="horae-btn-reset-mood-prompt" class="horae-btn-reset-prompt" data-i18n="common.restoreDefault" data-i18n-title="tooltip.restoreDefault" title="">
+									<i class="fa-solid fa-rotate-left"></i> 恢复默认
+								</button>
+							</div>
+							<textarea id="horae-custom-mood-prompt" class="horae-prompt-textarea" rows="6" placeholder="留空使用默认提示词..."></textarea>
+							<div class="horae-prompt-char-count">
+								<span id="horae-mood-prompt-count">0</span> 字符
+							</div>
+						</div>
+
+						<div id="horae-items-prompt-group" class="horae-prompt-editor-group" style="margin-top: 12px; display: none;">
+							<div class="horae-prompt-editor-header">
+								<span>Промпт Инвентарь</span>
+								<button id="horae-btn-reset-items-prompt" class="horae-btn-reset-prompt" type="button">
+									<i class="fa-solid fa-rotate-left"></i>
+									Восстановить по умолчанию
+								</button>
+							</div>
+							<textarea id="horae-custom-items-prompt" class="horae-prompt-textarea" rows="6" placeholder="Оставьте пустым для использования промпта по умолчанию..."></textarea>
+							<div class="horae-prompt-char-count">
+								<span id="horae-items-prompt-count">0</span> символов
+							</div>
+						</div>
+
+                        <div id="horae-items-advanced-prompt-group"
+                            class="horae-prompt-editor-group"
+                            style="margin-top: 12px; display: none;">
+
+                            <div class="horae-prompt-editor-header">
+                                <span>Промпт Расширенных правил</span>
+
+                                <button id="horae-btn-reset-items-advanced-prompt"
+                                        class="horae-btn-reset-prompt"
+                                        type="button">
+                                    <i class="fa-solid fa-rotate-left"></i>
+                                    Восстановить по умолчанию
+                                </button>
+                            </div>
+
+                            <textarea id="horae-custom-items-advanced-prompt"
+                                    class="horae-prompt-textarea"
+                                    rows="6"
+                                    placeholder="Оставьте пустым для использования промпта по умолчанию..."></textarea>
+
+                            <div class="horae-prompt-char-count">
+                                <span id="horae-items-advanced-prompt-count">0</span> символов
+                            </div>
+                        </div>
+
+						<div id="horae-items-quantity-prompt-group"
+							 class="horae-prompt-editor-group"
+							 style="margin-top: 12px; display: none;">
+
+							<div class="horae-prompt-editor-header">
+								<span>Промпт Количественный учёт</span>
+
+								<button id="horae-btn-reset-items-quantity-prompt"
+										class="horae-btn-reset-prompt"
+										type="button">
+									<i class="fa-solid fa-rotate-left"></i>
+									Восстановить по умолчанию
+								</button>
+							</div>
+
+							<textarea id="horae-custom-items-quantity-prompt"
+									  class="horae-prompt-textarea"
+									  rows="6"
+									  placeholder="Оставьте пустым для использования промпта по умолчанию..."></textarea>
+
+							<div class="horae-prompt-char-count">
+								<span id="horae-items-quantity-prompt-count">0</span> символов
+							</div>
+						</div>
+
                         <div id="horae-location-prompt-group" class="horae-prompt-editor-group" style="margin-top: 12px; display: none;">
                             <div class="horae-prompt-editor-header">
                                 <span data-i18n="prompts.locationPrompt">场景记忆提示词</span>
@@ -1618,32 +1958,6 @@
                             <textarea id="horae-custom-location-prompt" class="horae-prompt-textarea" rows="6" placeholder="留空使用默认提示词..."></textarea>
                             <div class="horae-prompt-char-count">
                                 <span id="horae-location-prompt-count">0</span> 字符
-                            </div>
-                        </div>
-
-                        <div id="horae-relationship-prompt-group" class="horae-prompt-editor-group" style="margin-top: 12px; display: none;">
-                            <div class="horae-prompt-editor-header">
-                                <span data-i18n="prompts.relationshipPrompt">关系网络提示词</span>
-                                <button id="horae-btn-reset-relationship-prompt" class="horae-btn-reset-prompt" data-i18n="common.restoreDefault" data-i18n-title="tooltip.restoreDefault" title="">
-                                    <i class="fa-solid fa-rotate-left"></i> 恢复默认
-                                </button>
-                            </div>
-                            <textarea id="horae-custom-relationship-prompt" class="horae-prompt-textarea" rows="6" placeholder="留空使用默认提示词..."></textarea>
-                            <div class="horae-prompt-char-count">
-                                <span id="horae-relationship-prompt-count">0</span> 字符
-                            </div>
-                        </div>
-
-                        <div id="horae-mood-prompt-group" class="horae-prompt-editor-group" style="margin-top: 12px; display: none;">
-                            <div class="horae-prompt-editor-header">
-                                <span data-i18n="prompts.moodPrompt">情绪追踪提示词</span>
-                                <button id="horae-btn-reset-mood-prompt" class="horae-btn-reset-prompt" data-i18n="common.restoreDefault" data-i18n-title="tooltip.restoreDefault" title="">
-                                    <i class="fa-solid fa-rotate-left"></i> 恢复默认
-                                </button>
-                            </div>
-                            <textarea id="horae-custom-mood-prompt" class="horae-prompt-textarea" rows="6" placeholder="留空使用默认提示词..."></textarea>
-                            <div class="horae-prompt-char-count">
-                                <span id="horae-mood-prompt-count">0</span> 字符
                             </div>
                         </div>
 
@@ -1659,6 +1973,25 @@
                                 <span id="horae-rpg-prompt-count">0</span> 字符
                             </div>
                         </div>
+
+						<div id="horae-anti-paraphrase-prompt-group" class="horae-prompt-editor-group" style="margin-top: 12px;">
+							<div class="horae-prompt-editor-header">
+								<span>Промпт режима «Без пересказа»</span>
+								<button id="horae-btn-reset-anti-paraphrase-prompt" class="horae-btn-reset-prompt" type="button">
+									<i class="fa-solid fa-rotate-left"></i> Восстановить по умолчанию
+								</button>
+							</div>
+
+							<textarea id="horae-custom-anti-paraphrase-prompt"
+									  class="horae-prompt-textarea"
+									  rows="6"
+									  placeholder="Оставьте пустым для использования промпта по умолчанию..."></textarea>
+
+							<div class="horae-prompt-char-count">
+								<span id="horae-anti-paraphrase-prompt-count">0</span> символов
+							</div>
+						</div>
+
                     </div>
                 </div>
                 

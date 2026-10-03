@@ -1,0 +1,23 @@
+## Agenda
+
+Tracks active tasks, plans, and future events.
+The agenda state represents obligations, promises, and goals that are still pending.
+
+### Format
+agenda: <creation date>|<content>
+agenda-: <content keyword>
+
+### Rules
+* Written only when a new plan, promise, task, or lead appears.
+* Written only when an existing plan is completed, cancelled, or no longer valid.
+* Do not mark completion with agenda: plus parentheses. Use agenda-: only.
+
+### Content
+* Describe the plan clearly and concisely.
+* Creation date = when the obligation was taken.
+* If the plan has a scheduled date or deadline, append it in parentheses.
+* Scheduled date is optional. Write it only if the story establishes one.
+
+### Removal
+* When a plan is completed, cancelled, or no longer valid, output it with the agenda-: prefix.
+* The keyword is enough to match and remove the original entry.

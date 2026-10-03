@@ -593,14 +593,16 @@ export function generateTimeReference(currentDate) {
         return `${d.getMonth() + 1}/${d.getDate()} (${weekday})`;
     };
     
-    return {
-        current: currentDate,
-        type: 'standard',
-        yesterday: getDateString(-1),
-        dayBefore: getDateString(-2),
-        threeDaysAgo: getDateString(-3),
-        tomorrow: getDateString(1)
-    };
+	return {
+		current: currentDate,
+		type: 'standard',
+		yesterday: getDateString(-1),
+		dayBefore: getDateString(-2),
+		threeDaysAgo: getDateString(-3),
+		tomorrow: getDateString(1),
+		dayAfterTomorrow: getDateString(2),
+		inThreeDays: getDateString(3)
+	};
 }
 
 /** 计算两个日期之间的详细差异 */

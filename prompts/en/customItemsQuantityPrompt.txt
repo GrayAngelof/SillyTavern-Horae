@@ -1,0 +1,90 @@
+## Inventory (Containers)
+
+Apply these rules only when the reply involves items that contain other items: bags, boxes, magazines, quivers, grimoires, and similar composite objects.
+
+Containers are an extension of the Basic rules. Use the Basic rules for all ordinary items.
+
+### Container
+Any owned item may be a container.
+
+A container holds other tracked items.
+
+A container is tracked only if the container itself is an inventory item.
+
+Do not create a container record only because an item is described as being inside something.
+
+Furniture, rooms, terrain, and environmental surfaces are not containers unless they are explicitly treated as owned storage objects.
+
+An item may be both a container and a contained item at the same time.
+
+Nesting is allowed when the placement chain remains unambiguous.
+
+### Content
+Container contents are represented by separate item records whose placement references the container.
+
+Placement chains express nesting:
+item:<emoji><container>=<owner>@<placement>
+item:<emoji><contained>=<owner>@in <container>
+
+A container's own record describes only the container itself.
+
+Do not encode its contents in the description.
+
+Adding or removing contents does not change the container's own record, except for composite items.
+
+Output the container only when its own quantity, owner, placement, or relevant properties change.
+
+If an item is explicitly removed from a container, update that item's placement.
+
+If an item is explicitly placed into a container, update that item's placement.
+
+### Container Movement
+When a container moves, its contents move with it.
+
+Do not output the contents merely because their container changed placement.
+
+Contents are considered changed only when:
+* they are explicitly removed from the container;
+* they are explicitly placed into a different container;
+* their own properties change (quantity, type, state);
+* the container itself is removed from the inventory.
+
+### Container Identity
+Containers with the same name and the same placement are not distinguished unless their contents differ in a way that matters.
+
+If two or more containers with the same name share a placement and their contents differ, distinguish them by a numbered suffix: <container>#1, <container>#2.
+
+Use numbered suffixes only when necessary. Do not assign identifiers to containers that are unambiguous without them.
+
+### Composite Items
+A composite item is a container whose contents define its identity.
+
+A container holding one set of contents is different from a container with the same name holding a different set of contents, even if both share the name.
+
+Track composite items as containers: the composite item itself is one record, its contents are separate records.
+
+Do not encode the composition in the description of the composite item.
+
+For composite items, changes in contents may change the identity of the container.
+
+Only track internal composition when the contents affect the identity or functionality of the item.
+
+Ordinary containers — bags, boxes, pockets — do not become composite items merely because they hold something.
+
+### Container Removal
+When a container is removed from the inventory, output item-: for the container.
+
+Output item-: separately for each contained item that is removed together with the container.
+
+Do not rely on implicit cascading removal.
+
+If contents are explicitly extracted before the container is removed, output updated placement for the extracted contents and item-: only for the container.
+
+If contents are not extracted and the container is removed, output item-: for the container and for every contained item.
+
+### Resolution
+Apply Basic rules first.
+
+Then apply container-specific rules.
+
+Output only final inventory changes.

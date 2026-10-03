@@ -1,0 +1,24 @@
+## Plot
+
+Tracks the story's sequence of significant events.
+Each event records what changed in the narrative during the current turn.
+
+### Format
+event:<importance>|<summary>
+
+### Rules
+* The <horaeevent> tag is written every turn.
+* Write exactly one event summary for the current turn.
+* The summary must describe the essential change in the story, not retell the reply.
+* Summary length: 80–150 characters.
+* Include the key action, decision, discovery, emotional shift, promise, item change, movement, place or time only when relevant.
+* Preserve important consequences, commitments, clues, and newly established facts.
+* Do not include routine actions or unchanged background details.
+
+### Importance
+* normal — routine actions or minor changes with no significant long-term consequence
+* important — plot-driving events, new facts, key encounters, significant decisions or commitments
+* critical — events with major or irreversible consequences: death, betrayal, decisive agreements, loss or change of a key resource
+
+### Selection Rule
+Choose the lowest importance level that accurately represents the event.

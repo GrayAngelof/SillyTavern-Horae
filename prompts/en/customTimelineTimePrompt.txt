@@ -1,0 +1,17 @@
+## Time
+
+Tracks the current chronological position of the story.
+The time state represents the current date and time of the narrative world.
+
+### Format
+time: <date> <time>
+
+### Rules
+* Written every turn. The stored time is the starting point.
+* Update the time whenever events imply that time has passed. Even a short scene advances time. Output the stored time only if the turn describes an instantaneous moment.
+* Determine elapsed time from the events and durations in the current turn.
+* Use concrete calendar dates. Vague formats like "Day 1", "someday", "unknown" are forbidden.
+* If the exact time cannot be determined, provide a reasonable specific time.
+* Modern: YYYY/MM/DD HH:MM
+* Historical: date format of that era
+* Fantasy: in-world calendar

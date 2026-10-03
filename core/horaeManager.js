@@ -156,8 +156,22 @@ class HoraeManager {
 
     _getPromptDefaultFromResource(key, vars = null) {
         const lang = this._getAiOutputLang();
+
+        console.log('[Horae DEBUG] Loading resource:', {
+            lang,
+            key
+        });
+
+
         let text = getPromptDefaultSync(lang, key) || '';
-        if (!text) return '';
+
+        console.log('[Horae DEBUG] Loaded chars:', text.length);
+
+        if (!text) {
+            console.error('[Horae ERROR] Missing prompt resource', key, lang);
+            return '';
+        }
+
         if (vars && typeof vars === 'object') {
             for (const [k, v] of Object.entries(vars)) {
                 const val = (v == null) ? '' : String(v);
@@ -600,21 +614,23 @@ class HoraeManager {
             if (lang === 'ru') return ru;
             return en;
         };
-        
+
         // 状态快照头
         lines.push(L(
             '[当前状态快照——对比本回合剧情，仅在<horae>中输出发生实质变化的字段]',
             '[Current State Snapshot — compare with this round\'s plot, only output substantively changed fields in <horae>]',
             '[現在の状態スナップショット——今回のストーリーと比較し、実質的に変化したフィールドのみ<horae>に出力]',
             '[현재 상태 스냅샷——이번 라운드의 스토리와 비교하여 실질적으로 변경된 필드만 <horae>에 출력]',
-            '[Снимок текущего состояния — сравните с сюжетом этого раунда, выводите в <horae> только существенно изменившиеся поля]',
+            '[Текущее состояние мира — база сравнения. Извлекайте только изменения, произошедшие в текущем раунде.]',
         ));
-        
+
         const sendTimeline = this.settings?.sendTimeline !== false;
-        const sendCharacters = this.settings?.sendCharacters !== false;
-        const sendCharacterAffection = this.settings?.sendCharacterAffection !== false;
-        const sendMainCharacterPersonality = this.settings?.sendMainCharacterPersonality !== false;
+		const sendCharacters = this.settings?.sendCharacters !== false;
+		const sendCharacterCostume = sendCharacters && this.settings?.sendCharacterCostume !== false;
+		const sendCharacterAffection = sendCharacters && this.settings?.sendCharacterAffection !== false;
+		const sendMainCharacterPersonality = sendCharacters && this.settings?.sendMainCharacterPersonality !== false;
         const sendItems = this.settings?.sendItems !== false;
+        const presentChars = state.scene.characters_present || [];
 
         // 主要角色判定：卡片本体 + 置顶 NPC，含别名匹配以兼容 NPC 改名
         const mainCharName = this.context?.name2 || '';
@@ -641,15 +657,23 @@ class HoraeManager {
         };
         
         // 时间
-        if (state.timestamp.story_date) {
+        if (this.settings?.sendTimeline !== false) {
             const fullDateTime = formatFullDateTime(state.timestamp.story_date, state.timestamp.story_time);
             lines.push(`[${L('时间','Time','時間','시간','Время')}|${fullDateTime}]`);
             
             // 时间参考
-            if (sendTimeline) {
+            if (this.settings?.sendTimeline !== false) {
                 const timeRef = generateTimeReference(state.timestamp.story_date);
                 if (timeRef && timeRef.type === 'standard') {
-                    lines.push(`[${L('时间参考','Time Ref','時間参考','시간 참조','Время (справка)')}|${L('昨天','yesterday','昨日','어제','вчера')}=${timeRef.yesterday}|${L('前天','day before','一昨日','그저께','позавчера')}=${timeRef.dayBefore}|${L('3天前','3 days ago','3日前','3일 전','3 дня назад')}=${timeRef.threeDaysAgo}]`);
+					lines.push(
+						`[${L('时间参考','Time Ref','時間参考','시간 참조','Время (справка)')}` +
+						`|${L('昨天','yesterday','昨日','어제','вчера')}=${timeRef.yesterday}` +
+						`|${L('前天','day before','一昨日','그저께','позавчера')}=${timeRef.dayBefore}` +
+						`|${L('3天前','3 days ago','3日前','3일 전','3 дня назад')}=${timeRef.threeDaysAgo}` +
+						`|${L('明天','tomorrow','明日','내일','завтра')}=${timeRef.tomorrow}` +
+						`|${L('后天','day after tomorrow','明後日','모레','послезавтра')}=${timeRef.dayAfterTomorrow}` +
+						`|${L('大后天','in three days','明々後日','글피','через три дня')}=${timeRef.inThreeDays}]`
+					);
                 } else if (timeRef && timeRef.type === 'fantasy') {
                     lines.push(`[${L('时间参考','Time Ref','時間参考','시간 참조','Время (справка)')}|${L('奇幻日历模式，参见剧情轨迹中的相对时间标记','Fantasy calendar mode, see relative time markers in story timeline','ファンタジー暦モード、ストーリー軌跡の相対時間マーカーを参照','판타지 달력 모드, 스토리 궤적의 상대 시간 마커 참조','Режим фэнтезийного календаря, см. относительные метки времени в сюжетной линии')}]`);
                 } else if (timeRef && timeRef.type === 'custom') {
@@ -659,8 +683,8 @@ class HoraeManager {
         }
         
         // 场景
-        if (state.scene.location) {
-            let sceneStr = `[${L('场景','Scene','シーン','장면','Сцена')}|${state.scene.location}`;
+        if (this.settings?.sendLocationMemory && state.scene.location) {
+            let sceneStr = `[${L('场景','Scene','シーン','장면','Локация:')}|${state.scene.location}`;
             if (state.scene.atmosphere) {
                 sceneStr += `|${state.scene.atmosphere}`;
             }
@@ -672,63 +696,65 @@ class HoraeManager {
                 const loc = state.scene.location;
                 const entry = this._findLocationMemory(loc, locMem, state._previousLocation);
                 if (entry?.desc) {
-                    lines.push(`[${L('场景记忆','Scene Memory','シーン記憶','장면 기억','Память сцены')}|${entry.desc}]`);
+                    lines.push(`[${L('场景记忆','Scene Memory','シーン記憶','장면 기억','Профиль локации:')}|${entry.desc}]`);
                 }
                 const sepMatch = loc.match(/[·・\-\/\|]/);
                 if (sepMatch) {
                     const parent = loc.substring(0, sepMatch.index).trim();
                     if (parent && locMem[parent] && locMem[parent].desc && parent !== entry?._matchedName) {
-                        lines.push(`[${L('场景记忆','Scene Memory','シーン記憶','장면 기억','Память сцены')}:${parent}|${locMem[parent].desc}]`);
+                        lines.push(`[${L('场景记忆','Scene Memory','シーン記憶','장면 기억','Профиль локации:')}:${parent}|${locMem[parent].desc}]`);
                     }
                 }
             }
         }
         
         // 在场角色和服装
-        if (sendCharacters) {
-            const presentChars = state.scene.characters_present || [];
+		if (presentChars.length > 0) {
+			const charStrs = [];
+
+			for (const char of presentChars) {
+				if (sendCharacterCostume) {
+					const costumeKey = Object.keys(state.costumes || {}).find(
+						k => k === char || k.includes(char) || char.includes(k)
+					);
+
+					if (costumeKey && state.costumes[costumeKey]) {
+						charStrs.push(`${char}(${state.costumes[costumeKey]})`);
+					} else {
+						charStrs.push(char);
+					}
+				} else {
+					charStrs.push(char);
+				}
+			}
+
+			lines.push(`[${L('在场','Present','出席','참석','Присутствуют')}|${charStrs.join('|')}]`);
+		}
             
-            if (presentChars.length > 0) {
-                const charStrs = [];
-                for (const char of presentChars) {
-                    // 模糊匹配服装
-                    const costumeKey = Object.keys(state.costumes || {}).find(
-                        k => k === char || k.includes(char) || char.includes(k)
-                    );
-                    if (costumeKey && state.costumes[costumeKey]) {
-                        charStrs.push(`${char}(${state.costumes[costumeKey]})`);
-                    } else {
-                        charStrs.push(char);
-                    }
-                }
-                lines.push(`[${L('在场','Present','出席','참석','Присутствуют')}|${charStrs.join('|')}]`);
-            }
+		// 情绪状态（仅在场角色，变化驱动）
+		if (this.settings?.sendMood) {
+			const moodEntries = [];
+			for (const char of presentChars) {
+				if (state.mood[char]) {
+					moodEntries.push(`${char}:${state.mood[char]}`);
+				}
+			}
+			if (moodEntries.length > 0) {
+				lines.push(`[${L('情绪','Mood','感情','감정','Настроение')}|${moodEntries.join('|')}]`);
+			}
+		}
             
-            // 情绪状态（仅在场角色，变化驱动）
-            if (this.settings?.sendMood) {
-                const moodEntries = [];
-                for (const char of presentChars) {
-                    if (state.mood[char]) {
-                        moodEntries.push(`${char}:${state.mood[char]}`);
-                    }
-                }
-                if (moodEntries.length > 0) {
-                    lines.push(`[${L('情绪','Mood','感情','감정','Настроение')}|${moodEntries.join('|')}]`);
-                }
-            }
-            
-            // 关系网络（仅在场角色相关的关系，从 chat[0] 读取，零AI输出token）
-            if (this.settings?.sendRelationships) {
-                const rels = this.getRelationshipsForCharacters(presentChars);
-                if (rels.length > 0) {
-                    lines.push(`\n[${L('关系网络','Relationship Network','関係ネットワーク','관계 네트워크','Сеть отношений')}]`);
-                    for (const r of rels) {
-                        const noteStr = r.note ? `(${r.note})` : '';
-                        lines.push(`${r.from}→${r.to}: ${r.type}${noteStr}`);
-                    }
-                }
-            }
-        }
+		// 关系网络（仅在场角色相关的关系，从 chat[0] 读取，零AI输出token）
+		if (this.settings?.sendRelationships) {
+			const rels = this.getRelationshipsForCharacters(presentChars);
+			if (rels.length > 0) {
+				lines.push(`\n[${L('关系网络','Relationship Network','関係ネットワーク','관계 네트워크','Связи персонажей')}]`);
+				for (const r of rels) {
+					const noteStr = r.note ? `(${r.note})` : '';
+					lines.push(`${r.from}→${r.to}: ${r.type}${noteStr}`);
+				}
+			}
+		}
         
         // 物品（已装备的物品不在此处显示，避免重复）
         if (sendItems) {
@@ -766,7 +792,7 @@ class HoraeManager {
             const affections = Object.entries(state.affection).filter(([_, v]) => v !== 0);
             if (affections.length > 0) {
                 const affStr = affections.map(([k, v]) => `${k}:${v > 0 ? '+' : ''}${v}`).join('|');
-                lines.push(`[${L('好感','Affection','好感度','호감도','Расположение')}|${affStr}]`);
+                lines.push(`[${L('好感','Affection','好感度','호감도','Отношения')}|${affStr}]`);
             }
         }
 
@@ -835,8 +861,9 @@ class HoraeManager {
                 }
             }
         }
+
         const activeAgenda = allAgendaItems.filter(a => !a.done);
-        if (activeAgenda.length > 0) {
+        if (this.settings?.sendTimeline !== false && this.settings?.sendAgenda !== false) {
             lines.push(`\n[${L('待办事项','Agenda','予定事項','할 일 목록','Список дел')}]`);
             for (const item of activeAgenda) {
                 const datePrefix = item.date ? `${item.date} ` : '';
@@ -856,7 +883,6 @@ class HoraeManager {
             for (const b of _barCfg) _barNames[b.key] = b.name;
 
             // 按在场角色过滤 RPG 数据
-            const presentChars = state.scene.characters_present || [];
             const userName = this.context?.name1 || '';
             const _cUoB = !!this.settings?.rpgBarsUserOnly;
             const _cUoS = !!this.settings?.rpgSkillsUserOnly;
@@ -1070,7 +1096,7 @@ class HoraeManager {
         }
 
         // 剧情轨迹
-        if (sendTimeline) {
+        if (this.settings?.sendTimeline !== false && this.settings?.sendHistory !== false) {
             const allEvents = this.getEvents(0, 'all', skipLast);
             // 过滤掉被活跃摘要覆盖的原始事件（_compressedBy 且摘要为 active）
             const timelineChat = this.getChat();
@@ -3472,10 +3498,17 @@ class HoraeManager {
 
     generateSystemPromptAddition() {
         const [userName, charName] = this._getDefaultNames();
-        const subs = this.generateLocationMemoryPrompt() + this.generateCustomTablesPrompt() +
-                     this.generateRelationshipPrompt() + this.generateMoodPrompt() +
-                     this.generateRpgPrompt() + this._generateAntiParaphrasePrompt() +
-                     this._generateCustomCalendarPrompt();
+        const subs = this._generateOutputAnchorPrompt() + 
+                    this.generateTimelineTimePrompt() +
+					this.generateTimelineAgendaPrompt() +
+					this.generateCharactersMemoryPrompt() +  
+					this.generateItemsMemoryPrompt() +
+					this.generateLocationMemoryPrompt() +
+					this.generateCustomTablesPrompt() +
+					this.generateRpgPrompt() +
+					this._generateAntiParaphrasePrompt() +
+					this._generateCustomCalendarPrompt() +
+					this.generateTimelineHistoryPrompt();
         const fieldLines = this.getPromptFieldLines();
 
         if (this.settings?.customSystemPrompt) {
@@ -3544,11 +3577,176 @@ class HoraeManager {
         };
     }
 
-    getDefaultTablesPrompt() {
-        return this._getPromptDefaultFromResource('customTablesPrompt');
+	getDefaultTablesPrompt() {
+		return this._getPromptDefaultFromResource('customTablesPrompt');
+	}
+
+	getDefaultTimelineTimePrompt() {
+		return this._getPromptDefaultFromResource('customTimelineTimePrompt');
+	}
+	
+	generateTimelineTimePrompt() {
+		if (!this.settings?.sendTimeline) return '';
+		const custom = this.settings?.customTimelineTimePrompt;
+		if (custom) {
+			return '\n' + custom;
+		}
+		return '\n' + this.getDefaultTimelineTimePrompt();
+	}
+
+	getDefaultTimelineAgendaPrompt() {
+		return this._getPromptDefaultFromResource('customTimelineAgendaPrompt');
+	}
+
+	generateTimelineAgendaPrompt() {
+		if (!this.settings?.sendTimeline || !this.settings?.sendAgenda) return '';
+		const custom = this.settings?.customTimelineAgendaPrompt;
+		if (custom) {
+			return '\n' + custom;
+		}
+		return '\n' + this.getDefaultTimelineAgendaPrompt();
+	}
+
+	getDefaultTimelineHistoryPrompt() {
+		return this._getPromptDefaultFromResource('customTimelineHistoryPrompt');
+	}
+
+	generateTimelineHistoryPrompt() {
+		if (!this.settings?.sendTimeline || !this.settings?.sendHistory) return '';
+		const custom = this.settings?.customTimelineHistoryPrompt;
+		if (custom) {
+			return '\n' + custom;
+		}
+		return '\n' + this.getDefaultTimelineHistoryPrompt();
+	}
+
+	getDefaultCharactersPrompt() {
+		return this._getPromptDefaultFromResource('customCharactersPrompt');
+	}
+
+	getDefaultCharacterCostumePrompt() {
+		return this._getPromptDefaultFromResource('customCharacterCostumePrompt');
+	}
+
+	getDefaultCharacterAffectionPrompt() {
+		return this._getPromptDefaultFromResource('customCharacterAffectionPrompt');
+	}
+
+	getDefaultRelationshipPrompt() {
+		const userName = this.context?.name1 || '{{user}}';
+		return this._getPromptDefaultFromResource('customRelationshipPrompt', { userName });
+	}
+
+	getDefaultMoodPrompt() {
+		return this._getPromptDefaultFromResource('customMoodPrompt');
+	}
+
+	generateCharactersMemoryPrompt() {
+		if (!this.settings?.sendCharacters) return '';
+
+		const userName = this.context?.name1 || '主角';
+		const charName = this.context?.name2 || '角色';
+
+		const replaceMacros = (prompt) =>
+			prompt.replace(/\{\{user\}\}/gi, userName)
+				.replace(/\{\{char\}\}/gi, charName);
+
+		const custom = this.settings?.customCharactersPrompt;
+
+		let prompt = custom
+			? replaceMacros(custom)
+			: this.getDefaultCharactersPrompt();
+
+		if (this.settings?.sendCharacterCostume !== false) {
+			const costume = this.settings?.customCharacterCostumePrompt;
+
+			prompt += '\n' + (
+				costume
+					? replaceMacros(costume)
+					: this.getDefaultCharacterCostumePrompt()
+			);
+		}
+
+		if (this.settings?.sendCharacterAffection !== false) {
+			const affection = this.settings?.customCharacterAffectionPrompt;
+
+			prompt += '\n' + (
+				affection
+					? replaceMacros(affection)
+					: this.getDefaultCharacterAffectionPrompt()
+			);
+		}
+
+		if (this.settings?.sendRelationships !== false) {
+			const relationship = this.settings?.customRelationshipPrompt;
+
+			prompt += '\n' + (
+				relationship
+					? replaceMacros(relationship)
+					: this.getDefaultRelationshipPrompt()
+			);
+		}
+
+		if (this.settings?.sendMood !== false) {
+			const mood = this.settings?.customMoodPrompt;
+
+			prompt += '\n' + (
+				mood
+					? replaceMacros(mood)
+					: this.getDefaultMoodPrompt()
+			);
+		}
+
+		return '\n' + prompt;
+	}
+	
+	getDefaultItemsPrompt() {
+		return this._getPromptDefaultFromResource('customItemsPrompt');
+	}
+
+    getDefaultItemsAdvancedPrompt() {
+        return this._getPromptDefaultFromResource('customItemsAdvancedPrompt');
+	}
+    
+	getDefaultItemsQuantityPrompt() {
+		return this._getPromptDefaultFromResource('customItemsQuantityPrompt');
+	}
+	
+generateItemsMemoryPrompt() {
+    if (!this.settings?.sendItems) return '';
+
+    const custom = this.settings?.customItemsPrompt;
+    const userName = this.context?.name1 || '主角';
+    const charName = this.context?.name2 || '角色';
+
+    let prompt = custom
+        ? custom.replace(/\{\{user\}\}/gi, userName).replace(/\{\{char\}\}/gi, charName)
+        : this.getDefaultItemsPrompt();
+
+    if (this.settings?.sendItemsAdvanced) {
+        const advanced = this.settings?.customItemsAdvancedPrompt;
+
+        prompt += '\n' + (
+            advanced
+                ? advanced.replace(/\{\{user\}\}/gi, userName).replace(/\{\{char\}\}/gi, charName)
+                : this.getDefaultItemsAdvancedPrompt()
+        );
     }
 
-    getDefaultLocationPrompt() {
+    if (this.settings?.sendItemsQuantity) {
+        const quantity = this.settings?.customItemsQuantityPrompt;
+
+        prompt += '\n' + (
+            quantity
+                ? quantity.replace(/\{\{user\}\}/gi, userName).replace(/\{\{char\}\}/gi, charName)
+                : this.getDefaultItemsQuantityPrompt()
+        );
+    }
+
+    return '\n' + prompt;
+}
+    
+	getDefaultLocationPrompt() {
         return this._getPromptDefaultFromResource('customLocationPrompt');
     }
 
@@ -3615,35 +3813,38 @@ class HoraeManager {
         return prompt;
     }
 
-    getDefaultRelationshipPrompt() {
-        const userName = this.context?.name1 || '{{user}}';
-        return this._getPromptDefaultFromResource('customRelationshipPrompt', { userName });
-    }
+	getDefaultAntiParaphrasePrompt() {
+		const userName = this.context?.name1 || '{{user}}';
+		return this._getPromptDefaultFromResource('customAntiParaphrasePrompt', { userName });
+	}
+	
+	_generateAntiParaphrasePrompt() {
+		if (!this.settings?.antiParaphraseMode) return '';
 
-    getDefaultMoodPrompt() {
-        return this._getPromptDefaultFromResource('customMoodPrompt');
-    }
+		const lang = this._getAiOutputLang();
+		const defaults = {
+			'zh-CN': '主角',
+			'zh-TW': '主角',
+			'ja': '主人公',
+			'ko': '주인공',
+			'ru': 'протагонист'
+		};
 
-    generateRelationshipPrompt() {
-        if (!this.settings?.sendRelationships) return '';
-        const custom = this.settings?.customRelationshipPrompt;
-        if (custom) {
-            const userName = this.context?.name1 || '主角';
-            const charName = this.context?.name2 || '角色';
-            return '\n' + custom.replace(/\{\{user\}\}/gi, userName).replace(/\{\{char\}\}/gi, charName);
-        }
-        return '\n' + this.getDefaultRelationshipPrompt();
-    }
+		const userName = this.context?.name1 || (defaults[lang] || 'protagonist');
 
-    _generateAntiParaphrasePrompt() {
-        if (!this.settings?.antiParaphraseMode) return '';
-        const lang = this._getAiOutputLang();
-        const defaults = { 'zh-CN': '主角', 'zh-TW': '主角', 'ja': '主人公', 'ko': '주인공', 'ru': 'протагонист' };
-        const userName = this.context?.name1 || (defaults[lang] || 'protagonist');
-        const text = this._getPromptDefaultFromResource('customAntiParaphrasePrompt', { userName });
-        if (!text || !text.trim()) return '';
-        return '\n' + text.trim();
-    }
+		let text = this.settings.customAntiParaphrasePrompt;
+
+		if (!text || !text.trim()) {
+			text = this._getPromptDefaultFromResource(
+				'customAntiParaphrasePrompt',
+				{ userName }
+			);
+		}
+
+		if (!text || !text.trim()) return '';
+
+		return '\n' + text.trim();
+	}
 
     /** 自定义日历提示词：仅启用且配置完整时注入，告诉 AI 使用指定月名 + 日数 */
     _generateCustomCalendarPrompt() {
@@ -3678,16 +3879,6 @@ class HoraeManager {
         );
     }
 
-    generateMoodPrompt() {
-        if (!this.settings?.sendMood) return '';
-        const custom = this.settings?.customMoodPrompt;
-        if (custom) {
-            const userName = this.context?.name1 || '主角';
-            const charName = this.context?.name2 || '角色';
-            return '\n' + custom.replace(/\{\{user\}\}/gi, userName).replace(/\{\{char\}\}/gi, charName);
-        }
-        return '\n' + this.getDefaultMoodPrompt();
-    }
 
     /** RPG 提示词（rpgMode 开启才注入） */
     generateRpgPrompt() {
@@ -4342,6 +4533,72 @@ class HoraeManager {
         }
         return `Your reply MUST end with ${joined} (${tags.length} tags total).\nMissing any tag = unacceptable.`;
     }
+	
+	
+	_generateOutputAnchorPrompt() {
+		let prompt = '\nAt the end of every reply, you must write tags:\n<horae>\n';
+
+		if (this.settings?.sendTimeline) {
+			prompt += 'time: date time ← current date and time\n';
+		
+			if (this.settings?.sendAgenda) {
+				prompt += 'agenda: <creation date> | <content> (<scheduled date, if applicable>) ← only when a new agenda item appears\n';
+				prompt += 'agenda-: <content keyword> ← only when an agenda item is completed, cancelled, or invalidated\n';
+			}
+		}
+
+        if (this.settings?.sendCharacters) {
+			prompt += 'characters: <names, comma-separated> ← every turn\n';
+			prompt += 'costume: <name>=<outfit description> ← only on first appearance or when the outfit changes\n';
+			prompt += 'npc: name|appearance=personality @relationship ~gender:value ~age:value ~race:value ~job:value ~birthday:value ← FOLLOW THIS FORMAT EXACTLY. WRITE EACH EXTENDED FIELD AS ~key:value. Write npc only on first appearance or when at least one NPC profile field changes..\n';
+
+				if (this.settings?.sendCharacterAffection) {
+					prompt += 'affection: <name>=<number> ← only on first appearance or when affection meaningfully changes\n';
+				}
+				
+				if (this.settings?.sendMood) {
+					prompt += 'mood: <name>=<emotional state> ← only on first appearance with an established emotion or when the emotional state changes\n';
+				}
+
+				if (this.settings?.sendRelationships) {
+					prompt += 'rel: <A>><B>=<type>|<note> ← only when a relationship between two NPCs is created or changed\n';
+				}
+		}
+
+        if (this.settings?.sendItems) {
+            if (this.settings?.sendItemsAdvanced) {
+                prompt += 'item/item!/item!!: <emoji><naitem nameme>(<quantity>)|<description>=<holder>@<placement> ← character`s items\n';
+            } else {
+                prompt += 'item: <emoji> <item name>(<quantity>)|<description>=<holder> ← character`s items\n';
+            }
+
+            prompt += 'item-: item name ← when the item is consumed, lost, destroyed, or removed\n';
+        }
+
+        //prompt += 'item/item!/item!!:<emoji><name>(<quantity>)|<description>=<owner>@<placement> ← on first tracked appearance or when quantity, owner, placement, or properties change\n';
+
+        if (this.settings?.sendLocationMemory) {
+            prompt += 'location: <Building·Area> ← every turn. Use `·` for hierarchy. Same place = same name.\n';
+            prompt += 'atmosphere: <brief description> ← every turn. Current mood or ambiance of the scene.\n';
+            prompt += 'scene_desc: Located at <position>. <permanent physical features> ← only on first arrival or permanent change. Child locations describe only position within parent.\n';
+        }
+		prompt += '</horae>\n';
+
+		if (this.settings?.sendTimeline && this.settings?.sendHistory) {
+			prompt += '\n<horaeevent>\n';
+			prompt += 'event: <importance>|<summary>\n';
+			prompt += '</horaeevent>\n';
+		}
+
+		prompt += 'The fields required by the active modules must follow their module rules.\n';
+        prompt += `Missing a required tag = invalid.\n`;
+
+        console.log('[Horae DEBUG] FINAL Anchor prompt:', prompt);
+
+		return prompt;
+	}
+	
+	
 
     /** 宽松正则解析（不需要标签包裹） */
     parseLooseFormat(message) {
