@@ -21638,8 +21638,6 @@ async function onPromptReady(eventData) {
 
         const rulesPrompt = horaeManager.generateSystemPromptAddition();
 
-        console.log('[Horae DEBUG] rulesPrompt:', rulesPrompt);
-
         let antiParaRef = '';
         if (settings.antiParaphraseMode && chat?.length) {
             for (let i = chat.length - 1; i >= 0; i--) {
