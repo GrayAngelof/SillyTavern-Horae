@@ -1,5 +1,4 @@
 ## Mood
-
 Tracks the current emotional state of present characters.
 The mood state represents how each character feels right now, as a local reaction to the current situation.
 
@@ -7,18 +6,18 @@ The mood state represents how each character feels right now, as a local reactio
 mood:<name>=<emotional state>
 
 ### Rules
-* Written only for characters present in the current scene.
-* Written only when the character's emotional state changes to a different state.
-* Written when a character first appears with a clearly established emotional state.
-* Do not write for characters not present in the scene.
+Written only for characters present in the current scene.
+Written only when the character's emotional state changes to a different state.
+Written when a character first appears with a clearly established emotional state.
+Do not write for characters not present in the scene.
 
 ### What counts as a change
-* A change is a shift from one emotional state to another: calm → angry, content → offended, neutral → excited.
-* A micro-reaction that only expresses the current state is not a change: a smile while calm, a glance while content.
-* Returning to a neutral state counts as a change if the story explicitly establishes it.
+A change is a shift from one emotional state to another: calm → angry, content → offended, neutral → excited.
+A micro-reaction that only expresses the current state is not a change: a smile while calm, a glance while content.
+Returning to a neutral state counts as a change if the story explicitly establishes it.
 
 ### Content
-* Use 1–4 words.
-* Use `/` to separate mixed emotions.
-* Do not describe personality traits or long-term qualities.
-* Do not describe feelings toward the user — those belong to `affection`.
+Use 1–4 words.
+Use `/` to separate mixed emotions.
+Do not describe personality traits or long-term qualities.
+Do not describe feelings toward the user — those belong to `affection`.

@@ -13,10 +13,17 @@ If an item is taken, extracted, obtained, received, or otherwise comes into a ch
 The final state takes priority over intermediate states.
 If the final state matches the saved state, output nothing.
 Do not invent an item's properties, history, or state.
+Possession must be explicitly established in the story.
+An unfinished transfer does not establish possession.
+If one character offers, extends, hands, or reaches an item toward another character, but the story does not explicitly state that the other character takes or receives it, the other character does not have the item.
+Do not infer the result of an action that is not explicitly completed.
 
 ### Holder
 Every tracked item must have a holder.
 The holder is the character who has the item at the end of the current turn.
+A character has an item only when the story explicitly establishes possession.
+Offering, showing, pointing to, reaching for, handing toward, or extending an item does not establish possession.
+Do not infer possession from the direction of an action.
 
 ### Description
 Description preserves significant information about the item.

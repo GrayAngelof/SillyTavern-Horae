@@ -9,16 +9,16 @@ Relationships between an NPC and the user are stored in `affection` and `npc@rel
 rel:<A>><B>=<type>|<note>
 
 ### Rules
-* Written only when a new relationship between two NPCs appears, or an existing one changes.
-* Both <A> and <B> must be NPCs. Do not use the user's name.
-* Directional: `A>B` describes how A relates to B.
-* A relationship appears only when the story explicitly establishes a persistent relationship between two NPCs. Interaction, cooperation, disagreement, conflict, familiarity, or shared circumstances alone do not establish a relationship.
-* Record the relationship from the perspective of the character whose attitude toward the other NPC is established. Do not infer the reverse direction.
+Written only when a new relationship between two NPCs appears, or an existing one changes.
+Both <A> and <B> must be NPCs. Do not use the user's name.
+Directional: `A>B` describes how A relates to B.
+A relationship appears only when the story explicitly establishes a persistent relationship between two NPCs. Interaction, cooperation, disagreement, conflict, familiarity, or shared circumstances alone do not establish a relationship.
+Record the relationship from the perspective of the character whose attitude toward the other NPC is established. Do not infer the reverse direction.
 
 ### Content
-* <type> — short label describing the nature of the relationship: friend, rival, mentor, student, ally, enemy, sibling, lover, colleague, employer, subordinate, partner.
-* <note> is optional. Clarifies the character of the relationship: professional, familial, secret, long-term.
-* <note> must not describe feelings, moods, or temporary emotional states.
+<type> — short label describing the nature of the relationship: friend, rival, mentor, student, ally, enemy, sibling, lover, colleague, employer, subordinate, partner.
+<note> is optional. Clarifies the character of the relationship: professional, familial, secret, long-term.
+<note> must not describe feelings, moods, or temporary emotional states.
 
 ### Change
-* If a relationship changes (e.g., allies become enemies), output the new type.
+If a relationship changes (e.g., allies become enemies), output the new type.

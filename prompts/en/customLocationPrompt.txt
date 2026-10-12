@@ -9,31 +9,31 @@ atmosphere:<brief description>
 scene_desc:Located at <position>. <permanent physical features>
 
 ### Rules
-* location and atmosphere are written every turn.
-* scene_desc is written only on first arrival at a new location or when the location permanently changes.
-* Do not repeat scene_desc for a location whose physical traits have not changed.
+location and atmosphere are written every turn.
+scene_desc is written only on first arrival at a new location or when the location permanently changes.
+Do not repeat scene_desc for a location whose physical traits have not changed.
 
 ### Location
-* Use `·` for multi-level locations: `Building·Area` (e.g., `Tavern·Hall`, `Palace·Throne Room`).
-* The same location must always use exactly the same name.
-* Same-named areas in different buildings are different locations.
+Use `·` for multi-level locations: `Building·Area` (e.g., `Tavern·Hall`, `Palace·Throne Room`).
+The same location must always use exactly the same name.
+Same-named areas in different buildings are different locations.
 
 ### Atmosphere
-* Briefly describe the current mood or ambiance of the scene.
-* Do not repeat fixed physical traits — those belong to scene_desc.
+Briefly describe the current mood or ambiance of the scene.
+Do not repeat fixed physical traits — those belong to scene_desc.
 
 ### Scene Desc
-* Start with `Located at` to indicate the position relative to the direct parent location.
-* For a child location (name contains `·`): write only the position within the parent (which floor, which side). Do not include the parent's external geography.
-* For a parent/top-level location: external geography may be included.
-* Describe only permanent physical features: structure, materials, fixed furniture, window orientation, permanent decorations.
-* Do not describe temporary states: current light, weather, crowds, seasonal decorations, temporarily placed objects.
-* Do not copy scene_desc verbatim into the main text. Use it as background reference.
+Start with `Located at` to indicate the position relative to the direct parent location.
+For a child location (name contains `·`): write only the position within the parent (which floor, which side). Do not include the parent's external geography.
+For a parent/top-level location: external geography may be included.
+Describe only permanent physical features: structure, materials, fixed furniture, window orientation, permanent decorations.
+Do not describe temporary states: current light, weather, crowds, seasonal decorations, temporarily placed objects.
+Do not copy scene_desc verbatim into the main text. Use it as background reference.
 
 ### When to write scene_desc
-* First arrival at a new location.
-* Permanent physical change at a location (destroyed, rebuilt, expanded).
+First arrival at a new location.
+Permanent physical change at a location (destroyed, rebuilt, expanded).
 
 ### When not to write scene_desc
-* Return to a recorded location with no physical change.
-* Seasonal, weather, lighting, or crowd changes.
+Return to a recorded location with no physical change.
+Seasonal, weather, lighting, or crowd changes.
