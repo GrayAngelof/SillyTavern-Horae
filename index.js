@@ -11911,7 +11911,29 @@ function buildPanelMoodEditable(meta) {
 }
 
 function buildPanelContent(messageIndex, meta) {
-    const costumeRows = Object.entries(meta.costumes || {}).map(([char, costume]) => `
+
+    const chatForCostumes = horaeManager.getChat();
+    const skipLast = Math.max(0, chatForCostumes.length - messageIndex - 1);
+    const stateAtMessage = horaeManager.getLatestState(skipLast);
+    const presentChars = meta.scene?.characters_present || [];
+    const allCostumes = stateAtMessage.costumes || {};
+
+    const findCostume = (name) => {
+        if (allCostumes[name]) return allCostumes[name];
+
+        const normalized = name.trim().toLowerCase();
+        const match = Object.entries(allCostumes).find(
+            ([char]) => char.trim().toLowerCase() === normalized
+        );
+
+        return match?.[1] || '';
+    };
+
+    const costumeEntries = presentChars.length > 0
+        ? presentChars.map(char => [char, findCostume(char)])
+        : Object.entries(meta.costumes || {});
+
+    const costumeRows = costumeEntries.map(([char, costume]) => `
         <div class="horae-editor-row">
             <input type="text" class="char-input" value="${escapeHtml(char)}" placeholder="${t('placeholder.holderName')}">
             <input type="text" value="${escapeHtml(costume)}" placeholder="${t('placeholder.costumeDesc')}">
@@ -11920,7 +11942,11 @@ function buildPanelContent(messageIndex, meta) {
     `).join('');
 
     // 物品分类由主页面管理，底部栏不显示
-    const itemRows = Object.entries(meta.items || {}).map(([name, info]) => {
+        const chatForItems = horaeManager.getChat();
+        const skipLastForItems = Math.max(0, chatForItems.length - messageIndex - 1);
+        const itemsAtMessage = horaeManager.getLatestState(skipLastForItems).items || {};
+
+        const itemRows = Object.entries(itemsAtMessage).map(([name, info]) => {
         return `
             <div class="horae-editor-row horae-item-row">
                 <input type="text" class="horae-item-icon" value="${escapeHtml(info.icon || '')}" placeholder="📦" maxlength="2">
@@ -11963,33 +11989,80 @@ function buildPanelContent(messageIndex, meta) {
         Object.assign(prevTotals, buildPanelContent._affCache[messageIndex - 1]);
     }
 
-    const affectionRows = Object.entries(meta.affection || {}).map(([key, value]) => {
-        // 解析当前层的值
-        let delta = 0, newTotal = 0;
-        const prevVal = prevTotals[key] || 0;
 
-        if (typeof value === 'object' && value !== null) {
-            if (value.type === 'absolute') {
-                newTotal = parseFloat(value.value) || 0;
-                delta = newTotal - prevVal;
-            } else if (value.type === 'relative') {
-                delta = parseFloat(value.value) || 0;
+    const currentTotals = buildPanelContent._affCache[messageIndex] || {};
+    const affectionPresentChars  = meta.scene?.characters_present || [];
+    const affectionKeys = [...new Set([
+        ...affectionPresentChars ,
+        ...Object.keys(meta.affection || {})
+    ])];
+
+    const findAffectionKey = (name, values) => {
+        if (Object.prototype.hasOwnProperty.call(values, name)) return name;
+        const normalized = name.trim().toLowerCase();
+        return Object.keys(values).find(
+            key => key.trim().toLowerCase() === normalized
+        );
+    };
+
+    const affectionRows = affectionKeys.map(char => {
+        const key = findAffectionKey(char, {
+            ...prevTotals,
+            ...currentTotals,
+            ...(meta.affection || {})
+        }) || char;
+
+        const value = meta.affection?.[key];
+        const hasCurrent = value !== undefined;
+        const hasTotal = Object.prototype.hasOwnProperty.call(
+            currentTotals, key
+        );
+
+        const prevVal = prevTotals[key] || 0;
+        let deltaStr = '';
+        let totalStr = '';
+
+        if (hasCurrent) {
+            let delta = 0;
+            let newTotal = 0;
+
+            if (typeof value === 'object' && value !== null) {
+                if (value.type === 'absolute') {
+                    newTotal = parseFloat(value.value) || 0;
+                    delta = newTotal - prevVal;
+                } else if (value.type === 'relative') {
+                    delta = parseFloat(value.value) || 0;
+                    newTotal = prevVal + delta;
+                }
+            } else {
+                delta = parseFloat(value) || 0;
                 newTotal = prevVal + delta;
             }
-        } else {
-            delta = parseFloat(value) || 0;
-            newTotal = prevVal + delta;
+
+            delta = Math.round(delta * 100) / 100;
+            newTotal = Math.round(newTotal * 100) / 100;
+            deltaStr = delta >= 0 ? `+${delta}` : `${delta}`;
+            totalStr = `${newTotal}`;
+        } else if (hasTotal) {
+            totalStr = `${Math.round(currentTotals[key] * 100) / 100}`;
+            deltaStr = '+0';
         }
 
-        const roundedDelta = Math.round(delta * 100) / 100;
-        const roundedTotal = Math.round(newTotal * 100) / 100;
-        const deltaStr = roundedDelta >= 0 ? `+${roundedDelta}` : `${roundedDelta}`;
         return `
-            <div class="horae-editor-row horae-affection-row" data-char="${escapeHtml(key)}" data-prev="${prevVal}">
-                <span class="horae-affection-char">${escapeHtml(key)}</span>
-                <input type="text" class="horae-affection-delta" value="${deltaStr}" placeholder="${t('placeholder.affectionDelta')}">
-                <input type="number" class="horae-affection-total" value="${roundedTotal}" placeholder="${t('placeholder.affectionTotal')}" step="any">
-                <button class="horae-delete-btn"><i class="fa-solid fa-xmark"></i></button>
+            <div class="horae-editor-row horae-affection-row"
+                 data-char="${escapeHtml(char)}"
+                 data-prev="${prevTotals[key] || 0}">
+                <span class="horae-affection-char">${escapeHtml(char)}</span>
+                <input type="text" class="horae-affection-delta"
+                       value="${deltaStr}"
+                       placeholder="${t('placeholder.affectionDelta')}">
+                <input type="number" class="horae-affection-total"
+                       value="${totalStr}"
+                       placeholder="${t('placeholder.affectionTotal')}"
+                       step="any">
+                <button class="horae-delete-btn">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
             </div>
         `;
     }).join('');
@@ -12001,6 +12074,73 @@ function buildPanelContent(messageIndex, meta) {
     const eventSummary = firstEvent.summary || '';
     const multipleEventsNote = eventsArr.length > 1 ? `<span class="horae-note">${t('ui.multipleEventsNote', { n: eventsArr.length })}</span>` : '';
 
+
+    // Собираем активную агенду по истории до выбранного сообщения.
+    const agendaForPanel = (() => {
+        const active = new Map();
+
+        for (let i = 0; i <= messageIndex && i < chat.length; i++) {
+            const message = chat[i];
+            const rawText = message?.mes || '';
+            const storedMeta = message?.horae_meta;
+            const parsedMeta = horaeManager.parseHoraeTag(rawText);
+
+            // Сначала учитываем задачи, добавленные на этом ходу.
+            const added = [
+                ...(Array.isArray(storedMeta?.agenda) ? storedMeta.agenda : []),
+                ...(Array.isArray(parsedMeta?.agenda) ? parsedMeta.agenda : [])
+            ];
+
+            for (const item of added) {
+                const text = String(item?.text || '').trim();
+                if (text) {
+                    active.set(text, item);
+                }
+            }
+
+            // Затем удаляем задачи по тегу agenda-.
+
+            // Парсер Horae сохраняет agenda- в deletedAgenda.
+            const removed = [
+                ...(Array.isArray(storedMeta?.deletedAgenda)
+                    ? storedMeta.deletedAgenda
+                    : []),
+                ...(Array.isArray(parsedMeta?.deletedAgenda)
+                    ? parsedMeta.deletedAgenda
+                    : [])
+            ];
+
+            for (const item of removed) {
+                const text = String(
+                    typeof item === 'string' ? item : item?.text || ''
+                ).trim();
+
+                if (!text) continue;
+
+                // Допускаем небольшие различия в формулировках.
+                for (const [key, value] of active.entries()) {
+                    const existingText = String(value?.text || key).trim();
+
+                    if (
+                        existingText === text ||
+                        existingText.includes(text) ||
+                        text.includes(existingText)
+                    ) {
+                        active.delete(key);
+                    }
+                }
+            }
+
+            // Резервное извлечение удалений непосредственно из текста.
+            const removalRegex = /(?:^|\n)\s*\**agenda-\s*:\s*(.+?)\**\s*(?=\n|$)/g;
+            for (const match of rawText.matchAll(removalRegex)) {
+                const text = match[1].trim().replace(/\*\*/g, '');
+                if (text) active.delete(text);
+            }
+        }
+
+        return [...active.values()];
+    })();
     return `
         <div class="horae-panel-grid">
             <div class="horae-panel-row">
@@ -12065,7 +12205,7 @@ function buildPanelContent(messageIndex, meta) {
             </div>
             <div class="horae-panel-row full-width">
                 <label><i class="fa-solid fa-list-check"></i> ${t('timeline.agenda')}</label>
-                <div class="horae-agenda-editor">${buildAgendaEditorRows(meta.agenda)}</div>
+                <div class="horae-agenda-editor">${buildAgendaEditorRows(agendaForPanel)}</div>
                 <button class="horae-btn-add-agenda-row"><i class="fa-solid fa-plus"></i> ${t('common.add')}</button>
             </div>
             ${buildPanelRelationships(meta)}
@@ -21637,8 +21777,6 @@ async function onPromptReady(eventData) {
         }
 
         const rulesPrompt = horaeManager.generateSystemPromptAddition();
-
-        console.log('[Horae DEBUG] rulesPrompt:', rulesPrompt);
 
         let antiParaRef = '';
         if (settings.antiParaphraseMode && chat?.length) {
