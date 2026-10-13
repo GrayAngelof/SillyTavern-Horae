@@ -156,16 +156,7 @@ class HoraeManager {
 
     _getPromptDefaultFromResource(key, vars = null) {
         const lang = this._getAiOutputLang();
-
-        console.log('[Horae DEBUG] Loading resource:', {
-            lang,
-            key
-        });
-
-
         let text = getPromptDefaultSync(lang, key) || '';
-
-        console.log('[Horae DEBUG] Loaded chars:', text.length);
 
         if (!text) {
             console.error('[Horae ERROR] Missing prompt resource', key, lang);
@@ -4592,9 +4583,6 @@ generateItemsMemoryPrompt() {
 
 		prompt += 'The fields required by the active modules must follow their module rules.\n';
         prompt += `Missing a required tag = invalid.\n`;
-
-        console.log('[Horae DEBUG] FINAL Anchor prompt:', prompt);
-
 		return prompt;
 	}
 	
