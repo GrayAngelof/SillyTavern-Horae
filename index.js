@@ -10027,7 +10027,6 @@ function _renderRpgHudFromSnapshot(messageEl, messageIndex, rpg) {
  * 刷新所有显示
  */
 function refreshAllDisplays() {
-    buildPanelContent._affCache = null;
     enforceHiddenState();
     updateStatusDisplay();
     updateAgendaDisplay();

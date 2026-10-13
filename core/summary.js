@@ -4,12 +4,11 @@
  * Внутренняя реализация находится в ./summary/.
  */
 
-//import { getAffectionTotals } from './summary/_SummaryStateService.js';
+import { getAffectionTotals } from './summary/_SummaryStateService.js';
 
 /**
  * Публичный фасад подсистемы Summary.
  */
-
 
 export function createMessagePanelRenderer({
     horaeManager,
@@ -319,35 +318,12 @@ export function buildPanelContent(messageIndex, meta, {
     }).join('');
 
     // 获取前一条消息的好感总值（使用缓存避免 O(n²) 重复遍历）
-    const prevTotals = {};
     const chat = horaeManager.getChat();
-    if (!buildPanelContent._affCache || buildPanelContent._affCacheLen !== chat.length) {
-        buildPanelContent._affCache = [];
-        buildPanelContent._affCacheLen = chat.length;
-        const running = {};
-        for (let i = 0; i < chat.length; i++) {
-            const m = chat[i]?.horae_meta;
-            if (m?.affection) {
-                for (const [k, v] of Object.entries(m.affection)) {
-                    let val = 0;
-                    if (typeof v === 'object' && v !== null) {
-                        if (v.type === 'absolute') val = parseFloat(v.value) || 0;
-                        else if (v.type === 'relative') val = (running[k] || 0) + (parseFloat(v.value) || 0);
-                    } else {
-                        val = (running[k] || 0) + (parseFloat(v) || 0);
-                    }
-                    running[k] = val;
-                }
-            }
-            buildPanelContent._affCache[i] = { ...running };
-        }
-    }
-    if (messageIndex > 0 && buildPanelContent._affCache[messageIndex - 1]) {
-        Object.assign(prevTotals, buildPanelContent._affCache[messageIndex - 1]);
-    }
+    const { prevTotals, currentTotals } = getAffectionTotals(
+        chat,
+        messageIndex
+    );
 
-
-    const currentTotals = buildPanelContent._affCache[messageIndex] || {};
     const affectionPresentChars  = meta.scene?.characters_present || [];
     const affectionKeys = [...new Set([
         ...affectionPresentChars ,
