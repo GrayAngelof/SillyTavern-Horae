@@ -7,6 +7,15 @@ import { parseStoryDate, calculateRelativeTime, calculateDetailedRelativeTime, g
 import { detectEffectiveAiLangIsZh, detectEffectiveAiLang } from './i18n.js';
 import { getPromptDefaultSync } from './promptDefaults.js';
 
+import { createStateService } from './state.js';
+import { createEmptyMeta } from './state/_createEmptyMeta.js';
+
+import {
+    COUNTING_CLASSIFIERS,
+    findExistingItemByBaseName,
+    getItemBaseName,
+} from './state/_itemUtils.js';
+
 /**
  * @typedef {Object} HoraeTimestamp
  * @property {string} story_date - 剧情日期，如 "10/1"
@@ -46,32 +55,6 @@ import { getPromptDefaultSync } from './promptDefaults.js';
  * @property {Object.<string, {description: string, first_seen: string}>} npcs - 临时NPC
  */
 
-/** 创建空的元数据对象 */
-export function createEmptyMeta() {
-    return {
-        timestamp: {
-            story_date: '',
-            story_time: '',
-            absolute: ''
-        },
-        scene: {
-            location: '',
-            characters_present: [],
-            atmosphere: ''
-        },
-        costumes: {},
-        items: {},
-        deletedItems: [],
-        deletedAgenda: [],
-        events: [],
-        affection: {},
-        npcs: {},
-        agenda: [],
-        mood: {},
-        relationships: [],
-    };
-}
-
 /**
  * 提取物品的基本名称（去掉末尾的数量括号）
  * "新鲜牛大骨(5斤)" → "新鲜牛大骨"
@@ -80,37 +63,30 @@ export function createEmptyMeta() {
  * "简易急救包(已开封)" → 不变（非数字开头的括号不去掉）
  */
 // 个体量词：1个 = 就一个，可省略。纯量词(个)(把)也无意义
-const COUNTING_CLASSIFIERS = '个把条块张根口份枚只颗支件套双对碗杯盘盆串束扎';
+
 // 容器/批量单位：1箱 = 一箱(里面有很多)，不可省略
 // 度量单位(斤/L/kg等)：有实际计量意义，不可省略
 
 // 物品ID：3位数字左补零，如 001, 002, ...
 function padItemId(id) { return String(id).padStart(3, '0'); }
 
-export function getItemBaseName(name) {
-    return name
-        .replace(/[\(（][\d][\d\.\/]*[a-zA-Z\u4e00-\u9fff]*[\)）]$/, '')  // 数字+任意单位
-        .replace(new RegExp(`[\\(（][${COUNTING_CLASSIFIERS}][\\)）]$`), '')  // 纯个体量词（AI错误格式）
-        .trim();
-}
 
-/** 按基本名查找已有物品 */
-function findExistingItemByBaseName(stateItems, newName) {
-    const newBase = getItemBaseName(newName);
-    if (stateItems[newName]) return newName;
-    for (const existingName of Object.keys(stateItems)) {
-        if (getItemBaseName(existingName) === newBase) {
-            return existingName;
-        }
-    }
-    return null;
-}
 
 /** Horae 管理器 */
+
+
 class HoraeManager {
     constructor() {
         this.context = null;
         this.settings = null;
+
+        this._stateService = createStateService({
+        createEmptyMeta,
+        getItemBaseName,
+        findExistingItemByBaseName,
+        padItemId,
+        countingClassifiers: COUNTING_CLASSIFIERS,
+    });
     }
 
     /** 初始化管理器 */
@@ -191,244 +167,8 @@ class HoraeManager {
         chat[messageIndex].horae_meta = meta;
     }
 
-    /** 聚合所有消息元数据，获取最新状态 */
     getLatestState(skipLast = 0) {
-        const chat = this.getChat();
-        const state = createEmptyMeta();
-        state._previousLocation = '';
-        const end = Math.max(0, chat.length - skipLast);
-        
-        for (let i = 0; i < end; i++) {
-            const meta = chat[i].horae_meta;
-            if (!meta) continue;
-            if (meta._skipHorae) continue;
-            
-            if (meta.timestamp?.story_date) {
-                state.timestamp.story_date = meta.timestamp.story_date;
-            }
-            if (meta.timestamp?.story_time) {
-                state.timestamp.story_time = meta.timestamp.story_time;
-            }
-            
-            if (meta.scene?.location) {
-                state._previousLocation = state.scene.location;
-                state.scene.location = meta.scene.location;
-            }
-            if (meta.scene?.atmosphere) {
-                state.scene.atmosphere = meta.scene.atmosphere;
-            }
-            if (meta.scene?.characters_present?.length > 0) {
-                state.scene.characters_present = [...meta.scene.characters_present];
-            }
-            
-            if (meta.costumes) {
-                Object.assign(state.costumes, meta.costumes);
-            }
-            
-            // 物品：合并更新
-            if (meta.items) {
-                for (let [name, newInfo] of Object.entries(meta.items)) {
-                    // 去掉无意义的数量标记
-                    // (1) 裸数字1 → 去掉
-                    name = name.replace(/[\(（]1[\)）]$/, '').trim();
-                    // 个体量词+数字1 → 去掉
-                    name = name.replace(new RegExp(`[\\(（]1[${COUNTING_CLASSIFIERS}][\\)）]$`), '').trim();
-                    // 纯个体量词 → 去掉
-                    name = name.replace(new RegExp(`[\\(（][${COUNTING_CLASSIFIERS}][\\)）]$`), '').trim();
-                    // 度量/容器单位保留
-                    
-                    // 数量为0视为消耗，自动删除
-                    const zeroMatch = name.match(/[\(（]0[a-zA-Z\u4e00-\u9fff]*[\)）]$/);
-                    if (zeroMatch) {
-                        const baseName = getItemBaseName(name);
-                        for (const itemName of Object.keys(state.items)) {
-                            if (getItemBaseName(itemName).toLowerCase() === baseName.toLowerCase()) {
-                                delete state.items[itemName];
-                                console.log(`[Horae] 物品数量归零自动删除: ${itemName}`);
-                            }
-                        }
-                        continue;
-                    }
-                    
-                    // 检测消耗状态标记，视为删除（简繁中+英文兼容）
-                    const consumedPatterns = /[\(（](已消耗|已用完|已销毁|已銷毀|消耗殆尽|消耗殆盡|消耗|用尽|用盡|consumed|used\s*up|destroyed|depleted)[\)）]/i;
-                    const holderConsumed = /^(消耗|已消耗|已用完|消耗殆尽|消耗殆盡|用尽|用盡|无|無|consumed|used\s*up|depleted|none)$/i;
-                    if (consumedPatterns.test(name) || holderConsumed.test(newInfo.holder || '')) {
-                        const cleanName = name.replace(consumedPatterns, '').trim();
-                        const baseName = getItemBaseName(cleanName || name);
-                        for (const itemName of Object.keys(state.items)) {
-                            if (getItemBaseName(itemName).toLowerCase() === baseName.toLowerCase()) {
-                                delete state.items[itemName];
-                                console.log(`[Horae] 物品已消耗自动删除: ${itemName}`);
-                            }
-                        }
-                        continue;
-                    }
-                    
-                    // 基本名匹配已有物品
-                    const existingKey = findExistingItemByBaseName(state.items, name);
-                    
-                    if (existingKey) {
-                        const existingItem = state.items[existingKey];
-                        const mergedItem = { ...existingItem };
-                        const locked = !!existingItem._locked;
-                        if (!locked && newInfo.icon) mergedItem.icon = newInfo.icon;
-                        if (!locked) {
-                            const _impRank = { '': 0, '!': 1, '!!': 2 };
-                            const _newR = _impRank[newInfo.importance] ?? 0;
-                            const _oldR = _impRank[existingItem.importance] ?? 0;
-                            mergedItem.importance = _newR >= _oldR ? (newInfo.importance || '') : (existingItem.importance || '');
-                        }
-                        if (newInfo.holder !== undefined) mergedItem.holder = newInfo.holder;
-                        if (newInfo.location !== undefined) mergedItem.location = newInfo.location;
-                        if (!locked && newInfo.description !== undefined && newInfo.description.trim()) {
-                            mergedItem.description = newInfo.description;
-                        }
-                        if (!mergedItem.description) mergedItem.description = existingItem.description || '';
-                        
-                        if (existingKey !== name) {
-                            delete state.items[existingKey];
-                        }
-                        state.items[name] = mergedItem;
-                    } else {
-                        state.items[name] = newInfo;
-                    }
-                }
-            }
-            
-            // 处理已删除物品
-            if (meta.deletedItems && meta.deletedItems.length > 0) {
-                for (const deletedItem of meta.deletedItems) {
-                    const deleteBase = getItemBaseName(deletedItem).toLowerCase();
-                    for (const itemName of Object.keys(state.items)) {
-                        const itemBase = getItemBaseName(itemName).toLowerCase();
-                        if (itemName.toLowerCase() === deletedItem.toLowerCase() ||
-                            itemBase === deleteBase) {
-                            delete state.items[itemName];
-                        }
-                    }
-                }
-            }
-            
-            // 好感度：支持绝对值和相对值
-            if (meta.affection) {
-                for (const [key, value] of Object.entries(meta.affection)) {
-                    if (typeof value === 'object' && value !== null) {
-                        // 新格式：{type: 'absolute'|'relative', value: number|string}
-                        if (value.type === 'absolute') {
-                            state.affection[key] = value.value;
-                        } else if (value.type === 'relative') {
-                            const delta = parseFloat(value.value) || 0;
-                            state.affection[key] = (state.affection[key] || 0) + delta;
-                        }
-                    } else {
-                        // 旧格式兼容
-                        const numValue = typeof value === 'number' ? value : parseFloat(value) || 0;
-                        state.affection[key] = (state.affection[key] || 0) + numValue;
-                    }
-                }
-            }
-            
-            // NPC：逐字段合并，保留_id
-            if (meta.npcs) {
-                // 可更新字段 vs 受保护字段
-                const updatableFields = ['appearance', 'personality', 'relationship', 'age', 'job', 'note'];
-                const protectedFields = ['gender', 'race', 'birthday'];
-                for (const [name, newNpc] of Object.entries(meta.npcs)) {
-                    const existing = state.npcs[name];
-                    if (existing) {
-                        for (const field of updatableFields) {
-                            if (newNpc[field] !== undefined) existing[field] = newNpc[field];
-                        }
-                        // age变更时记录剧情日期作为基准
-                        if (newNpc.age !== undefined && newNpc.age !== '') {
-                            if (!existing._ageRefDate) {
-                                existing._ageRefDate = state.timestamp.story_date || '';
-                            }
-                            const oldAgeNum = parseInt(existing.age);
-                            const newAgeNum = parseInt(newNpc.age);
-                            if (!isNaN(oldAgeNum) && !isNaN(newAgeNum) && oldAgeNum !== newAgeNum) {
-                                existing._ageRefDate = state.timestamp.story_date || '';
-                            }
-                        }
-                        // 受保护字段：仅在未设定时才填入
-                        for (const field of protectedFields) {
-                            if (newNpc[field] !== undefined && !existing[field]) {
-                                existing[field] = newNpc[field];
-                            }
-                        }
-                        if (newNpc.last_seen) existing.last_seen = newNpc.last_seen;
-                    } else {
-                        state.npcs[name] = {
-                            appearance: newNpc.appearance || '',
-                            personality: newNpc.personality || '',
-                            relationship: newNpc.relationship || '',
-                            gender: newNpc.gender || '',
-                            age: newNpc.age || '',
-                            race: newNpc.race || '',
-                            job: newNpc.job || '',
-                            birthday: newNpc.birthday || '',
-                            note: newNpc.note || '',
-                            _ageRefDate: newNpc.age ? (state.timestamp.story_date || '') : '',
-                            first_seen: newNpc.first_seen || new Date().toISOString(),
-                            last_seen: newNpc.last_seen || new Date().toISOString()
-                        };
-                    }
-                }
-            }
-            // 情绪状态（覆盖式）
-            if (meta.mood) {
-                for (const [charName, emotion] of Object.entries(meta.mood)) {
-                    state.mood[charName] = emotion;
-                }
-            }
-        }
-        
-        // 过滤用户已删除的NPC（防回滚）
-        const deletedNpcs = chat[0]?.horae_meta?._deletedNpcs;
-        if (deletedNpcs?.length) {
-            for (const name of deletedNpcs) {
-                delete state.npcs[name];
-                delete state.affection[name];
-                delete state.costumes[name];
-                delete state.mood[name];
-                if (state.scene.characters_present) {
-                    state.scene.characters_present = state.scene.characters_present.filter(c => c !== name);
-                }
-            }
-        }
-        
-        // 为无ID物品分配ID
-        let maxId = 0;
-        for (const info of Object.values(state.items)) {
-            if (info._id) {
-                const num = parseInt(info._id, 10);
-                if (num > maxId) maxId = num;
-            }
-        }
-        for (const info of Object.values(state.items)) {
-            if (!info._id) {
-                maxId++;
-                info._id = padItemId(maxId);
-            }
-        }
-        
-        // 为无ID的NPC分配ID
-        let maxNpcId = 0;
-        for (const info of Object.values(state.npcs)) {
-            if (info._id) {
-                const num = parseInt(info._id, 10);
-                if (num > maxNpcId) maxNpcId = num;
-            }
-        }
-        for (const info of Object.values(state.npcs)) {
-            if (!info._id) {
-                maxNpcId++;
-                info._id = padItemId(maxNpcId);
-            }
-        }
-        
-        return state;
+        return this._stateService.getLatestState(this.getChat(), skipLast);
     }
 
     /** 解析生日字符串，支持 yyyy-mm-dd / yyyy/mm/dd / mm-dd / mm/dd */

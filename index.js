@@ -10,12 +10,14 @@ import { renderExtensionTemplateAsync, getContext, extension_settings } from '/s
 import { getSlideToggleOptions, saveSettingsDebounced, eventSource, event_types, doNewChat } from '/script.js';
 import { slideToggle } from '/lib.js';
 
-import { horaeManager, createEmptyMeta, getItemBaseName } from './core/horaeManager.js';
+import { horaeManager } from './core/horaeManager.js';
 import { vectorManager } from './core/vectorManager.js';
 import { calculateRelativeTime, calculateDetailedRelativeTime, formatRelativeTime, generateTimeReference, getCurrentSystemTime, formatStoryDate, formatFullDateTime, parseStoryDate } from './utils/timeUtils.js';
 import { t, tForLang, initI18n, getLanguage, isZhLocale, setLanguage, detectEffectiveAiLangIsZh, detectEffectiveAiLang } from './core/i18n.js';
 import { initPromptDefaults, ensurePromptDefaults, ensurePresetPrompts, getPromptDefaultSync, getPresetPromptsSync, BUILTIN_PRESET_IDS } from './core/promptDefaults.js';
 
+import { createEmptyMeta } from './core/state/_createEmptyMeta.js';
+import { getItemBaseName } from './core/state/_itemUtils.js';
 import {
     createMessagePanelRenderer,
     buildDeletedItemsDisplay,
