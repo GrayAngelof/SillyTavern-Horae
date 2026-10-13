@@ -68,3 +68,70 @@ export function renderPanelContent(messageIndex, meta, {
         t,
     });
 }
+
+// Подготавливает CSS-классы панели на основе настроек и уровня события.
+export function preparePanelStyleData(meta, settings) {
+    const eventsArr = meta.events || (meta.event ? [meta.event] : []);
+    const firstLevel = (eventsArr.find(e => e && e.level)?.level || '').trim();
+
+    const levelMap = {
+        '一般': 'normal',
+        '重要': 'important',
+        '关键': 'critical',
+        '關鍵': 'critical',
+    };
+
+    const dataLevel = levelMap[firstLevel] || (firstLevel ? 'normal' : '');
+
+    const layoutClass = settings.panelLayoutStyle === 'glass'
+        ? ' horae-layout-glass'
+        : settings.panelLayoutStyle === 'obsidian'
+            ? ' horae-layout-obsidian'
+            : settings.panelLayoutStyle === 'cyber'
+                ? ' horae-layout-cyber'
+                : '';
+
+    return { layoutClass, dataLevel };
+}
+
+// Подготавливает данные сводки события для заголовка панели.
+export function preparePanelSummaryData(meta, t) {
+    const eventsArr = meta.events || (meta.event ? [meta.event] : []);
+
+    const eventSummary = eventsArr.length > 0
+        ? eventsArr.map(e => e.summary).join(' | ')
+        : t('ui.noSpecialEvents');
+
+    const charCount = meta.scene?.characters_present?.length || 0;
+
+    return { eventSummary, charCount };
+}
+
+// Подготавливает отображаемое время сообщения.
+export function preparePanelTime(meta, parseStoryDate, formatStoryDate) {
+    let time = '--';
+
+    if (meta.timestamp?.story_date) {
+        const parsed = parseStoryDate(meta.timestamp.story_date);
+
+        if (parsed && parsed.type === 'standard') {
+            time = formatStoryDate(parsed, true);
+        } else {
+            time = meta.timestamp.story_date;
+        }
+
+        if (meta.timestamp.story_time) {
+            time += ' ' + meta.timestamp.story_time;
+        }
+    }
+
+    return time;
+}
+
+// Подготавливает данные режима sideplay для панели сообщения.
+export function preparePanelSideplayData(meta, settings) {
+    const isSkipped = !!meta._skipHorae;
+    const sideplayBtnStyle = settings.sideplayMode ? '' : 'display:none;';
+
+    return { isSkipped, sideplayBtnStyle };
+}

@@ -69,28 +69,23 @@ export function getPanelRelationships(meta, { settings, horaeManager }) {
 
 // Подготавливает данные о костюмах и предметах для панели Summary на выбранном сообщении.
 export function getPanelCostumeAndItemData(messageIndex, meta, horaeManager) {
-    const chatForCostumes = horaeManager.getChat();
-    const skipLast = Math.max(0, chatForCostumes.length - messageIndex - 1);
+    const chat = horaeManager.getChat();
+    const skipLast = Math.max(0, chat.length - messageIndex - 1);
     const stateAtMessage = horaeManager.getLatestState(skipLast);
     const presentChars = meta.scene?.characters_present || [];
     const allCostumes = stateAtMessage.costumes || {};
+    const itemsAtMessage = stateAtMessage.items || {};
     const findCostume = (name) => {
         if (allCostumes[name]) return allCostumes[name];
         const normalized = name.trim().toLowerCase();
         const match = Object.entries(allCostumes).find(
             ([char]) => char.trim().toLowerCase() === normalized
         );
-
         return match?.[1] || '';
     };
-
     const costumeEntries = presentChars.length > 0
         ? presentChars.map(char => [char, findCostume(char)])
         : Object.entries(meta.costumes || {});
-    const chatForItems = horaeManager.getChat();
-    const skipLastForItems = Math.max(0, chatForItems.length - messageIndex - 1);
-    const itemsAtMessage = horaeManager.getLatestState(skipLastForItems).items || {};
-
     return {
         costumeEntries,
         itemsAtMessage,
