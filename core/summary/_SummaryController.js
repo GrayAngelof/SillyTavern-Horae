@@ -13,33 +13,45 @@
  * через публичный фасад core/summary.js.
  */
 
+import { buildPanelContent } from './_SummaryView.js';
+
 import {
-    getPanelCostumeAndItemData,
+    getPanelCostumeData,
+    getPanelItemData,
     getPanelAffectionData,
     getPanelAgendaData,
     getPanelRelationships,
 } from './_SummaryStateService.js';
-
-import { buildPanelContent } from './_SummaryView.js';
 
 // Подготавливает данные для отображения панели Summary.
 export function preparePanelData(messageIndex, meta, {
     horaeManager,
     settings,
 }) {
-    const { costumeEntries, itemsAtMessage } = getPanelCostumeAndItemData(
-        messageIndex,
+    const chat = horaeManager.getChat();
+    const skipLast = Math.max(0, chat.length - messageIndex - 1);
+    const stateAtMessage = horaeManager.getLatestState(skipLast);
+
+    const { costumeEntries } = getPanelCostumeData(
         meta,
-        horaeManager
+        stateAtMessage
     );
 
-    const chat = horaeManager.getChat();
-    const affectionEntries = getPanelAffectionData(meta, chat, messageIndex);
+    const { itemsAtMessage } = getPanelItemData(
+        stateAtMessage
+    );
     const agendaEntries = getPanelAgendaData(messageIndex, horaeManager);
     const relationships = getPanelRelationships(meta, {
         settings,
         horaeManager,
     });
+    const affectionEntries = getPanelAffectionData(
+        meta,
+        chat,
+        messageIndex,
+        horaeManager,
+        stateAtMessage
+    );
 
     return {
         costumeEntries,

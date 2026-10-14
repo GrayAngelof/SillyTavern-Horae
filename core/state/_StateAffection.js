@@ -13,7 +13,7 @@ export class StateAffection {
         for (const [key, value] of Object.entries(meta.affection)) {
             if (typeof value === 'object' && value !== null) {
                 if (value.type === 'absolute') {
-                    state.affection[key] = value.value;
+                    state.affection[key] = parseFloat(value.value) || 0;
                 } else if (value.type === 'relative') {
                     const delta = parseFloat(value.value) || 0;
                     state.affection[key] =
