@@ -12,6 +12,9 @@ import { StateScene } from './_StateScene.js';
 import { StateCostumes } from './_StateCostumes.js';
 import { StateTimestamp } from './_StateTimestamp.js';
 import { StateIds } from './_StateIds.js';
+import { StateAgenda } from './_StateAgenda.js';
+import { StateCharacters } from './_StateCharacters.js';
+
 import {
     COUNTING_CLASSIFIERS,
     findExistingItemByBaseName,
@@ -31,6 +34,8 @@ export class StateController {
     this.scene = new StateScene();
     this.costumes = new StateCostumes();
     this.timestamp = new StateTimestamp();
+    this.agenda = new StateAgenda();
+    this.characters = new StateCharacters();
 
     this.items = new StateItems({
         getItemBaseName,
@@ -74,6 +79,9 @@ export class StateController {
 
             // Применяем изменения настроения персонажей.
             this.mood.apply(state, meta);
+
+            // Применяем изменения списка задач.
+            this.agenda.apply(state, meta);
         }
 
         // Удаляем исключённых персонажей из итогового состояния.

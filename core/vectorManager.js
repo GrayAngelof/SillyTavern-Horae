@@ -319,7 +319,7 @@ export class VectorManager {
 
         const anchorTokens = [];
         if (meta.scene?.location) anchorTokens.push(meta.scene.location);
-        const chars = meta.scene?.characters_present || [];
+        const chars = meta.characters_present || [];
         if (chars.length > 0) anchorTokens.push(chars.join(' '));
         if (meta.timestamp?.story_date) {
             anchorTokens.push(
@@ -497,7 +497,7 @@ export class VectorManager {
 
         if (currentState.scene?.location) parts.push(currentState.scene.location);
 
-        const chars = currentState.scene?.characters_present || [];
+        const chars = currentState.characters_present || [];
         for (const c of chars) {
             parts.push(c);
             if (currentState.costumes?.[c]) parts.push(currentState.costumes[c]);
@@ -860,18 +860,18 @@ export class VectorManager {
         }
 
         // 相关角色 = 用户消息提及 + 当前在场；只用于 RRF 加分，不改 cosine
-        const relevantChars = new Set(state.scene?.characters_present || []);
+        const relevantChars = new Set(state.characters_present || []);
         const allKnownChars = new Set();
         for (let i = 0; i < chat.length; i++) {
             const m = chat[i].horae_meta;
             if (!m || m._skipHorae) continue;
-            (m.scene?.characters_present || []).forEach(c => allKnownChars.add(c));
+            (m.characters_present || []).forEach(c => allKnownChars.add(c));
             if (m.npcs) Object.keys(m.npcs).forEach(c => allKnownChars.add(c));
         }
         for (const f of this._iterateSnapshotEntries()) {
             const m = f.entry.meta;
             if (!m) continue;
-            (m.scene?.characters_present || []).forEach(c => allKnownChars.add(c));
+            (m.characters_present || []).forEach(c => allKnownChars.add(c));
             if (m.npcs) Object.keys(m.npcs).forEach(c => allKnownChars.add(c));
         }
         for (const c of allKnownChars) {
@@ -907,7 +907,7 @@ export class VectorManager {
                     : chat[r.messageIndex]?.horae_meta;
                 if (isMetaExcluded(meta)) continue;
                 const docChars = new Set([
-                    ...(meta.scene?.characters_present || []),
+                    ...(meta.characters_present || []),
                     ...Object.keys(meta.npcs || {}),
                 ]);
                 let hasRelevant = false;
@@ -1348,14 +1348,14 @@ export class VectorManager {
         for (let i = 0; i < chat.length; i++) {
             const m = chat[i].horae_meta;
             if (!m || m._skipHorae) continue;
-            (m.scene?.characters_present || []).forEach(c => knownChars.add(c));
+            (m.characters_present || []).forEach(c => knownChars.add(c));
             if (m.npcs) Object.keys(m.npcs).forEach(c => knownChars.add(c));
         }
         // 把快照里出现过的角色名也并进 knownChars，否则仅在历史里登场的角色无法触发结构化通道
         for (const f of this._iterateSnapshotEntries()) {
             const m = f.entry.meta;
             if (!m) continue;
-            (m.scene?.characters_present || []).forEach(c => knownChars.add(c));
+            (m.characters_present || []).forEach(c => knownChars.add(c));
             if (m.npcs) Object.keys(m.npcs).forEach(c => knownChars.add(c));
         }
 
@@ -1670,7 +1670,7 @@ export class VectorManager {
             const m = chat[i].horae_meta;
             if (isMetaExcluded(m)) continue;
             if (m.npcs && m.npcs[charName]) return i;
-            if (m.scene?.characters_present?.includes(charName)) return i;
+            if (m.characters_present?.includes(charName)) return i;
         }
         return -1;
     }
@@ -1988,7 +1988,7 @@ export class VectorManager {
 
             if (meta?.scene?.location) parts.push(`${labels.scene}:${meta.scene.location}`);
 
-            const chars = meta?.scene?.characters_present || [];
+            const chars = meta?.characters_present || [];
             const costumes = meta?.costumes || {};
             for (const c of chars) {
                 parts.push(costumes[c] ? `${c}(${costumes[c]})` : c);
@@ -2623,8 +2623,8 @@ export class VectorManager {
         if (meta.scene) {
             out.scene = {
                 location: meta.scene.location || '',
-                characters_present: Array.isArray(meta.scene.characters_present)
-                    ? [...meta.scene.characters_present]
+                characters_present: Array.isArray(meta.characters_present)
+                    ? [...meta.characters_present]
                     : [],
             };
         }

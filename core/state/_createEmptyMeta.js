@@ -10,9 +10,9 @@ export function createEmptyMeta() {
         },
         scene: {
             location: '',
-            characters_present: [],
             atmosphere: '',
         },
+        characters_present: [],
         costumes: {},
         items: {},
         deletedItems: [],

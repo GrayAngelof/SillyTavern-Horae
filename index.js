@@ -2371,7 +2371,7 @@ function updateStatusDisplay() {
     // 更新服装列表（仅显示在场角色的服装）
     const costumesEl = document.getElementById('horae-costumes-list');
     if (costumesEl) {
-        const presentChars = state.scene?.characters_present || [];
+        const presentChars = state.characters_present || [];
         const allCostumes = Object.entries(state.costumes || {});
         // 筛选：仅保留 characters_present 中的角色
         const entries = presentChars.length > 0
@@ -4206,7 +4206,7 @@ function openAgendaEditModal(agendaItem = null) {
  */
 function updateCharactersDisplay() {
     const state = horaeManager.getLatestState();
-    const presentChars = state.scene?.characters_present || [];
+    const presentChars = state.characters_present || [];
     const favoriteNpcs = settings.favoriteNpcs || [];
 
     // 获取角色卡主角色名（用于置顶和特殊样式）
@@ -5073,10 +5073,10 @@ function _cascadeDeleteNpcs(names) {
             if (meta.costumes?.[name]) { delete meta.costumes[name]; changed = true; }
             if (meta.mood?.[name]) { delete meta.mood[name]; changed = true; }
         }
-        if (meta.scene?.characters_present) {
-            const before = meta.scene.characters_present.length;
-            meta.scene.characters_present = meta.scene.characters_present.filter(c => !nameSet.has(c));
-            if (meta.scene.characters_present.length !== before) changed = true;
+        if (meta.characters_present) {
+            const before = meta.characters_present.length;
+            meta.characters_present = meta.characters_present.filter(c => !nameSet.has(c));
+            if (meta.characters_present.length !== before) changed = true;
         }
         if (meta.relationships?.length) {
             const before = meta.relationships.length;
@@ -5608,9 +5608,9 @@ function openNpcEditModal(npcName) {
                     delete meta.mood[npcName];
                     changed = true;
                 }
-                if (meta.scene?.characters_present) {
-                    const idx = meta.scene.characters_present.indexOf(npcName);
-                    if (idx !== -1) { meta.scene.characters_present[idx] = newName; changed = true; }
+                if (meta.characters_present) {
+                    const idx = metacharacters_present.indexOf(npcName);
+                    if (idx !== -1) { meta.characters_present[idx] = newName; changed = true; }
                 }
                 if (meta.relationships?.length) {
                     for (const rel of meta.relationships) {
@@ -7882,7 +7882,7 @@ function updateRpgDisplay() {
 
     if (useCardLayout) {
         barsSection.style.display = '';
-        const presentChars = new Set((state.scene?.characters_present || []).map(n => n.trim()).filter(Boolean));
+        const presentChars = new Set((state.characters_present || []).map(n => n.trim()).filter(Boolean));
         const userName = getContext().name1 || '';
         const inScene = [], offScene = [];
         for (const name of allNames) {
@@ -9884,7 +9884,7 @@ function renderRpgHud(messageEl, messageIndex) {
     if (!rpg.currencyConfig) rpg.currencyConfig = _hCfgs?.currencyConfig || _hChat?.[0]?.horae_meta?.rpg?.currencyConfig || { denominations: [] };
 
     const meta = horaeManager.getMessageMeta(messageIndex);
-    const present = meta?.scene?.characters_present || [];
+    const present = meta?.characters_present || [];
     if (present.length === 0) return;
 
     let chars = _matchPresentChars(present, rpg);
@@ -10003,7 +10003,7 @@ function _renderRpgHudFromSnapshot(messageEl, messageIndex, rpg) {
     if (!rpg) return;
 
     const meta = horaeManager.getMessageMeta(messageIndex);
-    const present = meta?.scene?.characters_present || [];
+    const present = meta?.characters_present || [];
     if (present.length === 0) return;
 
     let chars = _matchPresentChars(present, rpg);
@@ -12295,7 +12295,7 @@ async function savePanelData(panelEl, messageId) {
     meta.scene.location = panelEl.querySelector('.horae-input-location')?.value || '';
     meta.scene.atmosphere = panelEl.querySelector('.horae-input-atmosphere')?.value || '';
     const charsInput = panelEl.querySelector('.horae-input-characters')?.value || '';
-    meta.scene.characters_present = charsInput.split(/[,，]/).map(s => s.trim()).filter(Boolean);
+    meta.characters_present = charsInput.split(/[,，]/).map(s => s.trim()).filter(Boolean);
 
     meta.costumes = {};
     panelEl.querySelectorAll('.horae-costume-editor .horae-editor-row').forEach(row => {
@@ -12455,7 +12455,7 @@ async function savePanelData(panelEl, messageId) {
         summaryEvent.textContent = evts.length > 0 ? evts.map(e => e.summary).join(' | ') : t('ui.noSpecialEvents');
     }
     if (summaryChars) {
-        summaryChars.textContent = t('ui.presentCount', { n: meta.scene.characters_present.length });
+        summaryChars.textContent = t('ui.presentCount', { n: meta.characters_present.length });
     }
 }
 
@@ -12477,8 +12477,8 @@ function buildHoraeTagFromMeta(meta) {
         lines.push(`atmosphere:${meta.scene.atmosphere}`);
     }
 
-    if (meta.scene?.characters_present?.length > 0) {
-        lines.push(`characters:${meta.scene.characters_present.join(',')}`);
+    if (meta.characters_present?.length > 0) {
+        lines.push(`characters:${meta.characters_present.join(',')}`);
     }
 
     if (meta.costumes) {
@@ -20268,8 +20268,8 @@ function _importAsInitialState(importObj, chat, options = {}) {
         }
         if (meta.scene?.location) target.scene.location = meta.scene.location;
         if (meta.scene?.atmosphere) target.scene.atmosphere = meta.scene.atmosphere;
-        if (meta.scene?.characters_present?.length) {
-            target.scene.characters_present = [...meta.scene.characters_present];
+        if (meta.characters_present?.length) {
+            target.characters_present = [...meta.characters_present];
         }
     }
 
@@ -20541,7 +20541,7 @@ function _buildAnalysisContext(state, targetIndex, userName) {
     if (state?.scene?.location) lines.push(`- location: ${state.scene.location}`);
     if (state?.scene?.atmosphere) lines.push(`- atmosphere: ${state.scene.atmosphere}`);
 
-    const present = state?.scene?.characters_present || [];
+    const present = state?.characters_present || [];
     if (present.length > 0) {
         const costumes = state?.costumes || {};
         const charText = present

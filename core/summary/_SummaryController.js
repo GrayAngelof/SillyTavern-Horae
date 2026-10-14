@@ -114,7 +114,7 @@ export function preparePanelSummaryData(meta, t) {
         ? eventsArr.map(e => e.summary).join(' | ')
         : t('ui.noSpecialEvents');
 
-    const charCount = meta.scene?.characters_present?.length || 0;
+    const charCount = meta.characters_present?.length || 0;
 
     return { eventSummary, charCount };
 }

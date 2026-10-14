@@ -114,9 +114,9 @@ export class StateNpcs {
             delete state.costumes[name];
             delete state.mood[name];
 
-            if (state.scene.characters_present) {
-                state.scene.characters_present =
-                    state.scene.characters_present.filter(
+            if (state.characters_present) {
+                state.characters_present =
+                    state.characters_present.filter(
                         character => character !== name,
                     );
             }

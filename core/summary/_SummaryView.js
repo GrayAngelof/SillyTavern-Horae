@@ -218,7 +218,7 @@ export function buildPanelContent(meta, data, {
             <div class="horae-panel-row">
                 <label><i class="fa-solid fa-users"></i> ${t('characters.present')}</label>
                 <div class="horae-panel-value">
-                    <input type="text" class="horae-input-characters" value="${escapeHtml((meta.scene?.characters_present || []).join(', '))}" placeholder="${t('placeholder.charactersSeparated')}">
+                    <input type="text" class="horae-input-characters" value="${escapeHtml((meta.characters_present || []).join(', '))}" placeholder="${t('placeholder.charactersSeparated')}">
                 </div>
             </div>
             <div class="horae-panel-row full-width">

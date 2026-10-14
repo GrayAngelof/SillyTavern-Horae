@@ -40,13 +40,13 @@ export function getAffectionTotals(
 // Возвращает социальные отношения персонажей текущей сцены.
 export function getPanelRelationships(meta, { settings, horaeManager }) {
     if (!settings.sendRelationships) return [];
-    const presentChars = meta.scene?.characters_present || [];
+    const presentChars = meta.characters_present || [];
     return horaeManager.getRelationshipsForCharacters(presentChars);
 }
 
 // Подготавливает данные о костюмах для панели Summary на выбранном сообщении.
 export function getPanelCostumeData(meta, stateAtMessage) {
-    const presentChars = meta.scene?.characters_present || [];
+    const presentChars = meta.characters_present || [];
     const allCostumes = stateAtMessage.costumes || {};
 
     const findCostume = (name) => {
@@ -88,7 +88,7 @@ export function getPanelAffectionData(
         horaeManager,
         stateAtMessage
     );
-    const presentChars = meta.scene?.characters_present || [];
+    const presentChars = meta.characters_present || [];
     const affectionKeys = [...new Set([
         ...presentChars,
         ...Object.keys(meta.affection || {}),

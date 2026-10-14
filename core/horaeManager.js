@@ -361,7 +361,7 @@ class HoraeManager {
 		const sendCharacterAffection = sendCharacters && this.settings?.sendCharacterAffection !== false;
 		const sendMainCharacterPersonality = sendCharacters && this.settings?.sendMainCharacterPersonality !== false;
         const sendItems = this.settings?.sendItems !== false;
-        const presentChars = state.scene.characters_present || [];
+        const presentChars = state.characters_present || [];
 
         // 主要角色判定：卡片本体 + 置顶 NPC，含别名匹配以兼容 NPC 改名
         const mainCharName = this.context?.name2 || '';
@@ -1097,6 +1097,7 @@ class HoraeManager {
             events: [],
             affection: {},
             npcs: {},
+            characters_present: [],
             scene: {},
             agenda: [],
             deletedAgenda: [],
@@ -1142,7 +1143,7 @@ class HoraeManager {
             // characters:爱丽丝,鲍勃
             else if (trimmedLine.startsWith('characters:')) {
                 const chars = trimmedLine.substring(11).trim();
-                result.scene.characters_present = chars.split(/[,，]/).map(c => c.trim()).filter(Boolean);
+                result.characters_present = chars.split(/[,，]/).map(c => c.trim()).filter(Boolean);
             }
             // costume:爱丽丝=白色连衣裙
             else if (trimmedLine.startsWith('costume:')) {
@@ -1396,8 +1397,8 @@ class HoraeManager {
         if (parsed.scene?.scene_desc) {
             meta.scene.scene_desc = parsed.scene.scene_desc;
         }
-        if (parsed.scene?.characters_present?.length > 0) {
-            meta.scene.characters_present = parsed.scene.characters_present;
+        if (parsed.characters_present?.length > 0) {
+            meta.characters_present = parsed.characters_present;
         }
         
         if (parsed.costumes) {
@@ -3992,7 +3993,7 @@ generateItemsMemoryPrompt() {
         if (sendEq) {
             const eqCfg = this._getRpgEquipmentConfig();
             const perChar = eqCfg.perChar || {};
-            const present = new Set(this.getLatestState()?.scene?.characters_present || []);
+            const present = new Set(this.getLatestState()?.characters_present || []);
             const hasAnySlots = Object.values(perChar).some(c => c.slots?.length > 0);
             if (hasAnySlots) {
                 p += L(
@@ -4338,6 +4339,7 @@ generateItemsMemoryPrompt() {
             events: [],  // 支持多个事件
             affection: {},
             npcs: {},
+            characters_present: [],
             scene: {},
             agenda: [],   // 待办事项
             deletedAgenda: []  // 已完成的待办事项
@@ -4389,7 +4391,7 @@ generateItemsMemoryPrompt() {
 
         // characters
         while ((match = patterns.characters.exec(message)) !== null) {
-            result.scene.characters_present = match[1].trim().split(/[,，]/).map(c => c.trim()).filter(Boolean);
+            result.characters_present = match[1].trim().split(/[,，]/).map(c => c.trim()).filter(Boolean);
             hasAnyData = true;
         }
 

@@ -15,11 +15,5 @@ export class StateScene {
         if (meta.scene?.atmosphere) {
             state.scene.atmosphere = meta.scene.atmosphere;
         }
-
-        if (meta.scene?.characters_present?.length > 0) {
-            state.scene.characters_present = [
-                ...meta.scene.characters_present,
-            ];
-        }
     }
 }
