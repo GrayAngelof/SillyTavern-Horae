@@ -1,18 +1,28 @@
+// SillyTavern-Horae/core/state/_StateCharacters.js
 /**
-* Обрабатывает список персонажей, присутствующих в сцене.
-* Изменяет state.characters_present на основе метаданных сообщения.
-*/
+ * Подсистема состояния: присутствующие персонажи.
+ *
+ * Применяет изменения списка персонажей из метаданных сообщений.
+ *
+ */
+
+// ===== КЛАСС =====
 export class StateCharacters {
+    // ---- ПУБЛИЧНОЕ API ----
     /**
      * Применяет список присутствующих персонажей из метаданных.
+     *
      * Пустой список не перезаписывает ранее сохранённый.
+     *
+     * @param {Object} state — текущее состояние
+     * @param {Object} meta — метаданные сообщения
      */
     apply(state, meta) {
         if (!Array.isArray(state.characters_present)) {
             state.characters_present = [];
         }
 
-        if (!meta || !Array.isArray(meta.characters)) {
+        if (!meta || !Array.isArray(meta.characters_present)) {
             return;
         }
 
@@ -22,7 +32,7 @@ export class StateCharacters {
             return;
         }
 
-        // Убираем пустые имена и дубликаты, сохраняя исходный порядок.
+        // Убираем пустые имена и дубликаты, сохраняя исходный порядок
         state.characters_present = [
             ...new Set(
                 characters

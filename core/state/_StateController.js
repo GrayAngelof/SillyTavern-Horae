@@ -1,19 +1,28 @@
+// SillyTavern-Horae/core/state/_StateController.js
 /**
  * Контроллер агрегации состояния Horae.
+ *
  * Координирует обработку метаданных сообщений через специализированные подсистемы,
  * удаляет исключённых персонажей и назначает отсутствующие идентификаторы.
+ *
+ * Порядок применения подсистем соответствует порядку полей в createEmptyMeta():
+ * timestamp → scene → characters_present → costumes → items → events →
+ * affection → npcs → agenda → mood → relationships
  */
 
-import { StateItems } from './_StateItems.js';
-import { StateNpcs } from './_StateNpcs.js';
+// ===== ИМПОРТЫ =====
 import { StateAffection } from './_StateAffection.js';
-import { StateMood } from './_StateMood.js';
-import { StateScene } from './_StateScene.js';
-import { StateCostumes } from './_StateCostumes.js';
-import { StateTimestamp } from './_StateTimestamp.js';
-import { StateIds } from './_StateIds.js';
 import { StateAgenda } from './_StateAgenda.js';
 import { StateCharacters } from './_StateCharacters.js';
+import { StateCostumes } from './_StateCostumes.js';
+import { StateEvents } from './_StateEvents.js';
+import { StateIds } from './_StateIds.js';
+import { StateItems } from './_StateItems.js';
+import { StateMood } from './_StateMood.js';
+import { StateNpcs } from './_StateNpcs.js';
+import { StateRelationships } from './_StateRelationships.js';
+import { StateScene } from './_StateScene.js';
+import { StateTimestamp } from './_StateTimestamp.js';
 
 import {
     COUNTING_CLASSIFIERS,
@@ -21,73 +30,71 @@ import {
     getItemBaseName,
 } from './_itemUtils.js';
 
+
+// ===== КЛАСС =====
 export class StateController {
+    // ---- ЖИЗНЕННЫЙ ЦИКЛ ----
     constructor({
-    createEmptyMeta,
-    padItemId,
-}) {
-    this.createEmptyMeta = createEmptyMeta;
-
-    this.npcs = new StateNpcs();
-    this.affection = new StateAffection();
-    this.mood = new StateMood();
-    this.scene = new StateScene();
-    this.costumes = new StateCostumes();
-    this.timestamp = new StateTimestamp();
-    this.agenda = new StateAgenda();
-    this.characters = new StateCharacters();
-
-    this.items = new StateItems({
-        getItemBaseName,
-        findExistingItemByBaseName,
-        countingClassifiers: COUNTING_CLASSIFIERS,
-    });
-
-    this.ids = new StateIds({
+        createEmptyMeta,
         padItemId,
-    });
-}
+    }) {
+        this.createEmptyMeta = createEmptyMeta;
 
-    // Собирает итоговое состояние из метаданных сообщений чата.
+        // Порядок создания подсистем соответствует порядку полей в createEmptyMeta()
+        this.timestamp = new StateTimestamp();
+        this.scene = new StateScene();
+        this.characters = new StateCharacters();
+        this.costumes = new StateCostumes();
+        this.items = new StateItems({
+            getItemBaseName,
+            findExistingItemByBaseName,
+            countingClassifiers: COUNTING_CLASSIFIERS,
+        });
+        this.events = new StateEvents();
+        this.affection = new StateAffection();
+        this.npcs = new StateNpcs();
+        this.agenda = new StateAgenda();
+        this.mood = new StateMood();
+        this.relationships = new StateRelationships();
+        this.ids = new StateIds({
+            padItemId,
+        });
+    }
+
+    // ---- ПУБЛИЧНОЕ API ----
+    /**
+     * Собирает итоговое состояние из метаданных сообщений чата.
+     *
+     * @param {Array} chat — массив сообщений чата
+     * @param {number} skipLast — количество последних сообщений для пропуска
+     * @returns {Object} Итоговое состояние
+     */
     getLatestState(chat, skipLast = 0) {
         const state = this.createEmptyMeta();
         state._previousLocation = '';
         const end = Math.max(0, chat.length - skipLast);
-        
+
         for (let i = 0; i < end; i++) {
             const meta = chat[i].horae_meta;
             if (!meta) continue;
             if (meta._skipHorae) continue;
-            
-            // Применяем дату и время сюжета из метаданных текущего сообщения.
+
+            // Порядок применения соответствует порядку полей в createEmptyMeta()
             this.timestamp.apply(state, meta);
-            
-            // Применяем изменения сцены из метаданных текущего сообщения.
             this.scene.apply(state, meta);
-            
-            // Применяем изменения костюмов из метаданных текущего сообщения.
+            this.characters.apply(state, meta);
             this.costumes.apply(state, meta);
-            
-            // Применяем изменения предметов из метаданных текущего сообщения.
             this.items.apply(state, meta);
-            
-            // Применяем изменения показателей расположения персонажей.
+            this.events.apply(state, meta);
             this.affection.apply(state, meta);
-            
-            // Применяем изменения НПС из метаданных текущего сообщения.
             this.npcs.apply(state, meta);
-
-            // Применяем изменения настроения персонажей.
-            this.mood.apply(state, meta);
-
-            // Применяем изменения списка задач.
             this.agenda.apply(state, meta);
+            this.mood.apply(state, meta);
+            this.relationships.apply(state, meta);
         }
 
-        // Удаляем исключённых персонажей из итогового состояния.
+        // Постобработка: удаление исключённых персонажей и назначение ID
         this.npcs.removeDeleted(state, chat);
-
-        // Назначаем отсутствующие ID после завершения агрегации состояния.
         this.ids.assign(state);
 
         return state;

@@ -1,14 +1,22 @@
+// SillyTavern-Horae/core/state/_StateAgenda.js
 /**
- * Обрабатывает добавление, обновление и удаление задач
- * по метаданным одного сообщения.
- * Изменяет state.agenda, сохраняя существующий порядок задач
- * и правила сопоставления записей при удалении.
+ * Подсистема состояния: задачи (agenda).
+ *
+ * Применяет изменения задач из метаданных сообщений,
+ * сохраняя существующий порядок задач и правила сопоставления записей при удалении.
  */
+
+// ===== КЛАСС =====
 export class StateAgenda {
+    // ---- ПУБЛИЧНОЕ API ----
     /**
      * Применяет изменения задач из метаданных сообщения.
+     *
      * Сначала добавляет и обновляет задачи, затем удаляет
      * записи, соответствующие deletedAgenda.
+     *
+     * @param {Object} state — текущее состояние
+     * @param {Object} meta — метаданные сообщения
      */
     apply(state, meta) {
         if (!Array.isArray(state.agenda)) {
@@ -17,15 +25,14 @@ export class StateAgenda {
 
         if (!meta) return;
 
-        // Добавляем новые задачи и обновляем существующие.
+        // Добавляем новые задачи и обновляем существующие
         if (Array.isArray(meta.agenda)) {
             for (const item of meta.agenda) {
                 const text = String(item?.text || '').trim();
                 if (!text) continue;
 
                 const existingIndex = state.agenda.findIndex(
-                    (entry) =>
-                        String(entry?.text || '').trim() === text,
+                    (entry) => String(entry?.text || '').trim() === text,
                 );
 
                 if (existingIndex !== -1) {
@@ -36,7 +43,7 @@ export class StateAgenda {
             }
         }
 
-        // Удаляем задачи по точному или частичному совпадению текста.
+        // Удаляем задачи по точному или частичному совпадению текста
         if (Array.isArray(meta.deletedAgenda)) {
             for (const item of meta.deletedAgenda) {
                 const text = String(
@@ -46,9 +53,7 @@ export class StateAgenda {
                 if (!text) continue;
 
                 state.agenda = state.agenda.filter((entry) => {
-                    const existingText = String(
-                        entry?.text || '',
-                    ).trim();
+                    const existingText = String(entry?.text || '').trim();
 
                     return !(
                         existingText === text ||
