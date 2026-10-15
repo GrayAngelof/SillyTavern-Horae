@@ -8,7 +8,7 @@
  *
  * Состояние включает самостоятельные поля:
  * - timestamp     — внутриигровые дата и время (time)
- * - scene         — место и описание сцены (location, scene_desc, atmosphere)
+ * - scene         — место и описание сцены (location, atmosphere)
  * - characters    — персонажи, присутствующие в текущей сцене (characters)
  * - costumes      — костюмы персонажей (costume)
  * - items         — предметы, их владельцы и расположение (item)
