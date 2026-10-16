@@ -12,7 +12,7 @@
  * о состоянии чата и не реконструирует состояние самостоятельно.
  */
 
-export { createMessagePanelRenderer } from './summary/_SummaryPanelRenderer.js';
+export { createMessagePanelRenderer } from './summary/_SummaryDomRenderer.js';
 
 export {
     buildPanelContent,

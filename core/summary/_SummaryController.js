@@ -2,46 +2,48 @@
 /**
  * Контроллер подсистемы Summary.
  *
- * Координирует подготовку данных и формирование содержимого панели.
- * Получает данные состояния через _SummaryStateService.js
- * и передаёт их в _SummaryView.js для отображения.
+ * Координирует подготовку данных, формирование HTML
+ * и передачу разметки рендереру для отображения.
  *
- * Не содержит HTML-разметку и не реализует собственную логику
- * анализа истории сообщений.
+ * Не обращается к истории сообщений и не управляет DOM.
  *
  * Внутренний модуль. Внешний код должен обращаться к контроллеру
  * через публичный фасад core/summary.js.
  */
 
+// ===== ИМПОРТЫ =====
+import { renderMessagePanel } from './_SummaryDomRenderer.js';
+import { preparePanelData } from './_SummaryStateService.js';
+import { buildPanelHtml } from './_SummaryView.js';
 
-import {
-    preparePanelData as prepareSummaryData,
-} from './_SummaryStateService.js';
 
-import {
-    buildPanelContent,
-} from './_SummaryView.js';
-
+// ===== ПУБЛИЧНЫЕ ФУНКЦИИ =====
 /**
- * Подготавливает данные Summary из готовых снимков State.
+ * Координирует подготовку и отображение панели Summary.
  *
  * @param {Object} stateAtMessage — состояние текущего сообщения
  * @param {Object} previousState — состояние предыдущего сообщения
- * @returns {Object} Подготовленные данные для View
+ * @param {Object} options — параметры отображения панели
+ * @param {Element} options.messageEl — DOM-элемент сообщения
+ * @param {number} options.messageIndex — индекс сообщения
+ * @param {Object} options.rendererDependencies — зависимости DOM-рендерера
+ * @param {Object} options.settings — настройки отображения панели
+ * @param {Function} options.escapeHtml — функция экранирования HTML
+ * @param {Function} options.t — функция локализации
  */
-export function preparePanelData(stateAtMessage, previousState) {
-    return prepareSummaryData(stateAtMessage, previousState);
-}
+export function renderSummary(stateAtMessage, previousState, {
+    messageEl,
+    messageIndex,
+    rendererDependencies,
+    ...viewOptions
+}) {
+    const data = preparePanelData(stateAtMessage, previousState);
+    const panelHtml = buildPanelHtml(data, viewOptions);
 
-/**
- * Формирует HTML содержимого панели Summary.
- *
- * @param {Object} data — подготовленные данные для View
- * @param {Object} options — зависимости отображения
- * @param {Function} options.escapeHtml — экранирование HTML
- * @param {Function} options.t — локализация
- * @returns {string} HTML содержимого панели
- */
-export function renderPanelContent(data, { settings, escapeHtml, t }) {
-    return buildPanelContent(data, { settings, escapeHtml, t });
+    renderMessagePanel(
+        messageEl,
+        messageIndex,
+        panelHtml,
+        rendererDependencies,
+    );
 }
