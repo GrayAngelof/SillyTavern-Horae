@@ -1,4 +1,4 @@
-
+// SillyTavern-Horae/core/summary/_SummaryController.js
 /**
  * Контроллер подсистемы Summary.
  *
@@ -13,68 +13,86 @@
  * через публичный фасад core/summary.js.
  */
 
+// ===== ИМПОРТЫ =====
+import {
+    preparePanelData as prepareSummaryData,
+} from './_SummaryStateService.js';
 import { buildPanelContent } from './_SummaryView.js';
 
-import {
-    getPanelCostumeData,
-    getPanelItemData,
-    getPanelAffectionData,
-    getPanelAgendaData,
-    getPanelRelationships,
-} from './_SummaryStateService.js';
 
-// Подготавливает данные для отображения панели Summary.
+// ===== ПУБЛИЧНЫЕ ФУНКЦИИ =====
+/**
+ * Подготавливает данные для отображения панели Summary.
+ *
+ * Вычисляет снимок состояния на текущем сообщении и на предыдущем,
+ * затем передаёт их в сервис подготовки данных.
+ *
+ * @param {number} messageIndex — индекс сообщения в чате
+ * @param {Object} meta — метаданные сообщения
+ * @param {Object} deps — зависимости
+ * @param {Object} deps.horaeManager — менеджер чата
+ * @param {Object} deps.stateService — сервис состояния
+ * @param {Object} deps.settings — настройки расширения
+ * @returns {Object} Подготовленные данные для View
+ */
 export function preparePanelData(messageIndex, meta, {
     horaeManager,
+    stateService,
     settings,
 }) {
     const chat = horaeManager.getChat();
-    const skipLast = Math.max(0, chat.length - messageIndex - 1);
-    const stateAtMessage = horaeManager.getLatestState(skipLast);
 
-    const { costumeEntries } = getPanelCostumeData(
-        meta,
-        stateAtMessage
+    const skipLast = Math.max(
+        0,
+        chat.length - messageIndex - 1,
     );
 
-    const { itemsAtMessage } = getPanelItemData(
-        stateAtMessage
-    );
-    const agendaEntries = getPanelAgendaData(messageIndex, horaeManager);
-    const relationships = getPanelRelationships(meta, {
-        settings,
-        horaeManager,
-    });
-    const affectionEntries = getPanelAffectionData(
-        meta,
+    const stateAtMessage = stateService.getLatestState(
         chat,
-        messageIndex,
-        horaeManager,
-        stateAtMessage
+        skipLast,
     );
 
-    return {
-        costumeEntries,
-        itemsAtMessage,
-        affectionEntries,
-        agendaEntries,
-        relationships,
-    };
+    const previousState = messageIndex > 0
+        ? stateService.getLatestState(
+            chat,
+            chat.length - messageIndex,
+        )
+        : {};
+
+    return prepareSummaryData(
+        stateAtMessage,
+        previousState,
+        { settings },
+    );
 }
 
-// Подготавливает данные и формирует HTML содержимого панели Summary.
+/**
+ * Подготавливает данные и формирует HTML содержимого панели Summary.
+ *
+ * @param {number} messageIndex — индекс сообщения в чате
+ * @param {Object} meta — метаданные сообщения
+ * @param {Object} deps — зависимости
+ * @param {Object} deps.horaeManager — менеджер чата
+ * @param {Object} deps.stateService — сервис состояния
+ * @param {Object} deps.settings — настройки расширения
+ * @param {Function} deps.escapeHtml — функция экранирования HTML
+ * @param {Function} deps.t — функция локализации
+ * @returns {string} HTML-разметка содержимого панели
+ */
 export function renderPanelContent(messageIndex, meta, {
     horaeManager,
+    stateService,
     settings,
     escapeHtml,
     t,
 }) {
     const data = preparePanelData(messageIndex, meta, {
         horaeManager,
+        stateService,
         settings,
     });
 
-    return buildPanelContent(meta, data, {
+    return buildPanelContent(data, {
         settings,
         escapeHtml,
         t,

@@ -44,12 +44,16 @@ export class StateItems {
      * @param {Object} state — текущее состояние
      * @param {Object} meta — метаданные сообщения
      */
+
     apply(state, meta) {
+        state.deletedItems = [];
+
         if (meta.items) {
             this._applyItemsUpdates(state, meta.items);
         }
 
-        if (meta.deletedItems && meta.deletedItems.length > 0) {
+        if (meta.deletedItems?.length > 0) {
+            state.deletedItems = [...meta.deletedItems];
             this._applyItemsDeletions(state, meta.deletedItems);
         }
     }

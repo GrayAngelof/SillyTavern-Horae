@@ -1,209 +1,151 @@
+// SillyTavern-Horae/core/summary/_SummaryStateService.js
 /**
- * Сервис состояния подсистемы Summary.
+ * Сервис подготовки данных подсистемы Summary.
  *
- * Отвечает за получение и подготовку данных, необходимых для отображения
- * сводки, включая вычисляемые значения на основе истории сообщений
- * и получение связанных данных из horaeManager.
+ * Преобразует готовые снимки State в данные, необходимые представлению.
+ * Не восстанавливает историю сообщений, не обращается к horaeManager,
+ * не фильтрует поля по настройкам и не формирует HTML.
  *
- * Может содержать логику обработки состояния и кэширования результатов.
- * Не отвечает за формирование HTML-разметки и управление жизненным циклом
- * элементов интерфейса.
- *
- * Внутренний модуль. Внешний код должен обращаться к его функциям
+ * Внутренний модуль. Внешний код должен обращаться к сервису
  * через публичный фасад core/summary.js.
  */
 
+// ===== ВНУТРЕННИЕ ФУНКЦИИ =====
 /**
- * Возвращает предыдущие и текущие накопленные значения симпатии
- * через общий механизм восстановления состояния Horae.
+ * Находит ключ в словаре без учёта регистра и крайних пробелов.
+ *
+ * @param {string} name — искомое имя
+ * @param {Object} values — словарь для поиска
+ * @returns {string|undefined} Найденный ключ или undefined
  */
-export function getAffectionTotals(
-    chat,
-    messageIndex,
-    horaeManager,
-    stateAtMessage
-) {
-    const prevSkipLast = chat.length - messageIndex;
+function findKey(name, values) {
+    if (Object.prototype.hasOwnProperty.call(values, name)) {
+        return name;
+    }
 
-    const prevState = messageIndex > 0
-        ? horaeManager.getLatestState(prevSkipLast).affection || {}
-        : {};
+    const normalized = String(name).trim().toLowerCase();
 
-    const currentState = stateAtMessage.affection || {};
-
-    return {
-        prevTotals: prevState,
-        currentTotals: currentState,
-    };
-}
-
-// Возвращает социальные отношения персонажей текущей сцены.
-export function getPanelRelationships(meta, { settings, horaeManager }) {
-    if (!settings.sendRelationships) return [];
-    const presentChars = meta.characters_present || [];
-    return horaeManager.getRelationshipsForCharacters(presentChars);
-}
-
-// Подготавливает данные о костюмах для панели Summary на выбранном сообщении.
-export function getPanelCostumeData(meta, stateAtMessage) {
-    const presentChars = meta.characters_present || [];
-    const allCostumes = stateAtMessage.costumes || {};
-
-    const findCostume = (name) => {
-        if (allCostumes[name]) return allCostumes[name];
-
-        const normalized = name.trim().toLowerCase();
-        const match = Object.entries(allCostumes).find(
-            ([char]) => char.trim().toLowerCase() === normalized
-        );
-
-        return match?.[1] || '';
-    };
-
-    const costumeEntries = presentChars.length > 0
-        ? presentChars.map(char => [char, findCostume(char)])
-        : Object.entries(meta.costumes || {});
-
-    return { costumeEntries };
-}
-
-// Подготавливает данные о предметах для панели Summary на выбранном сообщении.
-export function getPanelItemData(stateAtMessage) {
-    return {
-        itemsAtMessage: stateAtMessage.items || {},
-    };
-}
-
-// Подготавливает данные симпатии персонажей для панели Summary на выбранном сообщении.
-export function getPanelAffectionData(
-    meta,
-    chat,
-    messageIndex,
-    horaeManager,
-    stateAtMessage
-) {
-    const { prevTotals, currentTotals } = getAffectionTotals(
-        chat,
-        messageIndex,
-        horaeManager,
-        stateAtMessage
+    return Object.keys(values).find(
+        key => String(key).trim().toLowerCase() === normalized,
     );
-    const presentChars = meta.characters_present || [];
-    const affectionKeys = [...new Set([
-        ...presentChars,
-        ...Object.keys(meta.affection || {}),
-    ])];
-    const findAffectionKey = (name, values) => {
-        if (Object.prototype.hasOwnProperty.call(values, name)) return name;
-        const normalized = name.trim().toLowerCase();
-        return Object.keys(values).find(
-            key => key.trim().toLowerCase() === normalized
-        );
-    };
-    const entries = affectionKeys.map(char => {
-        const key = findAffectionKey(char, {
-            ...prevTotals,
-            ...currentTotals,
-            ...(meta.affection || {}),
-        }) || char;
-        
-        const hasTotal = Object.prototype.hasOwnProperty.call(currentTotals, key);
-        const prevVal = prevTotals[key] || 0;
-        let delta = 0;
-        let newTotal = 0;
-        let hasDelta = false;
+}
 
-        if (hasTotal) {
-            newTotal = currentTotals[key];
-            delta = newTotal - prevVal;
-            hasDelta = Object.prototype.hasOwnProperty.call(meta.affection || {}, key);
-        }
+/**
+ * Преобразует костюмы в пары [имя персонажа, костюм].
+ *
+ * @param {Array} characters — список имён персонажей
+ * @param {Object} costumes — словарь костюмов
+ * @returns {Array} Массив пар [имя, костюм]
+ */
+function prepareCostumeEntries(characters, costumes) {
+    const entries = Object.entries(costumes);
 
-        delta = Math.round(delta * 100) / 100;
-        newTotal = Math.round(newTotal * 100) / 100;
+    if (characters.length === 0) {
+        return entries;
+    }
 
-        let deltaStr = '';
-        let totalStr = '';
+    return characters.map(char => {
+        const key = findKey(char, costumes);
+        return [char, key !== undefined ? costumes[key] : ''];
+    });
+}
 
-        if (hasDelta) {
-            deltaStr = delta >= 0 ? `+${delta}` : `${delta}`;
-            totalStr = `${newTotal}`;
-        } else if (hasTotal) {
-            totalStr = `${newTotal}`;
-            deltaStr = '+0';
-        }
+/**
+ * Преобразует настроения в пары [имя персонажа, настроение].
+ *
+ * @param {Object} mood — словарь настроений
+ * @returns {Array} Массив пар [имя, настроение]
+ */
+function prepareMoodEntries(mood) {
+    return Object.entries(mood);
+}
+
+/**
+ * Подготавливает значения симпатии для редактора.
+ */
+
+
+function prepareAffectionEntries(characters, currentTotals, previousTotals) {
+    return characters.map(char => {
+        const currentKey = findKey(char, currentTotals);
+        const previousKey = findKey(char, previousTotals);
+
+        const hasCurrent = currentKey !== undefined;
+        const currentVal = hasCurrent
+            ? currentTotals[currentKey] ?? 0
+            : 0;
+
+        const prevVal = previousKey !== undefined
+            ? previousTotals[previousKey] ?? 0
+            : 0;
+
+        const delta = Math.round((currentVal - prevVal) * 100) / 100;
+        const total = Math.round(currentVal * 100) / 100;
+
         return {
             char,
             prevVal,
-            deltaStr,
-            totalStr,
+            deltaStr: hasCurrent
+                ? delta >= 0 ? `+${delta}` : `${delta}`
+                : '',
+            totalStr: hasCurrent ? `${total}` : '',
         };
     });
-    return entries;
 }
 
+
+// ===== ПУБЛИЧНЫЕ ФУНКЦИИ =====
 /**
- * Восстанавливает активную повестку по истории до выбранного сообщения.
- * Учитывает добавленные и удалённые задачи из сохранённых метаданных
- * и разобранных тегов Horae, включая резервное извлечение удалений
- * непосредственно из текста сообщений.
+ * Подготавливает данные всех полей панели Summary.
+ *
+ * @param {Object} stateAtMessage — актуальный снимок состояния
+ * @param {Object} previousState — предыдущий снимок состояния
+ * @param {Object} dependencies — зарезервированные внешние зависимости
+ * @returns {Object} Данные для _SummaryView.js
  */
-export function getPanelAgendaData(messageIndex, horaeManager) {
-    const chat = horaeManager.getChat();
-    const active = new Map();
-    for (let i = 0; i <= messageIndex && i < chat.length; i++) {
-        const message = chat[i];
-        const rawText = message?.mes || '';
-        const storedMeta = message?.horae_meta;
-        const parsedMeta = horaeManager.parseHoraeTag(rawText);
+export function preparePanelData(
+    stateAtMessage,
+    previousState,
+    dependencies,
+) {
+    const state = stateAtMessage ?? {};
+    const previous = previousState ?? {};
 
-        // Сначала учитываем задачи, добавленные на этом ходу.
-        const added = [
-            ...(Array.isArray(storedMeta?.agenda) ? storedMeta.agenda : []),
-            ...(Array.isArray(parsedMeta?.agenda) ? parsedMeta.agenda : []),
-        ];
-        for (const item of added) {
-            const text = String(item?.text || '').trim();
-            if (text) {
-                active.set(text, item);
-            }
-        }
+    const timestampValue = state.timestamp ?? {};
+    const scene = state.scene ?? {};
+    const characters = Array.isArray(state.characters_present)
+        ? state.characters_present
+        : [];
 
-        // Затем удаляем задачи по данным deletedAgenda.
-        const removed = [
-            ...(Array.isArray(storedMeta?.deletedAgenda)
-                ? storedMeta.deletedAgenda
-                : []),
-            ...(Array.isArray(parsedMeta?.deletedAgenda)
-                ? parsedMeta.deletedAgenda
-                : []),
-        ];
+    const costumes = state.costumes ?? {};
+    const itemsAtMessage = state.items ?? {};
+    const currentAffection = state.affection ?? {};
+    const previousAffection = previous.affection ?? {};
+    const mood = state.mood ?? {};
 
-        for (const item of removed) {
-            const text = String(
-                typeof item === 'string' ? item : item?.text || ''
-            ).trim();
-            if (!text) continue;
+    return {
+        timestampValue,
+        locationValue: scene.location ?? '',
+        atmosphereValue: scene.atmosphere ?? '',
+        charactersValue: characters.join(', '),
 
-            // Допускаем небольшие различия в формулировках.
-            for (const [key, value] of active.entries()) {
-                const existingText = String(value?.text || key).trim();
-                if (
-                    existingText === text ||
-                    existingText.includes(text) ||
-                    text.includes(existingText)
-                ) {
-                    active.delete(key);
-                }
-            }
-        }
+        costumeEntries: prepareCostumeEntries(
+            characters,
+            costumes,
+        ),
 
-        // Резервное извлечение удалений непосредственно из текста.
-        const removalRegex = /(?:^|\n)\s*\*\*\*agenda-\s*:\s*(.+?)\*\*\*(?=\n|$)/g;
-        for (const match of rawText.matchAll(removalRegex)) {
-            const text = match[1].trim().replace(/\*\*\*/g, '');
-            if (text) active.delete(text);
-        }
-    }
-    return [...active.values()];
+        itemsAtMessage,
+        deletedItems: state.deletedItems ?? [],
+
+        affectionEntries: prepareAffectionEntries(
+            characters,
+            currentAffection,
+            previousAffection,
+        ),
+
+        relationships: state.relationships ?? [],
+        agendaEntries: state.agenda ?? [],
+        moodEntries: prepareMoodEntries(mood),
+        events: state.events ?? [],
+    };
 }

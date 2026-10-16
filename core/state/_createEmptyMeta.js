@@ -31,10 +31,8 @@ export function createEmptyMeta() {
         costumes: {},
         // Предметы
         items: {},
-        // Удалённые предметы (для аудита)
+        // Удалённые предметы
         deletedItems: [],
-        // Удалённые записи повестки (для аудита)
-        deletedAgenda: [],
         // События
         events: [],
         // Привязанности
@@ -43,6 +41,8 @@ export function createEmptyMeta() {
         npcs: {},
         // Повестка (agenda)
         agenda: [],
+        // Удалённые записи повестки (для аудита)
+        deletedAgenda: [],
         // Настроение
         mood: {},
         // Отношения между персонажами
