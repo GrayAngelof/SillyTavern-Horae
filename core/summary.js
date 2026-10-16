@@ -1,26 +1,23 @@
 /**
  * Фасад подсистемы Summary.
  *
- * Предоставляет публичный интерфейс для создания и отображения
- * сводной информации о состоянии чата в панелях сообщений.
- *
- * Создание и оформление панели делегируются SummaryPanelRenderer.
- * Подготовка данных делегируется SummaryController.
- * Формирование HTML делегируется SummaryView.
- *
- * Summary использует State как единственный источник истины
- * о состоянии чата и не реконструирует состояние самостоятельно.
+ * Предоставляет публичный интерфейс отображения панели Summary.
+ * Внутренняя подготовка данных, построение HTML и работа с DOM
+ * делегируются соответствующим модулям подсистемы.
  */
 
-export { createMessagePanelRenderer } from './summary/_SummaryDomRenderer.js';
+import { renderSummary as _renderSummary } from './summary/_SummaryController.js';
 
-export {
-    buildPanelContent,
-    buildDeletedItemsDisplay,
-    buildAgendaEditorRows,
-    buildPanelMoodEditable,
-    buildPanelRelationships,
-} from './summary/_SummaryView.js';
+/**
+ * Отображает панель Summary для сообщения.
+ *
+ * @param {Object} stateAtMessage — состояние текущего сообщения
+ * @param {Object} previousState — предыдущее состояние
+ * @param {Object} options — параметры отображения панели
+ */
+export function renderSummary(stateAtMessage, previousState, options) {
+    return _renderSummary(stateAtMessage, previousState, options);
+}
 
 
 // TODO!!! НЕ ПОТЕРЯТЬ ФУНКЦИОНАЛ ПРИ ПЕРЕРАБОТКЕ ОТОБРАЖЕНИЯ SUMMARY!!!
