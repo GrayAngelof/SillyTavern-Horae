@@ -29,12 +29,26 @@ import { renderPanelContentHtml } from './_SummaryView/PanelContentHtml.js';
 import { renderPanelRelationships } from './_SummaryView/RelationshipsHtml.js';
 import { renderPanelTimestamp } from './_SummaryView/TimestampHtml.js';
 
+
 // ===== ПУБЛИЧНЫЕ ФУНКЦИИ =====
 /**
  * Формирует полный HTML панели Summary.
  *
+ * Собирает содержимое панели из готовых HTML-блоков
+ * и оборачивает его в оболочку панели сообщения.
+ *
  * @param {Object} data — подготовленные данные для View
  * @param {Object} options — параметры панели и зависимости отображения
+ * @param {number} options.messageIndex — индекс сообщения
+ * @param {boolean} options.isSkipped — пропущено ли сообщение
+ * @param {string} options.layoutClass — CSS-класс раскладки
+ * @param {string} options.dataLevel — уровень события
+ * @param {string} options.time — время
+ * @param {string} options.eventSummary — описание события
+ * @param {number} options.charCount — количество персонажей
+ * @param {string} options.sideplayBtnStyle — стиль кнопки sideplay
+ * @param {Function} options.escapeHtml — функция экранирования HTML
+ * @param {Function} options.t — функция локализации
  * @returns {string} Полный HTML панели
  */
 export function buildPanelHtml(data, {
@@ -54,7 +68,7 @@ export function buildPanelHtml(data, {
         t,
     });
 
-    return _buildMessagePanelHtml({
+    return renderMessagePanelHtml({
         messageIndex,
         isSkipped,
         layoutClass,
@@ -68,12 +82,13 @@ export function buildPanelHtml(data, {
     });
 }
 
+
+// ===== ВНУТРЕННИЕ ФУНКЦИИ =====
 /**
  * Формирует содержимое панели Summary из готовых HTML-блоков.
  *
  * @param {Object} data — данные панели
  * @param {Object} deps — зависимости
- * @param {Object} deps.settings — настройки расширения (зарезервировано, пока не подключено)
  * @param {Function} deps.escapeHtml — функция экранирования HTML
  * @param {Function} deps.t — функция локализации
  * @returns {string} HTML-разметка содержимого панели
@@ -151,50 +166,6 @@ function _buildPanelContent(data, {
         affectionHtml,
         agendaHtml,
         relationshipsHtml,
-        t,
-    });
-}
-
-
-/**
- * Формирует HTML оболочки панели Summary для сообщения чата.
- *
- * @param {Object} params — параметры панели
- * @param {number} params.messageIndex — индекс сообщения
- * @param {boolean} params.isSkipped — пропущено ли сообщение
- * @param {string} params.layoutClass — CSS-класс раскладки
- * @param {string} params.dataLevel — уровень события
- * @param {string} params.time — время
- * @param {string} params.eventSummary — описание события
- * @param {number} params.charCount — количество персонажей
- * @param {string} params.sideplayBtnStyle — стиль кнопки sideplay
- * @param {Object} params.settings — настройки расширения (зарезервировано, пока не подключено)
- * @param {string} params.contentHtml — готовый HTML-контент
- * @param {Function} params.t — функция локализации
- * @returns {string} HTML-разметка панели сообщения
- */
-function _buildMessagePanelHtml({
-    messageIndex,
-    isSkipped,
-    layoutClass,
-    dataLevel,
-    time,
-    eventSummary,
-    charCount,
-    sideplayBtnStyle,
-    contentHtml = '',
-    t,
-}) {
-    return renderMessagePanelHtml({
-        messageIndex,
-        isSkipped,
-        layoutClass,
-        dataLevel,
-        time,
-        eventSummary,
-        charCount,
-        sideplayBtnStyle,
-        contentHtml,
         t,
     });
 }

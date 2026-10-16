@@ -38,7 +38,10 @@ export function renderSummary(stateAtMessage, previousState, {
     ...viewOptions
 }) {
     const data = preparePanelData(stateAtMessage, previousState);
-    const panelHtml = buildPanelHtml(data, viewOptions);
+    const panelHtml = buildPanelHtml(data, {
+        messageIndex,
+        ...viewOptions,
+    });
 
     renderMessagePanel(
         messageEl,
