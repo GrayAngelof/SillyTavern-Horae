@@ -10,6 +10,62 @@
  * через публичный фасад core/summary.js.
  */
 
+// ===== ПУБЛИЧНЫЕ ФУНКЦИИ =====
+/**
+ * Подготавливает данные всех полей панели Summary.
+ *
+ * @param {Object} stateAtMessage — актуальный снимок состояния
+ * @param {Object} previousState — предыдущий снимок состояния
+ * @param {Object} dependencies — зарезервированные внешние зависимости
+ * @returns {Object} Данные для _SummaryView.js
+ */
+export function preparePanelData(
+    stateAtMessage,
+    previousState,
+    dependencies,
+) {
+    const state = stateAtMessage ?? {};
+    const previous = previousState ?? {};
+
+    const timestampValue = state.timestamp ?? {};
+    const scene = state.scene ?? {};
+    const characters = Array.isArray(state.characters_present)
+        ? state.characters_present
+        : [];
+
+    const costumes = state.costumes ?? {};
+    const itemsAtMessage = state.items ?? {};
+    const currentAffection = state.affection ?? {};
+    const previousAffection = previous.affection ?? {};
+    const mood = state.mood ?? {};
+
+    return {
+        timestampValue,
+        locationValue: scene.location ?? '',
+        atmosphereValue: scene.atmosphere ?? '',
+        charactersValue: characters.join(', '),
+
+        costumeEntries: prepareCostumeEntries(
+            characters,
+            costumes,
+        ),
+
+        itemsAtMessage,
+        deletedItems: state.deletedItems ?? [],
+
+        affectionEntries: prepareAffectionEntries(
+            characters,
+            currentAffection,
+            previousAffection,
+        ),
+
+        relationships: state.relationships ?? [],
+        agendaEntries: state.agenda ?? [],
+        moodEntries: prepareMoodEntries(mood),
+        events: state.events ?? [],
+    };
+}
+
 // ===== ВНУТРЕННИЕ ФУНКЦИИ =====
 /**
  * Находит ключ в словаре без учёта регистра и крайних пробелов.
@@ -91,61 +147,4 @@ function prepareAffectionEntries(characters, currentTotals, previousTotals) {
             totalStr: hasCurrent ? `${total}` : '',
         };
     });
-}
-
-
-// ===== ПУБЛИЧНЫЕ ФУНКЦИИ =====
-/**
- * Подготавливает данные всех полей панели Summary.
- *
- * @param {Object} stateAtMessage — актуальный снимок состояния
- * @param {Object} previousState — предыдущий снимок состояния
- * @param {Object} dependencies — зарезервированные внешние зависимости
- * @returns {Object} Данные для _SummaryView.js
- */
-export function preparePanelData(
-    stateAtMessage,
-    previousState,
-    dependencies,
-) {
-    const state = stateAtMessage ?? {};
-    const previous = previousState ?? {};
-
-    const timestampValue = state.timestamp ?? {};
-    const scene = state.scene ?? {};
-    const characters = Array.isArray(state.characters_present)
-        ? state.characters_present
-        : [];
-
-    const costumes = state.costumes ?? {};
-    const itemsAtMessage = state.items ?? {};
-    const currentAffection = state.affection ?? {};
-    const previousAffection = previous.affection ?? {};
-    const mood = state.mood ?? {};
-
-    return {
-        timestampValue,
-        locationValue: scene.location ?? '',
-        atmosphereValue: scene.atmosphere ?? '',
-        charactersValue: characters.join(', '),
-
-        costumeEntries: prepareCostumeEntries(
-            characters,
-            costumes,
-        ),
-
-        itemsAtMessage,
-        deletedItems: state.deletedItems ?? [],
-
-        affectionEntries: prepareAffectionEntries(
-            characters,
-            currentAffection,
-            previousAffection,
-        ),
-
-        relationships: state.relationships ?? [],
-        agendaEntries: state.agenda ?? [],
-        moodEntries: prepareMoodEntries(mood),
-        events: state.events ?? [],
-    };
 }

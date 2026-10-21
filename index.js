@@ -18,9 +18,10 @@ import { initPromptDefaults, ensurePromptDefaults, ensurePresetPrompts, getPromp
 
 import { createEmptyMeta } from './core/state/_createEmptyMeta.js';
 import { getItemBaseName } from './core/state/_itemUtils.js';
-import { renderSummary } from './core/summary.js';
+
+//import { renderSummary } from './core/summary.js';
 //import { createMessagePanelRenderer } from './core/summary.js';
-//import { buildSummary } from './core/summary.js';
+import { buildSummary } from './core/summary.js';
 
 // ============================================
 // 常量定义
@@ -11747,20 +11748,91 @@ function openThemeDesigner() {
 }
 
 /**
- * Добавить панель метаданных для сообщений
+ * Добавить панель метаданных для сообщения.
+ *
+ * Подготавливает снимки State и параметры оболочки,
+ * затем передаёт рендеринг подсистеме Summary.
  */
-const addMessagePanel = createMessagePanelRenderer({
-    horaeManager,
-    getSettings: () => settings,
-    parseStoryDate,
-    formatStoryDate,
-    t,
-    escapeHtml,
-    bindPanelEvents,
-    isLightMode,
-    renderRpgHud,
-    refreshHoraePorts,
-});
+function addMessagePanel(messageEl, messageIndex) {
+    try {
+        if (!messageEl || messageEl.querySelector('.horae-message-panel')) {
+            return;
+        }
+
+        const chat = horaeManager.getChat();
+        const meta = horaeManager.getMessageMeta(messageIndex);
+
+        if (!chat?.[messageIndex] || !meta) {
+            return;
+        }
+
+        const skipLast = chat.length - messageIndex - 1;
+        const stateAtMessage = horaeManager.getLatestState(skipLast);
+        const previousState = messageIndex > 0
+            ? horaeManager.getLatestState(skipLast + 1)
+            : null;
+
+        const events = meta.events || (meta.event ? [meta.event] : []);
+        const firstLevel = (events.find(e => e?.level)?.level || '').trim();
+
+        const levelMap = {
+            '一般': 'normal',
+            '重要': 'important',
+            '关键': 'critical',
+            '關鍵': 'critical',
+        };
+
+        const layoutMap = {
+            glass: ' horae-layout-glass',
+            obsidian: ' horae-layout-obsidian',
+            cyber: ' horae-layout-cyber',
+        };
+
+        let time = '--';
+        if (meta.timestamp?.story_date) {
+            const parsed = parseStoryDate(meta.timestamp.story_date);
+
+            time = parsed?.type === 'standard'
+                ? formatStoryDate(parsed, true)
+                : meta.timestamp.story_date;
+
+            if (meta.timestamp.story_time) {
+                time += ` ${meta.timestamp.story_time}`;
+            }
+        }
+
+        buildSummary(stateAtMessage, previousState, {
+            messageEl,
+            messageIndex,
+
+            rendererDependencies: {
+                getSettings: () => settings,
+                bindPanelEvents,
+                isLightMode,
+                renderRpgHud,
+                refreshHoraePorts,
+            },
+
+            isSkipped: !!meta._skipHorae,
+            layoutClass: layoutMap[settings.panelLayoutStyle] || '',
+            dataLevel: levelMap[firstLevel] || (firstLevel ? 'normal' : ''),
+            time,
+            eventSummary: events.length > 0
+                ? events.map(event => event.summary).join(' | ')
+                : t('ui.noSpecialEvents'),
+            charCount: meta.scene?.characters_present?.length || 0,
+            sideplayBtnStyle: settings.sideplayMode ? '' : 'display:none;',
+
+            escapeHtml,
+            t,
+        });
+    } catch (err) {
+        console.error(
+            `[Horae] 添加消息面板失败 #${messageIndex}:`,
+            err,
+        );
+    }
+}
 
 
 
