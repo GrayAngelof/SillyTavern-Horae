@@ -1,26 +1,37 @@
+// SillyTavern-Horae/core/summary.js
 /**
  * Фасад подсистемы Summary.
  *
- * Предоставляет публичный интерфейс отображения панели Summary.
+ * Предоставляет публичный интерфейс построения панели Summary.
  * Внутренняя подготовка данных, построение HTML и работа с DOM
  * делегируются соответствующим модулям подсистемы.
+ *
+ * TECHNICAL DEBT:
+ *     - Восстановить перенос функциональности CSS-классов, сводки событий
+ *       и режима sideplay после переработки отображения Summary
+ *       (см. закомментированный блок ниже)
  */
 
-import { renderSummary as _renderSummary } from './summary/_SummaryController.js';
+// ===== ИМПОРТЫ =====
+import { renderSummary } from './summary/_SummaryController.js';
 
+
+// ===== ПУБЛИЧНЫЕ ФУНКЦИИ =====
 /**
- * Отображает панель Summary для сообщения.
+ * Строит и отображает Summary для сообщения.
  *
  * @param {Object} stateAtMessage — состояние текущего сообщения
  * @param {Object} previousState — предыдущее состояние
- * @param {Object} options — параметры отображения панели
+ * @param {Object} options — параметры построения Summary
+ * @returns {*} Результат DOM-рендеринга
  */
-export function renderSummary(stateAtMessage, previousState, options) {
-    return _renderSummary(stateAtMessage, previousState, options);
+export function buildSummary(stateAtMessage, previousState, options) {
+    return renderSummary(stateAtMessage, previousState, options);
 }
 
 
-// TODO!!! НЕ ПОТЕРЯТЬ ФУНКЦИОНАЛ ПРИ ПЕРЕРАБОТКЕ ОТОБРАЖЕНИЯ SUMMARY!!!
+// ===== ЗАРЕЗЕРВИРОВАННЫЙ КОД (технический долг) =====
+// TODO: НЕ ПОТЕРЯТЬ ФУНКЦИОНАЛ ПРИ ПЕРЕРАБОТКЕ ОТОБРАЖЕНИЯ SUMMARY!
 //
 // После завершения переработки отображения Summary обязательно
 // восстановить и перенести функциональность:

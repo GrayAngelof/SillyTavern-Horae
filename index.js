@@ -18,13 +18,9 @@ import { initPromptDefaults, ensurePromptDefaults, ensurePresetPrompts, getPromp
 
 import { createEmptyMeta } from './core/state/_createEmptyMeta.js';
 import { getItemBaseName } from './core/state/_itemUtils.js';
-import {
-    createMessagePanelRenderer,
-    buildDeletedItemsDisplay,
-    buildAgendaEditorRows,
-    buildPanelRelationships,
-    buildPanelMoodEditable,
-} from './core/summary.js';
+import { renderSummary } from './core/summary.js';
+//import { createMessagePanelRenderer } from './core/summary.js';
+//import { buildSummary } from './core/summary.js';
 
 // ============================================
 // 常量定义
